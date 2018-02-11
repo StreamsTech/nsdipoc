@@ -1239,3 +1239,22 @@ class LayerAttributeApi(ModelResource):
 
     def dehydrate_date_created(self, bundle):
         return bundle.obj.date_created.strftime('%b %d %Y  %H:%M:%S ')
+
+
+class LayerAttributeApiPublic(ModelResource):
+    """
+    in this public api user will send layer id
+    and it returns permitted attributes
+    no authentications needed for this api
+    """
+    class Meta:
+        queryset = Attribute.objects.all()
+        resource_name = 'layer-attributes-public'
+        allowed_method = 'get'
+        fields = ['attribute', 'attribute_type', 'id']
+
+    def get_object_list(self, request):
+        layer_id = request.GET.get('layer_id')
+        layer = Layer.objects.get(id=layer_id)
+        return Attribute.objects.filter(layer=layer, is_permitted=True)
+
