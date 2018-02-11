@@ -573,6 +573,10 @@ class SectiontmentList(ListView):
     template_name = 'section_list.html'
     model = SectionModel
 
+    def get_form(self):
+        form = SectionForm(self.request.user)
+        return form
+
     def get_queryset(self):
         return SectionModel.objects.all()
 
