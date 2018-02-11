@@ -554,7 +554,7 @@ class LayerUpload(TypeFilteredResource):
                     # Moved this inside the try/except block because it can raise
                     # exceptions when unicode characters are present.
                     # This should be followed up in upstream Django.
-                    tempdir, base_file, file_type = form.write_files()
+                    tempdir, base_file = form.write_files()
                     saved_layer = file_upload(
                         base_file,
                         name=name,
@@ -569,8 +569,8 @@ class LayerUpload(TypeFilteredResource):
                         title=form.cleaned_data["layer_title"],
                         metadata_uploaded_preserve=form.cleaned_data["metadata_uploaded_preserve"]
                     )
-                    file = form.cleaned_data['base_file']
-                    saved_layer.file_size = file.size
+                    file_size, file_type = form.get_type_and_size()
+                    saved_layer.file_size = file_size
                     saved_layer.file_type = file_type
                     saved_layer.save()
                 except Exception as e:
