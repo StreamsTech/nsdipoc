@@ -313,6 +313,10 @@ def layer_upload(request, template='upload/layer_upload.html'):
                     metadata_uploaded_preserve=form.cleaned_data["metadata_uploaded_preserve"],
                     user_data_epsg=epsg_code
                 )
+                file = form.cleaned_data['base_file']
+                saved_layer.file_size = file.size
+                saved_layer.file_type = file_type
+                saved_layer.save()
                 if admin_upload:
                     saved_layer.status = 'ACTIVE'
                     saved_layer.save()
@@ -861,6 +865,10 @@ def layer_replace(request, layername, template='layers/layer_replace.html'):
                         overwrite=True,
                         charset=form.cleaned_data["charset"],
                     )
+                    file = form.cleaned_data['base_file']
+                    saved_layer.file_size = file.size
+                    saved_layer.file_type = file_type
+                    saved_layer.save()
                     out['success'] = True
                     out['url'] = reverse(
                         'layer_detail', args=[
