@@ -102,6 +102,10 @@ class Layer(ResourceBase):
     name = models.CharField(max_length=128)
     typename = models.CharField(max_length=128, null=True, blank=True)
 
+    download_count = models.IntegerField(null=True, blank=True, default=0)
+    file_size = models.CharField(null=True, blank=True, max_length=300)
+    file_type = models.CharField(max_length=200, blank=True, null=True)
+
     is_mosaic = models.BooleanField(default=False)
     has_time = models.BooleanField(default=False)
     has_elevation = models.BooleanField(default=False)
@@ -117,6 +121,8 @@ class Layer(ResourceBase):
     styles = models.ManyToManyField(Style, related_name='layer_styles')
 
     charset = models.CharField(max_length=255, default='UTF-8')
+    current_version = models.IntegerField(blank=True, null=True)
+    latest_version = models.IntegerField(blank=True, null=True)
 
     upload_session = models.ForeignKey('UploadSession', blank=True, null=True)
 
@@ -431,6 +437,8 @@ class Attribute(models.Model):
         default=datetime.now,
         help_text=_('date when attribute statistics were last updated'))  # passing the method itself, not
 
+    is_permitted = models.NullBooleanField(_('is permitted'), null=True, default=False,
+                                           help_text=_('if true, permitted groups will see this attribute'))
     objects = AttributeManager()
 
     def __str__(self):
@@ -670,6 +678,15 @@ class StyleExtension(models.Model):
     class Meta:
         pass
 #end
+
+
+class LayerVersionModel(models.Model):
+    layer = models.ForeignKey(Layer, blank=True, null=True)
+    version = models.IntegerField(blank=True, null=True)
+    version_path = models.CharField(blank=True, null=True, max_length=500)
+    version_name = models.CharField(max_length=400, blank=True, null=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
 
 
 signals.pre_save.connect(pre_save_layer, sender=Layer)
