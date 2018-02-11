@@ -29,7 +29,7 @@ from .api import TagResource, TopicCategoryResource, ProfileResource, \
 from .resourcebase_api import LayerResource, MapResource, DocumentResource, \
     ResourceBaseResource, FeaturedResourceBaseResource, LayerResourceWithFavorite, MapResourceWithFavorite, \
     DocumentResourceWithFavorite, GroupsResourceWithFavorite, GroupActivity, WorkSpaceLayerApi, WorkSpaceDocumentApi, \
-    WorkSpaceMapApi, LayerAttributeApi
+    WorkSpaceMapApi, LayerAttributeApi, AttributeApi
 
 
 
@@ -93,3 +93,5 @@ api.register(AccessTokenApi())
 api.register(LayerDownloadCountApi())
 api.register(LayerPermissionPreviewApi())
 api.register(LayerAttributeApi())
+
+api.register(AttributeApi())
