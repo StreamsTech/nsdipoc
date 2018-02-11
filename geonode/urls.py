@@ -94,6 +94,9 @@ urlpatterns = patterns('',
                        (r'^workspace/', include('geonode.workspace.urls')),
                        #end
 
+                       # nsdi views
+                       url(r'^nsdi/', include('geonode.nsdi.urls')),
+
 
 
                        # Catalogue views

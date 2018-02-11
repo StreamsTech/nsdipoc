@@ -282,6 +282,7 @@ GEONODE_APPS = (
     'geonode.dashboard',
     'geonode.cms',
     'geonode.workspace',
+    'geonode.nsdi',
 
     'rest_framework',
     'rest_framework_gis',

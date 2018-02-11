@@ -22,6 +22,7 @@ from django.conf.urls import patterns, url
 from django.views.generic import TemplateView
 
 from .views import GroupDetailView, GroupActivityView, AnswerUpdate, UserInvitationListView, UserInvitationDeleteView
+from .views import SectionCreate, SectiontmentList, SectionUpdate, SectionDelete
 urlpatterns = patterns('geonode.groups.views',
                        url(r'^$', TemplateView.as_view(template_name='groups/group_list.html'), name="group_list"),
                        url(r'^create/$', 'group_create', name="group_create"),
@@ -55,7 +56,12 @@ urlpatterns = patterns('geonode.groups.views',
 		       #end
 
 
-
+                        url(r'^section/list$', SectiontmentList.as_view(), name='section_list'),
+                        url(r'^section/add$', SectionCreate.as_view(), name='section_new'),
+                        url(r'^section/edit/(?P<section_pk>\d+)$', SectionUpdate.as_view(),
+                                                    name='section_edit'),
+                        url(r'^section/delete/(?P<section_pk>\d+)$', SectionDelete.as_view(),
+                                                    name='section_delete'),
 
 
 
