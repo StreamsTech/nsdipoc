@@ -1,0 +1,20 @@
+{% load i18n %}
+
+{% block head %}
+{% include 'Templates/_base-headers.html' %}
+   
+{% endblock %}
+
+{% block body %}
+
+<div class="col-md-8  margin-zero left-pad-zero r surfgis" ng-controller="appController" style="width: 100%;padding-right: 0;" ng-app="appModule" ng-click="bodyClicked()">
+    <div class="gd-content-body map-details-info" ng-controller="MapUpdateController">
+        <!-- <div id="embedded_map"> -->
+            <!-- <div id="the_map"></div> -->
+            {% include 'maps/_map-view-panel.html'%}
+
+        <!-- </div> -->
+    </div>
+</div>
+
+{% endblock %}

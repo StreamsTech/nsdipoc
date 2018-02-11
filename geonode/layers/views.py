@@ -17,19 +17,33 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #########################################################################
-
-import os
-import sys
+import base64
+import csv
+import decimal
+import httplib2
 import logging
+import os
 import shutil
+import sys
 import traceback
 import uuid
-import decimal
 
 import requests
 import xmltodict
-import  requests
-
+import requests
+import string
+import random
+import shutil
+from osgeo import gdal, osr
+from geonode.layers.utils import (
+    reprojection,
+    create_tmp_dir,
+    upload_files,
+    checking_projection,
+    collect_epsg
+)
+import zipfile
+from django.contrib.gis.db import models
 from guardian.shortcuts import get_perms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -40,6 +54,7 @@ from django.conf import settings
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 from django.template import RequestContext, loader
+from django.core.files import File
 try:
     import json
 except ImportError:
@@ -49,9 +64,10 @@ from django.template.defaultfilters import slugify
 from django.forms.models import inlineformset_factory
 from django.db import transaction
 from django.db.models import F
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
+from django.views.generic import View
 from requests.auth import HTTPBasicAuth
-from geonode.settings import  OGC_SERVER
+from geonode.settings import OGC_SERVER
 
 from notify.signals import notify
 
@@ -74,15 +90,31 @@ from geonode.documents.models import get_related_documents
 from geonode.utils import build_social_links
 from geonode.geoserver.helpers import cascading_delete, gs_catalog
 from geonode.geoserver.helpers import ogc_server_settings
+from geonode import GeoNodeException
 
 from geonode.groups.models import GroupProfile
-from geonode.layers.models import LayerSubmissionActivity, LayerAuditActivity
+from geonode.layers.models import LayerSubmissionActivity, LayerAuditActivity, StyleExtension, Style
 from geonode.base.libraries.decorators import manager_or_member
 from geonode.base.models import KeywordIgnoreListModel
+from geonode.system_settings.models import SystemSettings
+from geonode.system_settings.system_settings_enum import SystemSettingsEnum
+# from geonode.authentication_decorators import login_required as custom_login_required
+from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, CreateAPIView
+from .serializers import StyleExtensionSerializer
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework import permissions, status
+from rest_framework.response import Response
 
+from django.db import connection
+from osgeo import osr
+
+from geonode.authentication_decorators import login_required as custom_login_required
+from geonode.class_factory import ClassFactory
 
 if 'geonode.geoserver' in settings.INSTALLED_APPS:
     from geonode.geoserver.helpers import _render_thumbnail
+    # from geonode.geoserver.views import save_sld_geoserver
+
 CONTEXT_LOG_FILE = ogc_server_settings.LOG_FILE
 
 logger = logging.getLogger("geonode.layers.views")
@@ -125,7 +157,8 @@ def _resolve_layer(request, typename, permission='base.view_resourcebase',
         service = Service.objects.filter(name=service_typename[0])
         return resolve_object(request,
                               Layer,
-                              {'typename': service_typename[1] if service[0].method != "C" else typename},
+                              {'typename': service_typename[1]
+                                  if service[0].method != "C" else typename},
                               permission=permission,
                               permission_msg=msg,
                               **kwargs)
@@ -144,6 +177,7 @@ def _resolve_layer(request, typename, permission='base.view_resourcebase',
 @login_required
 @user_passes_test(manager_or_member)
 def layer_upload(request, template='upload/layer_upload.html'):
+    db_logger = logging.getLogger('db')
     if request.method == 'GET':
         mosaics = Layer.objects.filter(is_mosaic=True).order_by('name')
         ctx = {
@@ -156,11 +190,85 @@ def layer_upload(request, template='upload/layer_upload.html'):
         }
         return render_to_response(template, RequestContext(request, ctx))
     elif request.method == 'POST':
+
+        file_extension = request.FILES['base_file'].name.split('.')[1].lower()
+        data_dict = dict()
+        tmp_dir = ''
+        epsg_code = ''
+        if str(file_extension).lower() == 'shp' or zipfile.is_zipfile(request.FILES['base_file']):
+            # Check if zip file then, extract into tmp_dir and convert
+            if zipfile.is_zipfile(request.FILES['base_file']):
+                tmp_dir = create_tmp_dir()
+                with zipfile.ZipFile(request.FILES['base_file']) as zf:
+                    zf.extractall(tmp_dir)
+
+                prj_file_name = ''
+                shp_file_name = ''
+                for file in os.listdir(tmp_dir):
+                    if file.endswith(".prj"):
+                        prj_file_name = file
+
+                    elif file.endswith(".shp"):
+                        shp_file_name = file
+
+                srs = checking_projection(tmp_dir, prj_file_name)
+
+                # collect epsg code
+                epsg_code = collect_epsg(tmp_dir, prj_file_name)
+
+                if epsg_code:
+                    data_dict = reprojection(tmp_dir, shp_file_name)
+
+            if str(file_extension) == 'shp':
+
+                # create temporary directory for conversion
+                tmp_dir = create_tmp_dir()
+
+                # Upload files
+                upload_files(tmp_dir, request.FILES)
+
+                # collect epsg code
+                epsg_code = collect_epsg(tmp_dir, str(
+                    request.FILES['prj_file'].name))
+
+                # Checking projection
+                srs = checking_projection(
+                    tmp_dir, str(request.FILES['prj_file'].name))
+
+                # if srs.IsProjected:
+                if epsg_code:
+
+                    if srs.GetAttrValue('projcs'):
+                        if "WGS" not in srs.GetAttrValue('projcs'):
+
+                            data_dict = reprojection(tmp_dir, str(
+                                request.FILES['base_file'].name))
+
+                    # check WGS84 projected
+                    else:
+                        # call projection util function
+                        data_dict = reprojection(tmp_dir, str(
+                            request.FILES['base_file'].name))
+
         form = NewLayerUploadForm(request.POST, request.FILES)
         tempdir = None
         errormsgs = []
         out = {'success': False}
         if form.is_valid():
+            if str(file_extension) == 'shp' and srs.IsProjected:
+                form.cleaned_data['base_file'] = data_dict['base_file']
+                form.cleaned_data['shx_file'] = data_dict['shx_file']
+                form.cleaned_data['dbf_file'] = data_dict['dbf_file']
+                form.cleaned_data['prj_file'] = data_dict['prj_file']
+                if 'xml_file' in data_dict:
+                    form.cleaned_data['xml_file'] = data_dict['xml_file']
+                """
+                if 'sbn_file' in  data_dict:
+                    form.cleaned_data['sbn_file'] = data_dict['sbn_file']
+                if 'sbx_file' in data_dict:
+                    form.cleaned_data['sbx_file'] = data_dict['sbx_file']
+                """
+
             title = form.cleaned_data["layer_title"]
             category = form.cleaned_data["category"]
             organization_id = form.cleaned_data["organization"]
@@ -176,7 +284,8 @@ def layer_upload(request, template='upload/layer_upload.html'):
                 name_base, __ = os.path.splitext(
                     form.cleaned_data["base_file"].name)
                 keywords = name_base.split()
-            ignore_keys = KeywordIgnoreListModel.objects.values_list('key', flat=True)
+            ignore_keys = KeywordIgnoreListModel.objects.values_list(
+                'key', flat=True)
             keyword_list = []
             for key in keywords:
                 if key not in ignore_keys and not key.isdigit() and any(c.isalpha() for c in key) and len(key) > 2:
@@ -201,19 +310,22 @@ def layer_upload(request, template='upload/layer_upload.html'):
                     charset=form.cleaned_data["charset"],
                     abstract=form.cleaned_data["abstract"],
                     title=form.cleaned_data["layer_title"],
-                    metadata_uploaded_preserve=form.cleaned_data["metadata_uploaded_preserve"]
+                    metadata_uploaded_preserve=form.cleaned_data["metadata_uploaded_preserve"],
+                    user_data_epsg=epsg_code
                 )
                 if admin_upload:
                     saved_layer.status = 'ACTIVE'
                     saved_layer.save()
 
             except Exception as e:
+                db_logger.exception(e)
                 exception_type, error, tb = sys.exc_info()
                 logger.exception(e)
                 out['success'] = False
                 out['errors'] = str(error)
                 # Assign the error message to the latest UploadSession from that user.
-                latest_uploads = UploadSession.objects.filter(user=request.user).order_by('-date')
+                latest_uploads = UploadSession.objects.filter(
+                    user=request.user).order_by('-date')
                 if latest_uploads.count() > 0:
                     upload_session = latest_uploads[0]
                     upload_session.error = str(error)
@@ -237,6 +349,11 @@ def layer_upload(request, template='upload/layer_upload.html'):
                 if permissions is not None and len(permissions.keys()) > 0:
                     saved_layer.set_permissions(permissions)
             finally:
+                # Delete temporary files
+
+                if tmp_dir != '':
+                    shutil.rmtree(tmp_dir)
+
                 if tempdir is not None:
                     shutil.rmtree(tempdir)
         else:
@@ -258,7 +375,7 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
     try:
         user_role = request.GET['user_role']
     except:
-        user_role=None
+        user_role = None
 
     layer = _resolve_layer(
         request,
@@ -273,16 +390,16 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
     elif user in layer.group.get_managers() and layer.status in ['PENDING', 'ACTIVE', 'DENIED']:
         edit_permit = True
 
-    if not edit_permit and layer.status=='ACTIVE':
+    if not edit_permit and layer.status == 'ACTIVE':
         edit_permit = True
 
     # if the edit request is not valid then just return from here
     if not edit_permit:
         return HttpResponse(
-                        loader.render_to_string(
-                            '401.html', RequestContext(
-                            request, {
-                            'error_message': _("You dont have permission to edit this layer.")})), status=401)
+            loader.render_to_string(
+                '401.html', RequestContext(
+                    request, {
+                        'error_message': _("You dont have permission to edit this layer.")})), status=401)
         # return  HttpResponse('You dont have permission to edit this layer')
 
     # assert False, str(layer_bbox)
@@ -324,7 +441,8 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
             id=layer.id).update(popular_count=F('popular_count') + 1)
 
     # center/zoom don't matter; the viewer will center on the layer bounds
-    map_obj = GXPMap(projection=getattr(settings, 'DEFAULT_MAP_CRS', 'EPSG:900913'))
+    map_obj = GXPMap(projection=getattr(
+        settings, 'DEFAULT_MAP_CRS', 'EPSG:900913'))
 
     NON_WMS_BASE_LAYERS = [
         la for la in default_map_config(request)[1] if la.ows_url is None]
@@ -352,7 +470,8 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
             offset = 10 * (request.page - 1)
             granules = cat.mosaic_granules(coverages['coverages']['coverage'][0]['name'], store, limit=10,
                                            offset=offset, filter=filter)
-            all_granules = cat.mosaic_granules(coverages['coverages']['coverage'][0]['name'], store, filter=filter)
+            all_granules = cat.mosaic_granules(
+                coverages['coverages']['coverage'][0]['name'], store, filter=filter)
         except:
             granules = {"features": []}
             all_granules = {"features": []}
@@ -362,19 +481,21 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
                            'maintenance_frequency', 'regions', 'restriction_code_type', 'constraints_other', 'license',
                            'language', 'spatial_representation_type', 'resource_type', 'temporal_extent_start',
                            'temporal_extent_end', 'supplemental_information', 'data_quality_statement', 'thumbnail_url',
-                            'elevation_regex', 'time_regex', 'keywords',
+                           'elevation_regex', 'time_regex', 'keywords',
                            'category']
     if request.user == layer.owner or request.user in layer.group.get_managers():
         if not layer.attributes:
-            messages.info(request, 'Please update layer metadata, missing some informations')
+            messages.info(
+                request, 'Please update layer metadata, missing some informations')
         elif not layer.metadata_author:
-            messages.info(request, 'Please update layer metadata, missing some informations')
+            messages.info(
+                request, 'Please update layer metadata, missing some informations')
         else:
             for field in metadata_field_list:
                 if not getattr(layer, layer._meta.get_field(field).name):
-                    messages.info(request, 'Please update layer metadata, missing some informations')
+                    messages.info(
+                        request, 'Please update layer metadata, missing some informations')
                     break
-
 
     # layer_name = layer.service_typename
     # geoserver_user = OGC_SERVER['default']['USER']
@@ -414,7 +535,7 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
         "deny_form": deny_form,
         "denied_comments": LayerAuditActivity.objects.filter(layer_submission_activity__layer=layer),
         "status": layer.status,
-        "chart_link" : xlink
+        "chart_link": xlink
     }
 
     if 'access_token' in request.session:
@@ -464,6 +585,25 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
 
     if settings.SOCIAL_ORIGINS:
         context_dict["social_links"] = build_social_links(request, layer)
+
+    if str(layer.user_data_epsg) and str(layer.user_data_epsg) != 'None':
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT srtext FROM spatial_ref_sys WHERE srid = %s", [
+                           str(layer.user_data_epsg)])
+
+            all_data = cursor.fetchall()
+        srstext = str(all_data[0][0])
+
+        srs = osr.SpatialReference(wkt=srstext)
+        if srs.IsProjected:
+            print srs.GetAttrValue('projcs')
+        user_proj = srs.GetAttrValue('geogcs')
+
+        context_dict['user_data_proj'] = user_proj
+
+    context_dict["user_data_epsg"] = str(layer.user_data_epsg)
+
+    context_dict["layer_status"] = layer.status
 
     return render_to_response(template, RequestContext(request, context_dict))
 
@@ -561,8 +701,10 @@ def layer_metadata(request, layername, template='layers/layer_metadata.html'):
             if poc_form.is_valid():
                 if len(poc_form.cleaned_data['profile']) == 0:
                     # FIXME use form.add_error in django > 1.7
-                    errors = poc_form._errors.setdefault('profile', ErrorList())
-                    errors.append(_('You must set a point of contact for this resource'))
+                    errors = poc_form._errors.setdefault(
+                        'profile', ErrorList())
+                    errors.append(
+                        _('You must set a point of contact for this resource'))
                     poc = None
             if poc_form.has_changed and poc_form.is_valid():
                 new_poc = poc_form.save()
@@ -576,8 +718,10 @@ def layer_metadata(request, layername, template='layers/layer_metadata.html'):
             if author_form.is_valid():
                 if len(author_form.cleaned_data['profile']) == 0:
                     # FIXME use form.add_error in django > 1.7
-                    errors = author_form._errors.setdefault('profile', ErrorList())
-                    errors.append(_('You must set an author for this resource'))
+                    errors = author_form._errors.setdefault(
+                        'profile', ErrorList())
+                    errors.append(
+                        _('You must set an author for this resource'))
                     metadata_author = None
             if author_form.has_changed and author_form.is_valid():
                 new_author = author_form.save()
@@ -594,7 +738,8 @@ def layer_metadata(request, layername, template='layers/layer_metadata.html'):
             la.save()
 
         if new_poc is not None and new_author is not None:
-            new_keywords = [x.strip() for x in layer_form.cleaned_data['keywords']]
+            new_keywords = [x.strip()
+                            for x in layer_form.cleaned_data['keywords']]
             layer.keywords.clear()
             layer.keywords.add(*new_keywords)
             the_layer = layer_form.save()
@@ -605,12 +750,13 @@ def layer_metadata(request, layername, template='layers/layer_metadata.html'):
             the_layer.metadata_author = new_author
             Layer.objects.filter(id=the_layer.id).update(
                 category=new_category
-                )
+            )
 
             if getattr(settings, 'SLACK_ENABLED', False):
                 try:
                     from geonode.contrib.slack.utils import build_slack_message_layer, send_slack_messages
-                    send_slack_messages(build_slack_message_layer("layer_edit", the_layer))
+                    send_slack_messages(
+                        build_slack_message_layer("layer_edit", the_layer))
                 except:
                     print "Could not send slack message."
 
@@ -670,6 +816,7 @@ def layer_change_poc(request, ids, template='layers/layer_change_poc.html'):
 
 @login_required
 def layer_replace(request, layername, template='layers/layer_replace.html'):
+    db_logger = logging.getLogger('db')
     layer = _resolve_layer(
         request,
         layername,
@@ -696,10 +843,12 @@ def layer_replace(request, layername, template='layers/layer_replace.html'):
                 tempdir, base_file = form.write_files()
                 if layer.is_vector() and is_raster(base_file):
                     out['success'] = False
-                    out['errors'] = _("You are attempting to replace a vector layer with a raster.")
+                    out['errors'] = _(
+                        "You are attempting to replace a vector layer with a raster.")
                 elif (not layer.is_vector()) and is_vector(base_file):
                     out['success'] = False
-                    out['errors'] = _("You are attempting to replace a raster layer with a vector.")
+                    out['errors'] = _(
+                        "You are attempting to replace a raster layer with a vector.")
                 else:
                     # delete geoserver's store before upload
                     cat = gs_catalog
@@ -716,6 +865,7 @@ def layer_replace(request, layername, template='layers/layer_replace.html'):
                         'layer_detail', args=[
                             saved_layer.service_typename])
             except Exception as e:
+                db_logger.exception(e)
                 out['success'] = False
                 out['errors'] = str(e)
             finally:
@@ -741,6 +891,7 @@ def layer_replace(request, layername, template='layers/layer_replace.html'):
 
 @login_required
 def layer_remove(request, layername, template='layers/layer_remove.html'):
+    db_logger = logging.getLogger('db')
     layer = _resolve_layer(
         request,
         layername,
@@ -760,9 +911,11 @@ def layer_remove(request, layername, template='layers/layer_remove.html'):
                 if request.user != layer.owner:
                     recipient = layer.owner
                     notify.send(request.user, recipient=recipient, actor=request.user,
-                    target=layer, verb='deleted your layer')
+                                target=layer, verb='deleted your layer')
         except Exception as e:
-            message = '{0}: {1}.'.format(_('Unable to delete layer'), layer.typename)
+            db_logger.exception(e)
+            message = '{0}: {1}.'.format(
+                _('Unable to delete layer'), layer.typename)
 
             if 'referenced by layer group' in getattr(e, 'message', ''):
                 message = _('This layer is a member of a layer group, you must remove the layer from the group '
@@ -794,9 +947,11 @@ def layer_granule_remove(request, granule_id, layername, template='layers/layer_
             cat._cache.clear()
             store = cat.get_store(layer.name)
             coverages = cat.mosaic_coverages(store)
-            cat.mosaic_delete_granule(coverages['coverages']['coverage'][0]['name'], store, granule_id)
+            cat.mosaic_delete_granule(
+                coverages['coverages']['coverage'][0]['name'], store, granule_id)
         except Exception as e:
-            message = '{0}: {1}.'.format(_('Unable to delete layer'), layer.typename)
+            message = '{0}: {1}.'.format(
+                _('Unable to delete layer'), layer.typename)
 
             if 'referenced by layer group' in getattr(e, 'message', ''):
                 message = _('This layer is a member of a layer group, you must remove the layer from the group '
@@ -864,12 +1019,12 @@ def get_layer(request, layername):
 
 
 def layer_metadata_detail(request, layername, template='layers/layer_metadata_detail.html'):
-    layer = _resolve_layer(request, layername, 'view_resourcebase', _PERMISSION_MSG_METADATA)
+    layer = _resolve_layer(
+        request, layername, 'view_resourcebase', _PERMISSION_MSG_METADATA)
     return render_to_response(template, RequestContext(request, {
         "resource": layer,
         'SITEURL': settings.SITEURL[:-1]
     }))
-
 
 
 #@jahangir091
@@ -883,21 +1038,22 @@ def layer_publish(request, layer_pk):
         else:
             if request.user != layer.owner:
                 return HttpResponse(
-                        loader.render_to_string(
-                            '401.html', RequestContext(
+                    loader.render_to_string(
+                        '401.html', RequestContext(
                             request, {
-                            'error_message': _("You are not allowed to publish this layer.")})), status=401)
+                                'error_message': _("You are not allowed to publish this layer.")})), status=401)
                 # return HttpResponse('you are not allowed to publish this layer')
             group = layer.group
             layer.status = 'PENDING'
             layer.current_iteration += 1
             layer.save()
-            layer_submission_activity = LayerSubmissionActivity(layer=layer, group=group, iteration=layer.current_iteration)
+            layer_submission_activity = LayerSubmissionActivity(
+                layer=layer, group=group, iteration=layer.current_iteration)
             layer_submission_activity.save()
 
             # notify organization admins about the new published layer
-            managers = list( group.get_managers())
-            notify.send(request.user, recipient_list = managers, actor=request.user,
+            managers = list(group.get_managers())
+            notify.send(request.user, recipient_list=managers, actor=request.user,
                         verb='pushed a new layer for approval', target=layer)
 
             # set all the permissions for all the managers of the group for this layer
@@ -925,11 +1081,13 @@ def layer_approve(request, layer_pk):
                     return HttpResponse(
                         loader.render_to_string(
                             '401.html', RequestContext(
-                            request, {
-                            'error_message': _("You are not allowed to approve this layer.")})), status=401)
+                                request, {
+                                    'error_message': _("You are not allowed to approve this layer.")})), status=401)
                     # return HttpResponse("you are not allowed to approve this layer")
-                layer_submission_activity = LayerSubmissionActivity.objects.get(layer=layer, group=group, iteration=layer.current_iteration)
-                layer_audit_activity = LayerAuditActivity(layer_submission_activity=layer_submission_activity)
+                layer_submission_activity = LayerSubmissionActivity.objects.get(
+                    layer=layer, group=group, iteration=layer.current_iteration)
+                layer_audit_activity = LayerAuditActivity(
+                    layer_submission_activity=layer_submission_activity)
                 comment_body = request.POST.get('comment')
                 comment_subject = request.POST.get('comment_subject')
                 layer.status = 'ACTIVE'
@@ -941,27 +1099,30 @@ def layer_approve(request, layer_pk):
                 if request.POST.get('view_permission'):
                     if not 'AnonymousUser' in perm_dict['users']:
                         perm_dict['users']['AnonymousUser'] = []
-                        perm_dict['users']['AnonymousUser'].append('view_resourcebase')
+                        perm_dict['users']['AnonymousUser'].append(
+                            'view_resourcebase')
                     else:
                         if not 'view_resourcebase' in perm_dict['users']['AnonymousUser']:
-                            perm_dict['users']['AnonymousUser'].append('view_resourcebase')
+                            perm_dict['users']['AnonymousUser'].append(
+                                'view_resourcebase')
 
                 if request.POST.get('download_permission'):
                     if not 'AnonymousUser' in perm_dict['users']:
                         perm_dict['users']['AnonymousUser'] = []
-                        perm_dict['users']['AnonymousUser'].append('download_resourcebase')
+                        perm_dict['users']['AnonymousUser'].append(
+                            'download_resourcebase')
                     else:
                         if not 'download_resourcebase' in perm_dict['users']['AnonymousUser']:
-                            perm_dict['users']['AnonymousUser'].append('download_resourcebase')
+                            perm_dict['users']['AnonymousUser'].append(
+                                'download_resourcebase')
 
                 layer.set_permissions(perm_dict)
-
 
                 # notify layer owner that someone have approved the layer
                 if request.user != layer.owner:
                     recipient = layer.owner
                     notify.send(request.user, recipient=recipient, actor=request.user,
-                    target=layer, verb='approved your layer')
+                                target=layer, verb='approved your layer')
 
                 layer_submission_activity.is_audited = True
                 layer_submission_activity.save()
@@ -975,7 +1136,8 @@ def layer_approve(request, layer_pk):
             messages.info(request, 'Approved layer succesfully')
             return HttpResponseRedirect(reverse('admin-workspace-layer'))
         else:
-            messages.info(request, 'Please write an approve comment and try again')
+            messages.info(
+                request, 'Please write an approve comment and try again')
             return HttpResponseRedirect(reverse('admin-workspace-layer'))
     else:
         return HttpResponseRedirect(reverse('admin-workspace-layer'))
@@ -997,11 +1159,13 @@ def layer_deny(request, layer_pk):
                     return HttpResponse(
                         loader.render_to_string(
                             '401.html', RequestContext(
-                            request, {
-                            'error_message': _("You are not allowed to deny this layer.")})), status=401)
+                                request, {
+                                    'error_message': _("You are not allowed to deny this layer.")})), status=401)
                     # return HttpResponse("you are not allowed to deny this layer")
-                layer_submission_activity = LayerSubmissionActivity.objects.get(layer=layer, group=group, iteration=layer.current_iteration)
-                layer_audit_activity = LayerAuditActivity(layer_submission_activity=layer_submission_activity)
+                layer_submission_activity = LayerSubmissionActivity.objects.get(
+                    layer=layer, group=group, iteration=layer.current_iteration)
+                layer_audit_activity = LayerAuditActivity(
+                    layer_submission_activity=layer_submission_activity)
                 comment_body = request.POST.get('comment')
                 comment_subject = request.POST.get('comment_subject')
                 layer.status = 'DENIED'
@@ -1012,7 +1176,7 @@ def layer_deny(request, layer_pk):
                 if request.user != layer.owner:
                     recipient = layer.owner
                     notify.send(request.user, recipient=recipient, actor=request.user,
-                    target=layer, verb='denied your layer')
+                                target=layer, verb='denied your layer')
 
                 layer_submission_activity.is_audited = True
                 layer_submission_activity.save()
@@ -1040,16 +1204,16 @@ def layer_delete(request, layer_pk):
         except:
             return Http404("requested layer does not exists")
         else:
-            if layer.status == 'DRAFT' and ( request.user == layer.owner or request.user in layer.group.get_managers()):
+            if layer.status == 'ACTIVE' and (request.user == request.user.is_superuser or request.user == layer.owner or request.user in layer.group.get_managers()):
                 layer.status = "DELETED"
                 layer.save()
 
             else:
                 return HttpResponse(
-                        loader.render_to_string(
-                            '401.html', RequestContext(
+                    loader.render_to_string(
+                        '401.html', RequestContext(
                             request, {
-                            'error_message': _("You have no acces to delete the layer.")})), status=401)
+                                'error_message': _("You have no acces to delete the layer.")})), status=401)
                 # messages.info(request, 'You have no acces to delete the layer')
 
         messages.info(request, 'Deleted layer successfully')
@@ -1066,13 +1230,18 @@ def style_chart_legend_color(layer):
     layer_name = layer.service_typename
     geoserver_user = OGC_SERVER['default']['USER']
     geoserver_password = OGC_SERVER['default']['PASSWORD']
-    style_url = OGC_SERVER['default']['PUBLIC_LOCATION'] + "rest/layers/" + layer_name + ".json"
-    response1 = requests.get(style_url, auth=HTTPBasicAuth(geoserver_user, geoserver_password))
+    style_url = OGC_SERVER['default']['PUBLIC_LOCATION'] + \
+        "rest/layers/" + layer_name + ".json"
+    response1 = requests.get(style_url, auth=HTTPBasicAuth(
+        geoserver_user, geoserver_password))
     sld_file_name_url = response1.json()['layer']['defaultStyle']['href']
-    response2 = requests.get(sld_file_name_url, auth=HTTPBasicAuth(geoserver_user, geoserver_password))
+    response2 = requests.get(sld_file_name_url, auth=HTTPBasicAuth(
+        geoserver_user, geoserver_password))
     file_name = response2.json()['style']['filename']
-    sld_file_url = OGC_SERVER['default']['PUBLIC_LOCATION'] + "rest/styles/" + file_name
-    sld_content = requests.get(sld_file_url, auth=HTTPBasicAuth(geoserver_user, geoserver_password)).content
+    sld_file_url = OGC_SERVER['default']['PUBLIC_LOCATION'] + \
+        "rest/styles/" + file_name
+    sld_content = requests.get(sld_file_url, auth=HTTPBasicAuth(
+        geoserver_user, geoserver_password)).content
     sld_content = sld_content.replace('\r', '')
     sld_content = sld_content.replace('\n', '')
 
@@ -1094,7 +1263,6 @@ def style_chart_legend_color(layer):
     return ''
 
 
-
 def finding_xlink(dic):
 
     for key, value in dic.iteritems():
@@ -1106,5 +1274,244 @@ def finding_xlink(dic):
             if item is not None:
                 return item
 
-#end
 
+def save_sld_geoserver(request_method, full_path, sld_body, content_type='application/vnd.ogc.sld+xml'):
+    def strip_prefix(path, prefix):
+        assert path.startswith(prefix)
+        return path[len(prefix):]
+
+    proxy_path = '/gs/rest/styles'
+    downstream_path = 'rest/styles'
+
+    path = strip_prefix(full_path, proxy_path)
+    url = str("".join([ogc_server_settings.LOCATION, downstream_path, path]))
+
+    http = httplib2.Http()
+    username, password = ogc_server_settings.credentials
+    auth = base64.encodestring(username + ':' + password)
+    headers = dict()
+    headers["Content-Type"] = content_type
+    headers["Authorization"] = "Basic " + auth
+
+    return http.request(
+        url, request_method,
+        body=sld_body or None,
+        headers=headers)
+
+
+class LayerStyleListAPIView(ListAPIView):
+    serializer_class = StyleExtensionSerializer
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the style extension for a layer.
+        """
+        layername = self.kwargs['layername']
+        layer_obj = _resolve_layer(self.request, layername)
+        styles = layer_obj.styles.all()
+        return StyleExtension.objects.filter(style__in=styles)
+
+
+class StyleExtensionRetrieveUpdateAPIView(RetrieveUpdateAPIView):
+    queryset = StyleExtension.objects.all()
+    serializer_class = StyleExtensionSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def put(self, request, pk, **kwargs):
+        data = json.loads(request.body)
+        # check already style extension created or not
+        try:
+            style_extension = StyleExtension.objects.get(pk=pk)
+            style_extension.json_field = data.get("StyleString", None)
+            style_extension.sld_body = data.get('SldStyle', None)
+            style_extension.title = data.get('Title', style_extension.title)
+            style_extension.style.sld_title = style_extension.title
+        except Exception as ex:
+            raise ex
+
+        style_extension.style.save()
+        style_extension.save()
+
+        full_path = '/gs/rest/styles/{0}.xml'.format(
+            style_extension.style.name)
+        try:
+            save_sld_geoserver(
+                request_method='PUT', full_path=full_path, sld_body=style_extension.sld_body)
+        except Exception as ex:
+            logger.error(ex)
+
+        return HttpResponse(
+            json.dumps(
+                dict(success="OK"),
+                ensure_ascii=False),
+            status=200,
+            content_type='application/javascript')
+
+
+class LayerStyleView(View):
+    def get(self, request, layername):
+        layer_obj = _resolve_layer(request, layername)
+        layer_style = layer_obj.default_style
+        serializer = StyleExtensionSerializer(layer_style.styleextension)
+        return HttpResponse(
+            json.dumps(
+                serializer.data,
+                ensure_ascii=False),
+            status=200,
+            content_type='application/javascript')
+
+    @custom_login_required
+    def put(self, request, layername, **kwargs):
+        layer_obj = _resolve_layer(request, layername)
+        data = json.loads(request.body)
+        # check already style extension created or not
+        try:
+            style_extension = layer_obj.default_style.styleextension
+            style_extension.json_field = data.get("StyleString", None)
+            style_extension.sld_body = data.get('SldStyle', None)
+        except Exception as ex:
+            # Style extension does not exists
+            style_extension = StyleExtension(style=layer_obj.default_style, json_field=data.get(
+                "StyleString", None), sld_body=data.get('SldStyle', None), created_by=request.user, modified_by=request.user)
+
+        style_extension.save()
+        full_path = '/gs/rest/styles/{0}.xml'.format(
+            layer_obj.default_style.name)
+        try:
+            save_sld_geoserver(
+                request_method='PUT', full_path=full_path, sld_body=style_extension.sld_body)
+        except Exception as ex:
+            logger.error(ex)
+
+        return HttpResponse(
+            json.dumps(
+                dict(success="OK"),
+                ensure_ascii=False),
+            status=200,
+            content_type='application/javascript')
+
+    @custom_login_required
+    def post(self, request, layername, **kwargs):
+        layer_obj = _resolve_layer(request, layername)
+        data = json.loads(request.body)
+        json_field = data.get("StyleString", None)
+        sld_body = data.get('SldStyle', None)
+
+        # create style
+
+        style_extension = StyleExtension(
+            json_field=json_field, created_by=request.user, modified_by=request.user)
+
+        title = data.get('Title', str(style_extension.uuid))
+        sld_body = sld_body.format(style_name=str(style_extension.uuid))
+
+        style = Style(name=str(style_extension.uuid),
+                      sld_body=sld_body, sld_title=title)
+        style.save()
+
+        layer_obj.styles.add(style)
+
+        style_extension.title = title
+        style_extension.sld_body = sld_body
+        style_extension.style = style
+        style_extension.save()
+        full_path = '/gs/rest/styles/'
+
+        save_sld_geoserver(
+            request_method='POST', full_path=full_path, sld_body=style_extension.sld_body)
+
+        serializer = StyleExtensionSerializer(style_extension)
+        return HttpResponse(
+            json.dumps(
+                serializer.data,
+                ensure_ascii=False),
+            status=200,
+            content_type='application/javascript')
+
+
+class LayerAttributeView(View):
+    def get(self, request, layername, attributename, **kwargs):
+        layer_obj = _resolve_layer(request, layername)
+        factory = ClassFactory()
+        model_instance = factory.get_model(name=str(
+            layer_obj.title_en), table_name=str(layer_obj.name), db=str(layer_obj.store))
+        values = set([getattr(l, attributename)
+                      for l in model_instance.objects.all()])
+        return HttpResponse(
+            json.dumps(
+                dict(values=[dict(value=v, checked=False)
+                             for v in values], count=len(values)),
+                ensure_ascii=False),
+            status=200,
+            content_type='application/javascript')
+
+
+class LayerAttributeRangeView(ListAPIView):
+    def get(self, request, layername, **kwargs):
+        from django.db.models import Max, Min
+        layer_obj = _resolve_layer(request, layername)
+        factory = ClassFactory()
+        model_instance = factory.get_model(name=str(
+            layer_obj.title_en), table_name=str(layer_obj.name), db=str(layer_obj.store))
+        data = dict(request.query_params)
+        result = dict()
+        for attribute in data.get('attributes', []):
+            min_value = model_instance.objects.all().aggregate(Min(attribute))
+            max_value = model_instance.objects.all().aggregate(Max(attribute))
+            result[attribute] = [
+                min_value.items()[0][1], max_value.items()[0][1]]
+
+        return HttpResponse(
+            json.dumps(
+                result,
+                ensure_ascii=False, default=lambda x: float(x) if isinstance(x, decimal.Decimal) else x),
+            status=200,
+            content_type='application/javascript')
+
+
+class GeoLocationApiView(CreateAPIView):
+    """
+    Api for getting geo location from address (post_code, road_no, house_no)
+    """
+    def post(self, request, **kwargs):
+        location_settings = SystemSettings.objects.get(
+            settings_code=SystemSettingsEnum.LOCATION)
+        
+        factory = ClassFactory({'USER-DEFINED':models.PointField})
+        
+        layer_obj = location_settings.content_object
+        model_instance = factory.get_model(name=str(
+            layer_obj.title_en), table_name=str(layer_obj.name), db=str(layer_obj.store))
+
+        keys = ['post_code', 'road_no', 'house_no']
+        post_code = request.POST.get('post_code', None)
+        road_no = request.POST.get('road_no', None)
+        house_no = request.POST.get('house_no', None)
+        filtered_dict = dict(zip(keys, [post_code, road_no, house_no]))
+
+        csv_file = File(request.FILES['file']).file
+        csv_reader = csv.reader(csv_file, delimiter=',', quotechar='"')
+        headers = csv_reader.next()
+        headers = [h.replace(' ', '_') for h in headers]
+        response_headers = headers + ['latitude', 'longitude']
+        response = []
+        success_count, failed_count = 0, 0
+        for row in csv_reader:
+            mapped_row = dict(zip(headers, row))
+            values = [mapped_row[filtered_dict[k]] for k in keys]
+            data = dict(zip(keys, values))
+            try:
+                result = model_instance.objects.filter(**data).first()
+                if result is None:
+                    raise Exception()
+                longitude, latitude = result.the_geom.get_coords()
+                row.append(latitude)
+                row.append(longitude)
+                success_count += 1
+            except Exception as ex:
+                row += ['', '']
+                failed_count += 1
+            response.append(dict(zip(response_headers, row)))
+
+        return Response(data=dict(data=response, success=success_count, error=failed_count), status=status.HTTP_200_OK)
+# end
