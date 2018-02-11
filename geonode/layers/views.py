@@ -1284,6 +1284,37 @@ def finding_xlink(dic):
                 return item
 
 
+def layer_permission_preview(request, layername, template='layers/layer_attribute_permissions_preview.html'):
+    try:
+        user_role = request.GET['user_role']
+    except:
+        user_role=None
+
+    layer = _resolve_layer(
+        request,
+        layername,
+        'base.view_resourcebase',
+        _PERMISSION_MSG_VIEW)
+
+    if request.method == 'GET':
+        ctx = {
+            'layer': layer,
+            'organizations': GroupProfile.objects.all(),
+            'user_role': user_role,
+
+        }
+        return render_to_response(template, RequestContext(request, ctx))
+
+
+def getPermittedAttributes(layer, user):
+    if user == layer.owner or user.is_working_group_admin:
+        return Attribute.objects.filter(layer=layer)
+    elif user.has_perm('download_resourcebase', layer.get_self_resource()):
+        return Attribute.objects.filter(layer=layer, is_permitted=True)
+    else:
+        return Attribute.objects.none()
+
+
 def save_sld_geoserver(request_method, full_path, sld_body, content_type='application/vnd.ogc.sld+xml'):
     def strip_prefix(path, prefix):
         assert path.startswith(prefix)
