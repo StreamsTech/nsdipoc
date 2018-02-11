@@ -96,6 +96,7 @@ from geonode.layers.models import Attribute
 from geonode.layers.views import backupCurrentVersion
 from geonode.geoserver.helpers import gs_catalog, cascading_delete
 from geonode.layers.utils import unzip_file
+from  geonode.layers.utils import file_size_with_ext
 
 CONTEXT_LOG_FILE = None
 
@@ -573,7 +574,8 @@ class LayerUpload(TypeFilteredResource):
                         metadata_uploaded_preserve=form.cleaned_data["metadata_uploaded_preserve"]
                     )
                     file_size, file_type = form.get_type_and_size()
-                    saved_layer.file_size = file_size
+                    f_size = file_size_with_ext(file_size)
+                    saved_layer.file_size = f_size
                     saved_layer.file_type = file_type
                     saved_layer.current_version = 1
                     saved_layer.save()
@@ -1036,16 +1038,15 @@ class LayerDownloadCountApi(TypeFilteredResource):
         if request.method == 'POST':
             out = {'success': False}
 
-            layer_id = json.loads(request.body).get('resource_id')
+            layer_id = json.loads(request.body).get('layer_id')
 
             if layer_id:
                 try:
-                    resource = Layer.objects.get(pk=layer_id)
+                    layer = Layer.objects.get(id=layer_id)
                 except Layer.DoesNotExist:
                     status_code = 404
                     out['errors'] = 'layer does not exist'
                 else:
-                    layer = Layer.objects.get(id=layer_id)
                     layer.download_count = layer.download_count + 1
                     layer.save()
                     out['success'] = 'True'

@@ -92,6 +92,7 @@ from geonode.geoserver.helpers import cascading_delete, gs_catalog
 from geonode.geoserver.helpers import ogc_server_settings
 from geonode import GeoNodeException
 from geonode.layers.models import LayerVersionModel
+from geonode.layers.utils import file_size_with_ext
 
 from geonode.groups.models import GroupProfile
 from geonode.layers.models import LayerSubmissionActivity, LayerAuditActivity, StyleExtension, Style
@@ -316,7 +317,8 @@ def layer_upload(request, template='upload/layer_upload.html'):
                     user_data_epsg=epsg_code
                 )
                 file_size, file_type = form.get_type_and_size()
-                saved_layer.file_size = file.size
+                f_size = file_size_with_ext(file_size)
+                saved_layer.file_size = f_size
                 saved_layer.file_type = file_type
                 saved_layer.current_version = 1
                 saved_layer.latest_version = 1
@@ -870,7 +872,8 @@ def layer_replace(request, layername, template='layers/layer_replace.html'):
                         charset=form.cleaned_data["charset"],
                     )
                     file_size, file_type = form.get_type_and_size()
-                    saved_layer.file_size = file_size
+                    f_size = file_size_with_ext(file_size)
+                    saved_layer.file_size = f_size
                     saved_layer.file_type = file_type
                     saved_layer.save()
                     out['success'] = True
@@ -1606,7 +1609,8 @@ def add_new_layer(request, layername, template='layers/add_new_layer.html'):
                         charset=form.cleaned_data["charset"],
                     )
                     file_size, file_type = form.get_type_and_size()
-                    saved_layer.file_size = file_size
+                    f_size = file_size_with_ext(file_size)
+                    saved_layer.file_size = f_size
                     saved_layer.file_type = file_type
                     saved_layer.current_version = layer.latest_version + 1
                     saved_layer.latest_version = layer.latest_version + 1
