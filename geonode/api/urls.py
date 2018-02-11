@@ -24,12 +24,13 @@ from .api import TagResource, TopicCategoryResource, ProfileResource, \
     GroupResource, RegionResource, OwnersResource, UserOrganizationList, LayerUpload, MakeFeatured, MesseagesUnread, \
         UndockResources, FavoriteUnfavoriteResources, OsmOgrInfo, LayerSourceServer, LayersWithFavoriteAndDoocked, \
     MapsWithFavoriteAndDoocked, GroupsWithFavoriteAndDoocked, DocumentsWithFavoriteAndDoocked, UserNotifications, \
-    ViewNotificationTimeSaving, ThesaurusKeywordResource, AccessTokenApi, LayerDownloadCountApi, LayerPermissionPreviewApi
+    ViewNotificationTimeSaving, ThesaurusKeywordResource, AccessTokenApi, LayerDownloadCountApi, LayerPermissionPreviewApi, \
+ ChangeLayerVersionApi
 
 from .resourcebase_api import LayerResource, MapResource, DocumentResource, \
     ResourceBaseResource, FeaturedResourceBaseResource, LayerResourceWithFavorite, MapResourceWithFavorite, \
     DocumentResourceWithFavorite, GroupsResourceWithFavorite, GroupActivity, WorkSpaceLayerApi, WorkSpaceDocumentApi, \
-    WorkSpaceMapApi, LayerAttributeApi, AttributeApi, LayerAttributeApiPublic
+    WorkSpaceMapApi, LayerAttributeApi, AttributeApi, LayerAttributeApiPublic, LayerVersionAPI
 
 
 
@@ -96,3 +97,7 @@ api.register(LayerAttributeApi())
 
 api.register(AttributeApi())
 api.register(LayerAttributeApiPublic())
+
+
+api.register(LayerVersionAPI())
+api.register(ChangeLayerVersionApi())

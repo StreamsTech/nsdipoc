@@ -91,6 +91,7 @@ from geonode.utils import build_social_links
 from geonode.geoserver.helpers import cascading_delete, gs_catalog
 from geonode.geoserver.helpers import ogc_server_settings
 from geonode import GeoNodeException
+from geonode.layers.models import LayerVersionModel
 
 from geonode.groups.models import GroupProfile
 from geonode.layers.models import LayerSubmissionActivity, LayerAuditActivity, StyleExtension, Style
@@ -317,6 +318,8 @@ def layer_upload(request, template='upload/layer_upload.html'):
                 file_size, file_type = form.get_type_and_size()
                 saved_layer.file_size = file.size
                 saved_layer.file_type = file_type
+                saved_layer.current_version = 1
+                saved_layer.latest_version = 1
                 saved_layer.save()
                 if admin_upload:
                     saved_layer.status = 'ACTIVE'
@@ -1556,3 +1559,120 @@ class GeoLocationApiView(CreateAPIView):
 
         return Response(data=dict(data=response, success=success_count, error=failed_count), status=status.HTTP_200_OK)
 # end
+
+
+@login_required
+def add_new_layer(request, layername, template='layers/add_new_layer.html'):
+    layer = _resolve_layer(
+        request,
+        layername,
+        'base.change_resourcebase',
+        _PERMISSION_MSG_MODIFY)
+
+    if request.method == 'GET':
+        ctx = {
+            'charsets': CHARSETS,
+            'layer': layer,
+            'is_featuretype': layer.is_vector(),
+            'is_layer': True,
+        }
+        return render_to_response(template,
+                                  RequestContext(request, ctx))
+    elif request.method == 'POST':
+        backupPreviousVersion(layer)
+
+        form = LayerUploadForm(request.POST, request.FILES)
+        tempdir = None
+        out = {}
+
+        if form.is_valid():
+            try:
+                tempdir, base_file = form.write_files()
+                if layer.is_vector() and is_raster(base_file):
+                    out['success'] = False
+                    out['errors'] = _("You are attempting to replace a vector layer with a raster.")
+                elif (not layer.is_vector()) and is_vector(base_file):
+                    out['success'] = False
+                    out['errors'] = _("You are attempting to replace a raster layer with a vector.")
+                else:
+                    # delete geoserver's store before upload
+                    cat = gs_catalog
+                    cascading_delete(cat, layer.typename)
+                    saved_layer = file_upload(
+                        base_file,
+                        name=layer.name,
+                        user=request.user,
+                        overwrite=True,
+                        charset=form.cleaned_data["charset"],
+                    )
+                    file_size, file_type = form.get_type_and_size()
+                    saved_layer.file_size = file_size
+                    saved_layer.file_type = file_type
+                    saved_layer.current_version = layer.latest_version + 1
+                    saved_layer.latest_version = layer.latest_version + 1
+                    saved_layer.save()
+                    out['success'] = True
+                    out['url'] = reverse(
+                        'layer_detail', args=[
+                            saved_layer.service_typename])
+            except Exception as e:
+                out['success'] = False
+                out['errors'] = str(e)
+            finally:
+                if tempdir is not None:
+                    shutil.rmtree(tempdir)
+        else:
+            errormsgs = []
+            for e in form.errors.values():
+                errormsgs.append([escape(v) for v in e])
+
+            out['errors'] = form.errors
+            out['errormsgs'] = errormsgs
+
+        if out['success']:
+            status_code = 200
+        else:
+            status_code = 400
+        return HttpResponse(
+            json.dumps(out),
+            content_type='application/json',
+            status=status_code)
+
+
+def backupCurrentVersion(layer):
+
+    download_link = layer.link_set.get(name='Zipped Shapefile')
+    # r = requests.get(download_link.url)
+    r = requests.get('http://localhost:8080/geoserver/geonode/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geonode:cool&maxFeatures=50&outputFormat=SHAPE-ZIP')
+    temdir = '/home/jaha/Documents/version/' + layer.name + '/' + str(layer.current_version) + '/'
+    if not os.path.exists(temdir):
+        os.makedirs(temdir)
+    zfile = open(temdir + layer.name + '.zip', 'wb')
+    layer_version, created= LayerVersionModel.objects.get_or_create(layer=layer, version=layer.current_version)
+    layer_version.version_name = 'version ' + str(layer.current_version)
+    layer_version.version_path = zfile.name
+    layer_version.save()
+    zfile.write(r.content)
+    zfile.close()
+    r.close()
+
+
+def backupPreviousVersion(layer):
+
+    download_link = layer.link_set.get(name='Zipped Shapefile')
+    # r = requests.get(download_link.url)
+    r = requests.get('http://localhost:8080/geoserver/geonode/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geonode:cool&maxFeatures=50&outputFormat=SHAPE-ZIP')
+    temdir = '/home/jaha/Documents/version/' + layer.name + '/' + str(layer.current_version) + '/'
+    if not os.path.exists(temdir):
+        os.makedirs(temdir)
+    zfile = open(temdir + layer.name + '.zip', 'wb')
+    layer_version = LayerVersionModel.objects.create()
+    layer_version.layer = layer
+    layer_version.version = layer.latest_version
+    layer_version.version_name = 'version ' + str(layer.latest_version)
+    layer_version.version_path = zfile.name
+    layer_version.save()
+    zfile.write(r.content)
+    zfile.close()
+    r.close()
+

@@ -121,6 +121,8 @@ class Layer(ResourceBase):
     styles = models.ManyToManyField(Style, related_name='layer_styles')
 
     charset = models.CharField(max_length=255, default='UTF-8')
+    current_version = models.IntegerField(blank=True, null=True)
+    latest_version = models.IntegerField(blank=True, null=True)
 
     upload_session = models.ForeignKey('UploadSession', blank=True, null=True)
 
@@ -676,6 +678,15 @@ class StyleExtension(models.Model):
     class Meta:
         pass
 #end
+
+
+class LayerVersionModel(models.Model):
+    layer = models.ForeignKey(Layer, blank=True, null=True)
+    version = models.IntegerField(blank=True, null=True)
+    version_path = models.CharField(blank=True, null=True, max_length=500)
+    version_name = models.CharField(max_length=400, blank=True, null=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
 
 
 signals.pre_save.connect(pre_save_layer, sender=Layer)

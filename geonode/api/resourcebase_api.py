@@ -55,7 +55,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from tastypie.utils.mime import build_content_type
 
-from geonode.layers.models import Layer, Attribute
+from geonode.layers.models import Layer, Attribute, LayerVersionModel
 from geonode.maps.models import Map
 from geonode.documents.models import Document
 from geonode.base.models import ResourceBase
@@ -1258,3 +1258,21 @@ class LayerAttributeApiPublic(ModelResource):
         layer = Layer.objects.get(id=layer_id)
         return Attribute.objects.filter(layer=layer, is_permitted=True)
 
+
+class LayerVersionAPI(ModelResource):
+    """
+    this api gives all the available version details
+    for a given layer
+    header is: layer_id
+    exm: http://localhost:8000/api/layer-version-api/?layer_id=49
+    """
+    class Meta:
+        queryset = LayerVersionModel.objects.all()
+        resource_name = 'layer-version-api'
+        allowed_method = 'get'
+        excludes = ['version_path',]
+
+    def get_object_list(self, request):
+        layer_id = request.GET.get('layer_id')
+        layer = Layer.objects.get(id=layer_id)
+        return LayerVersionModel.objects.filter(layer=layer)

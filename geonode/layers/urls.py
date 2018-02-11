@@ -44,6 +44,7 @@ urlpatterns = patterns(
     url(r'^(?P<granule_id>[^/]*)/(?P<layername>[^/]*)/granule_remove$', 'layer_granule_remove',
         name="layer_granule_remove"),
     url(r'^(?P<layername>[^/]*)/replace$', 'layer_replace', name="layer_replace"),
+    url(r'^(?P<layername>[^/]*)/newlayer$', 'add_new_layer', name="add_new_layer"),
     url(r'^(?P<layername>[^/]*)/thumbnail$', 'layer_thumbnail', name='layer_thumbnail'),
     url(r'^(?P<layername>[^/]*)/get$', 'get_layer', name='get_layer'),
     url(r'^(?P<layername>[^/]*)/metadata_detail$', 'layer_metadata_detail', name='layer_metadata_detail'),

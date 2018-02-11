@@ -76,7 +76,7 @@ from geonode.base.models import Region
 from geonode.base.models import HierarchicalKeyword
 from geonode.base.models import ThesaurusKeywordLabel
 
-from geonode.layers.models import Layer
+from geonode.layers.models import Layer, LayerVersionModel
 from geonode.maps.models import Map
 from geonode.documents.models import Document
 from geonode.groups.models import GroupProfile
@@ -93,6 +93,9 @@ from geonode.security.views import _perms_info, _perms_info_json
 from .authorization import GeoNodeAuthorization
 from geonode.base.models import FavoriteResource, DockedResource
 from geonode.layers.models import Attribute
+from geonode.layers.views import backupCurrentVersion
+from geonode.geoserver.helpers import gs_catalog, cascading_delete
+from geonode.layers.utils import unzip_file
 
 CONTEXT_LOG_FILE = None
 
@@ -572,6 +575,7 @@ class LayerUpload(TypeFilteredResource):
                     file_size, file_type = form.get_type_and_size()
                     saved_layer.file_size = file_size
                     saved_layer.file_type = file_type
+                    saved_layer.current_version = 1
                     saved_layer.save()
                 except Exception as e:
                     exception_type, error, tb = sys.exc_info()
@@ -1092,3 +1096,75 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                 out['errors'] = 'You dont have permission to update permissions'
         out['errors'] = 'Only post method is permitted'
         return HttpResponse(json.dumps(out), content_type='application/json', status=200)
+
+
+class ChangeLayerVersionApi(TypeFilteredResource):
+    """
+    This api changes layer version
+    if there is multiple available versions of a layer
+    then user can select any version and then
+    the layer will changed to that selected version
+    and the pevious or current version will be archaived as
+    an odler version
+    it takes body parameters:
+        'layer_id'
+        'version_id'
+        'user_id'
+    """
+
+    class Meta:
+        resource_name = 'change-layer-version-api'
+        list_allowed_methods = ['post']
+
+    def dispatch(self, request_type, request, **kwargs):
+        if request.method == 'POST':
+            out = {'success': False}
+
+            layer_id = json.loads(request.body).get('layer_id')
+            layer_version_id = json.loads(request.body).get('version_id')
+            user_id = json.loads(request.body).get('user_id')
+            user = Profile.objects.get(id=user_id)
+            request.user = user
+
+            if layer_id and layer_version_id:
+                try:
+                    layer = Layer.objects.get(pk=layer_id)
+                except Layer.DoesNotExist:
+                    status_code = 404
+                    out['errors'] = 'layer does not exist'
+                else:
+
+                    backupCurrentVersion(layer)
+                    layer_version = LayerVersionModel.objects.get(id=layer_version_id)
+
+                    cat = gs_catalog
+                    cascading_delete(cat, layer.typename)
+
+                    base_file = unzip_file(layer_version.version_path, '.shp', tempdir=None)
+
+                    saved_layer = file_upload(
+                        base_file,
+                        name=layer.name,
+                        user=request.user,
+                        overwrite=True,
+                        # charset=form.cleaned_data["charset"],
+                    )
+                    # file_size, file_type = form.get_type_and_size()
+                    # saved_layer.file_size = file_size
+                    # saved_layer.file_type = file_type
+                    saved_layer.current_version = layer_version.version
+                    saved_layer.save()
+                    out['success'] = True
+                    out['url'] = reverse(
+                        'layer_detail', args=[
+                            saved_layer.service_typename])
+
+                    out['success'] = 'True'
+                    status_code = 200
+
+            else:
+                out['error'] = 'Access denied'
+                out['success'] = False
+                status_code = 400
+            return HttpResponse(json.dumps(out), content_type='application/json', status=status_code)
+
