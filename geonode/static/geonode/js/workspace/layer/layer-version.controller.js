@@ -1,6 +1,6 @@
 (function(){
     angular.module('layerApp').controller('approveLayerController',
-    function($scope,layerService,uiGridConstants,$window){
+    function($scope,layerService,uiGridConstants){
         $scope.layer={};
         $scope.layer_id="";
         $scope.departments=[];
@@ -49,7 +49,7 @@
 
         function postLayerData(url,data){
             layerService.submitLayerInformation(url,data).then(function(response){
-                $window.history.back();
+                console.log(response);
             },function(error){
                 console.log(error);
             });
@@ -58,12 +58,14 @@
 
         $scope.approveLayer=function(){
             var data=getPostLayerDataInformation();
+            console.log(data);
             postLayerData($scope.layerApprovalUrl,data);
         };
 
         $scope.publishLayer=function(){
             var data=getPostLayerDataInformation();
-            postLayerData($scope.layerApprovalUrl,data);
+            console.log(data);
+            // postLayerData($scope.layerApprovalUrl,data);
         };
         angular.isUndefinedOrNull = function(val) {
             return angular.isUndefined(val) || val === null ;

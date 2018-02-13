@@ -44,5 +44,12 @@
         this.getOrganizations=function(url){
             return get(url);
         };
+        this.getAllLayerVersions=function(url){
+            return get(url);
+        };
+        this.setVersion=function(url,data){
+            return post(url,data);
+        };
+
     });
 })();

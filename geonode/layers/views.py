@@ -109,6 +109,7 @@ from rest_framework.response import Response
 
 from django.db import connection
 from osgeo import osr
+from geonode.settings import MEDIA_ROOT
 
 from geonode.authentication_decorators import login_required as custom_login_required
 from geonode.class_factory import ClassFactory
@@ -1158,27 +1159,6 @@ def layer_approve(request, layer_pk):
     else:
         return HttpResponseRedirect(reverse('admin-workspace-layer'))
 
-@login_required
-def layer_draft(request, layer_pk):
-    if request.method == 'POST':
-        try:
-            layer = Layer.objects.get(id=layer_pk)
-        except Layer.DoesNotExist:
-            return Http404("Map does not exist")
-
-        group = layer.group
-        managers = list( group.get_managers())
-        layer.status = 'DRAFT'
-
-        if request.user in managers or request.user.is_superuser:
-            # only managers or superuser can change status
-            layer.save()
-            messages.info(request, 'Unapproved layer successfully')
-            
-        return HttpResponseRedirect(reverse('member-workspace-layer'))            
-    else:
-        return HttpResponseRedirect(reverse('member-workspace-layer'))
-
 
 @login_required
 def layer_deny(request, layer_pk):
@@ -1667,9 +1647,9 @@ def add_new_layer(request, layername, template='layers/add_new_layer.html'):
 def backupCurrentVersion(layer):
 
     download_link = layer.link_set.get(name='Zipped Shapefile')
-    # r = requests.get(download_link.url)
-    r = requests.get('http://localhost:8080/geoserver/geonode/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geonode:cool&maxFeatures=50&outputFormat=SHAPE-ZIP')
-    temdir = '/home/jaha/Documents/version/' + layer.name + '/' + str(layer.current_version) + '/'
+    r = requests.get(download_link.url)
+    # r = requests.get('http://localhost:8080/geoserver/geonode/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geonode:cool&maxFeatures=50&outputFormat=SHAPE-ZIP')
+    temdir = MEDIA_ROOT + '/' + layer.name + '/' + str(layer.current_version) + '/'
     if not os.path.exists(temdir):
         os.makedirs(temdir)
     zfile = open(temdir + layer.name + '.zip', 'wb')
@@ -1685,9 +1665,9 @@ def backupCurrentVersion(layer):
 def backupPreviousVersion(layer):
 
     download_link = layer.link_set.get(name='Zipped Shapefile')
-    # r = requests.get(download_link.url)
-    r = requests.get('http://localhost:8080/geoserver/geonode/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geonode:cool&maxFeatures=50&outputFormat=SHAPE-ZIP')
-    temdir = '/home/jaha/Documents/version/' + layer.name + '/' + str(layer.current_version) + '/'
+    r = requests.get(download_link.url)
+    # r = requests.get('http://localhost:8080/geoserver/geonode/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geonode:cool&maxFeatures=50&outputFormat=SHAPE-ZIP')
+    temdir = MEDIA_ROOT + '/' + layer.name + '/' + str(layer.current_version) + '/'
     if not os.path.exists(temdir):
         os.makedirs(temdir)
     zfile = open(temdir + layer.name + '.zip', 'wb')
@@ -1700,4 +1680,3 @@ def backupPreviousVersion(layer):
     zfile.write(r.content)
     zfile.close()
     r.close()
-

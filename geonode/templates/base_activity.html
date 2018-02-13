@@ -17,7 +17,7 @@
       {% else %}
       <link href="{{ STATIC_URL }}lib/css/main.4df7c95f.css?v={{ VERSION }}" rel="stylesheet"/>
       <link href="{{ STATIC_URL }}lib/css/bootstrap.min.css?v={{ VERSION }}" rel="stylesheet"/>
-      <link href="{{ STATIC_URL }}lib/css/font-awesome.min.css" rel="stylesheet"/>
+      <link href="{{ STATIC_URL }}lib/css/font-awesome.min.css?v={{ VERSION }}" rel="stylesheet"/>
       <link href="{{ STATIC_URL }}lib/css/bootstrap-datetimepicker.css?v={{ VERSION }}" rel="stylesheet"/>
       <!--<link href="{{ STATIC_URL }}lib/css/bootstrap-select.min.css?v={{ VERSION }}" rel="stylesheet"/>-->
       {% endif %}
@@ -73,7 +73,7 @@
 
     <section id="gd-wrapper">
     {% block middle %}
-    <div class="container-fluid">
+    <div class="container">
       {% include "_status_message.html" %}
       <!--{% include "_announcements.html" %}-->
       {% include "_messages.html" %}
@@ -94,10 +94,10 @@
     <!-- Modal must stay outside the navbar -->
     {% if not user.is_authenticated %}
     <section id="gd-model">
-        <div class="container-fluid">
+        <div class="container">
             <div style="">
                 <div class="modal fade" id="SigninModal"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
-                  <div class="modal-dialog fullScreenModal" role="document" >
+                  <div class="modal-dialog" role="document" >
                     <div class="modal-content" >
                       <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -130,50 +130,6 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div class="block-separator"></div>
-                                <div class="row">
-                                    <div class="col-md-5"></div>
-                                    <div class="col-md-2"><span style=""> or </span> </div>
-                                    <div class="col-md-5"></div>
-                                </div>
-                                <div class="block-separator"></div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <button type="button" class="btn btn-gd-gray-facebook btn-lg col-md-12 col-sm-12 col-xs-12">
-                                            <div class="row">
-                                                <div class="col-md-2">
-                                                    <i class="fa fa-facebook fbicon" aria-hidden="true" style=""></i>
-                                                </div>
-                                                <div class="col-md-8 text-center">
-                                                    <span class="fbsign"><a href="{% url 'social:begin' 'facebook' %}?next={{ request.path }}">{% trans "Sign in with Facebook" %}</a></span>
-                                                </div>
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="block-separator"></div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <button type="button" class="btn btn-gd-gray-gplus btn-lg col-md-12 col-sm-12 col-xs-12">
-                                            <div class="row">
-                                                <div class="col-md-2">
-                                                    <i class="fa fa-google-plus golicon" aria-hidden="true" style=""></i>
-                                                </div>
-                                                <div class="col-md-8 text-center">
-                                                    <span class="fbsign"><a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}">{% trans "Sign in with Google Plus" %}</a></span>
-                                                </div>
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="block-separator"></div>
-                                <div class="row">
-                                    <div class="col-md-12 text-center">
-                                        <span>
-                                            Don't have an account?<a href="#" data-target="#SignupModal" role="button" data-toggle="modal" data-dismiss="modal">{% trans " Register" %}</a>
-                                        </span>
-                                    </div>
-                                </div>
                           </div>
                       </form>
                     </div>
@@ -185,10 +141,10 @@
     {% endif %}
     {% if not user.is_authenticated and REGISTRATION_OPEN %}
     <section id="gd-model">
-        <div class="container-fluid">
+        <div class="container">
             <div style="">
                 <div class="modal fade" id="SignupModal"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
-                  <div class="modal-dialog fullScreenModal" role="document" >
+                  <div class="modal-dialog" role="document" >
                     <div class="modal-content" >
                       <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -290,7 +246,7 @@
     {% else %}
     <nav id="c-menu--slide-right" class="c-menu c-menu--slide-right">
         <div class="c-menu__close">
-            <button class="btn-link c-menu_gd_close">XRudra</button>
+            <button class="btn-link c-menu_gd_close">X</button>
         </div>
         <div class="user-details">
             <article>

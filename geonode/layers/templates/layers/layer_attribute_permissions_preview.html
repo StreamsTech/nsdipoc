@@ -125,18 +125,15 @@
                             <div class="col-md-12">
                                 <div class="col-md-4 pull-right">
                                     <button type="button" 
-                                    ng-if="!layer.is_wg_admin"
-                                    class="btn btn-default pull-right"
+                                    class="btn btn-primary pull-right"
                                      ng-click="approveLayer()">Submit For Approval</button>
                                     <button type="button"
-                                    ng-if="layer.is_wg_admin"
-                                    class="btn btn-default pull-right" 
+                                    class="btn btn-primary pull-right" 
                                     ng-click="publishLayer()">Publish</button>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                     </div>    
               </div>
             </div>
@@ -148,6 +145,6 @@
 <script src="{{ STATIC_URL }}geonode/js/workspace/layer/layer.module.js"></script>
 <script src="{{ STATIC_URL }}geonode/js/workspace/layer/layer.service.js"></script>
 <script src="{{ STATIC_URL }}geonode/js/workspace/layer/approve-layer.controller.js"></script>
+<script src="/static/.components//angular-cookies/angular-cookies.js"></script>
 {{ block.super }}
 {% endblock %}
-
