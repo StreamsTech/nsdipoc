@@ -740,10 +740,34 @@
             <li class="c-menu__item">
                 <a href="{% url "section-list-table" %}" class="c-menu__link">
                     <i class="fa fa-columns"></i>
-                    <span style="text-align:left;">{% trans "Manage Section" %}</span>
+                    <span style="text-align:left;">{% trans "Manage Index Page Sections" %}</span>
                 </a>
             </li>
             {% endif %}
+            {% if request.user.is_superuser and request.user.is_authenticated %}
+              <li class="c-menu__item">
+                  <a href="{% url "sector_list" %}" class="c-menu__link">
+                      <i class="fa fa-tasks"></i>
+                      <span style="text-align:left;color:#fff;margin-left:-8px;">{% trans "Manage Sector" %}</span>
+                  </a>
+              </li>
+            <li class="c-menu__item">
+                  <a href="{% url "department_list" %}" class="c-menu__link">
+                      <i class="fa fa-tasks"></i>
+                      <span style="text-align:left;color:#fff;margin-left:-8px;">{% trans "Manage Department" %}</span>
+                  </a>
+              </li>
+              {% endif %}
+            {% if request.user.is_manager_of_any_group %}
+                 <li class="c-menu__item">
+                 <a href="{% url "section_list" %}" class="c-menu__link">
+                     <i class="fa fa-tasks"></i>
+                     <span style="text-align:left;color:#fff;margin-left:-8px;">{% trans "Manage Section" %}</span>
+                 </a>
+                 </li>
+             {% endif%}
+
+
             {% if request.user.is_superuser %}
             <li class="c-menu__item">
                 <a href="{% url "topiccategory-list" %}" class="c-menu__link">
@@ -933,6 +957,9 @@
     <script src="{{ STATIC_URL }}lib/js/jquery.ajaxprogress.js?v={{ VERSION }}"></script>
     <script src="{{ STATIC_URL }}lib/js/jquery.ajaxQueue.js?v={{ VERSION }}"></script>
     <script src="{{ STATIC_URL }}lib/js/jquery-ui.custom.js?v={{ VERSION }}"></script>
+    <script src="{{ STATIC_URL }}.components/angular/angular.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}.components/angular-ui-grid/ui-grid.min.css">
+    <script src="{{ STATIC_URL }}.components/angular-ui-grid/ui-grid.min.js"></script>
     <script src="{{ STATIC_URL }}lib/js/jquery.raty.js?v={{ VERSION }}"></script>
     <script src="{{ STATIC_URL }}lib/js/bootstrap.min.js?v={{ VERSION }}"></script>
     <script src="{{ STATIC_URL }}lib/js/moment-with-locales.min.js?v={{ VERSION }}"></script>
