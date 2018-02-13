@@ -290,7 +290,7 @@
     {% else %}
     <nav id="c-menu--slide-right" class="c-menu c-menu--slide-right">
         <div class="c-menu__close">
-            <button class="btn-link c-menu_gd_close">X</button>
+            <button class="btn-link c-menu_gd_close">XRudra</button>
         </div>
         <div class="user-details">
             <article>
@@ -327,11 +327,19 @@
             </li>
             {% if request.user.is_superuser %}
             <li class="c-menu__item">
-                <a href="{% url "section-list-table" %}" class="c-menu__link">
+                <a href="{% url "section-management-table" %}" class="c-menu__link">
                     <i class="fa fa-tasks"></i> {% trans "Manage Section" %}
                 </a>
             </li>
             {% endif %}
+
+           
+            <li class="c-menu__item">
+                <a href="{% url "section-list-table" %}" class="c-menu__link">
+                    <i class="fa fa-tasks"></i> {% trans "Manage Page Section" %}
+                </a>
+            </li>
+           
             {% if request.user.is_superuser %}
             <li class="c-menu__item">
                 <a href="{% url "topiccategory-list" %}" class="c-menu__link">
