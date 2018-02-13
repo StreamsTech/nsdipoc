@@ -1,6 +1,6 @@
 (function(){
     angular.module('layerApp').controller('layerVersionController',
-    function($scope,layerService,uiGridConstants){
+    function($scope,layerService,uiGridConstants,$window){
         $scope.layerApprovalUrl="/api/layer-version-api/?layer_id=";
         $scope.versionSettingUrl="/api/change-layer-version-api/";
         $scope.layers=[];
@@ -25,7 +25,7 @@
                 version_id : layer.version
             };
             layerService.setVersion($scope.versionSettingUrl,data).then(function(response){
-                
+                $window.location.reload();
             });
         };
     });

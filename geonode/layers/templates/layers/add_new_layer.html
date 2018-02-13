@@ -131,7 +131,14 @@
                         <td>[{layer.version_name}]</td>
                         <td>[{layer.date_created | date : 'shortDate'}]</td>
                         <td>
-                            <button type="button" class="btn btn-primary btn-sm" ng-click="setVersion(layer)">Set This Version</button>
+                            <button type="button" class="btn btn-primary btn-sm" 
+                            ng-hide="{{layer.current_version}}==layer.version"
+                            ng-disabled="{{layer.current_version}}==layer.version"
+                            ng-click="setVersion(layer)">Set This Version [{layer.version}]</button>
+                            <span ng-show="{{layer.current_version}}==layer.version">
+                                Current Version
+                                <span class="glyphicon glyphicon-asterisk"></span>
+                            </span>
                         </td>
                       </tr>
                     </tbody>

@@ -612,6 +612,14 @@
                   </a>
               </li>
               {% endif %}
+              {% if request.user.is_superuser %}
+                <li class="c-menu__item">
+                    <a href="{% url "group_create" %}" class="c-menu__link">
+                        <i class="fa fa-tags"></i>
+                        <span style="text-align:left;">{% trans "Create Organization" %}</span>
+                    </a>
+                </li>
+            {% endif %}
             {% if request.user.is_manager_of_any_group %}
                  <li class="c-menu__item">
                  <a href="{% url "section_list" %}" class="c-menu__link">
