@@ -107,7 +107,7 @@ and open the template in the editor.
     margin-left: 10px;
     margin-right: 20px;
     font-size: 18px;
-    color: #FFFFFF;
+    color:#3896e2;
 }
 
 .c-menu--slide-left .c-menu__close,
@@ -354,6 +354,6 @@ body.has-active-menu {
     text-decoration: none;
 }
 .c-menu__item .c-menu__link img {
-    margin-left: 10px;
+    /* margin-left: 10px; */
     margin-right: 20px;
 }
