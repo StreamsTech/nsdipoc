@@ -683,14 +683,14 @@
             {% endif %}
             <li class="c-menu__item">
                 <a href="{% url "recent-activity" %}" class="c-menu__link">
-                    <i class="fa"><img src="{{ STATIC_URL }}geonode/images/user-icon/recent-activity.png" alt="Recent Activity"></i>
+                    <i><img src="{{ STATIC_URL }}geonode/images/user-icon/recent-activity.png" alt="Recent Activity"></i>
                     <span style="text-align:left;">{% trans "Recent Activity" %}</span>
                 </a>
             </li>
             {% if perms.announcements.can_manage %}
             <li class="c-menu__item">
                 <a href="{% url "announcements_list" %}" class="c-menu__link">
-                    <i class="fa"><img src="{{ STATIC_URL }}geonode/images/user-icon/announcements.png" alt="Announcements"></i>
+                    <i ><img src="{{ STATIC_URL }}geonode/images/user-icon/announcements.png" alt="Announcements"></i>
                     <span style="text-align:left;">{% trans "Announcements" %}</span>
                 </a>
             </li>
@@ -698,13 +698,13 @@
             {% if user.is_superuser %}
             <li class="c-menu__item">
                 <a href="{% url "services" %}" class="c-menu__link">
-                    <i class="fa"><img src="{{ STATIC_URL }}geonode/images/user-icon/remote-services.png" alt="Remote Services"></i>
+                    <i ><img src="{{ STATIC_URL }}geonode/images/user-icon/remote-services.png" alt="Remote Services"></i>
                     <span style="text-align:left;">{% trans "Remote Services" %}</span>
                 </a>
             </li>
             <li class="c-menu__item">
                 <a href="{{ GEOSERVER_BASE_URL }}" class="c-menu__link">
-                    <i class="fa"><img src="{{ STATIC_URL }}geonode/images/user-icon/geo-server.png" alt="GeoServer"></i>
+                    <i ><img src="{{ STATIC_URL }}geonode/images/user-icon/geo-server.png" alt="GeoServer"></i>
                     <span style="text-align:left;">{% trans "GeoServer" %}</span>
                 </a>
             </li>
@@ -712,7 +712,7 @@
             {% if user.is_manager_of_any_group %}
             <li class="c-menu__item">
                 <a href="{% url "invite_user" %}" class="c-menu__link">
-                    <i class="fa"><img src="{{ STATIC_URL }}geonode/images/user-icon/invite-user.png" alt="Invite User"></i>
+                    <i ><img src="{{ STATIC_URL }}geonode/images/user-icon/invite-user.png" alt="Invite User"></i>
                     <span style="text-align:left;">{% trans "Invite User" %}</span>
                 </a>
             </li>
@@ -731,66 +731,66 @@
             {% if request.user.is_superuser %}
             <li class="c-menu__item">
                 <a href="{% url "metadata-backup" %}" class="c-menu__link">
-                    <i class="fa"><img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help"></i>
+                    <i ><img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help"></i>
                     <span style="text-align:left;">{% trans "Metadata Backup" %}</span>
                 </a>
             </li>
             <li class="c-menu__item">
                 <a href="{% url "data-backup" %}" class="c-menu__link">
-                    <i class="fa"><img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help"></i>
+                    <i ><img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help"></i>
                     <span style="text-align:left;">{% trans "Data Backup" %}</span>
                 </a>
             </li>
             <li class="c-menu__item">
                 <a href="{% url "uploaded-folder-backup" %}" class="c-menu__link">
-                    <i class="fa"><img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help"></i>
+                    <i ><img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help"></i>
                     <span style="text-align:left;">{% trans "Media Backup" %}</span>
                 </a>
             </li>
             <li class="c-menu__item">
                 <a href="{% url "analytics" %}" class="c-menu__link">
-                    <i class="fa">
+                    <i >
                             <img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help">
                     </i>
-                    <span style="text-align:left;margin-left:-10px;">{% trans "Analytics" %}</span>
+                    <span style="text-align:left;">{% trans "Analytics" %}</span>
                 </a>
             </li>
             <li class="c-menu__item">
                 <a href="{% url "error_reporting" %}" class="c-menu__link">
-                    <i class="fa">
+                    <i >
                             <img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help">
                     </i>
-                    <span style="text-align:left;margin-left:-10px;">{% trans "Error Reporting" %}</span>
+                    <span style="text-align:left;">{% trans "Error Reporting" %}</span>
                 </a>
             </li>
             <li class="c-menu__item">
                 <a href="{% url "system_settings" %}" class="c-menu__link">
-                    <i class="fa">
+                    <i >
                             <img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help">
                     </i>
                     
-                    <span style="text-align:left;margin-left:-10px;">{% trans "System Settings" %}</span>
+                    <span style="text-align:left;">{% trans "System Settings" %}</span>
                 </a>
             </li>
             <li class="c-menu__item">
                 <a href="{% url "locations" %}" class="c-menu__link">
-                    <i class="fa">
+                    <i >
                             <img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help">
                     </i>  
-                    <span style="text-align:left;margin-left:-10px;">{% trans "Locations" %}</span>
+                    <span style="text-align:left;">{% trans "Locations" %}</span>
                 </a>
             </li>
             <li class="c-menu__item">
                 <a href="{% url "data-folder-backup" %}" class="c-menu__link">
-                    <i class="fa">
+                    <i >
                             <img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help">
                     </i>  
-                    <span style="text-align:left;margin-left:-10px;">{% trans "Error Reporting" %}</span>
+                    <span style="text-align:left;">{% trans "Error Reporting" %}</span>
                 </a>
             </li>
             <li class="c-menu__item">
                 <a href="{% url "data-folder-backup" %}" class="c-menu__link">
-                    <i class="fa"><img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help"></i>
+                    <i ><img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help"></i>
                     <span style="text-align:left;">{% trans "Geoserver Data Backup" %}</span>
                 </a>
             </li>
@@ -803,7 +803,7 @@
             </li>
             <li class="c-menu__item">
                 <a href="{% url "help" %}" class="c-menu__link">
-                    <i class="fa"><img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help"></i>
+                    <i ><img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help"></i>
                     <span style="text-align:left;">{% trans "Help" %}</span>
                 </a>
             </li>
@@ -812,7 +812,7 @@
                   {% csrf_token %}
                   <a class="c-menu__link" href="javascript:{}"
                      onclick="document.getElementById('logout_form').submit();">
-                     <i class="fa"><img src="{{ STATIC_URL }}geonode/images/user-icon/logout.png" alt="Logout"></i>
+                     <i ><img src="{{ STATIC_URL }}geonode/images/user-icon/logout.png" alt="Logout"></i>
                       <span style="text-align:left;">{% trans "Log out" %}</span>
                   </a>
                 </form>
