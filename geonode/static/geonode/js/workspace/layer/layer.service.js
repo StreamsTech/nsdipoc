@@ -50,6 +50,9 @@
         this.setVersion=function(url,data){
             return post(url,data);
         };
+        this.getLayerPermissions=function(url){
+            return get(url);  
+        };
 
     });
 })();

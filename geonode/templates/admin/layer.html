@@ -15,7 +15,7 @@
         <div class="gd-content-heading">
                 <div class="d-title">
             
-                        {% trans "Admin Workspace" %}          
+                        {% trans "Admin Workspace" %}     
                   
                 </div>
             <div class="hr"></div>
@@ -477,7 +477,7 @@
                     output+='<td>'+ item.date_updated +'</td>';
                     output+='<td>'+ item.file_type +'</td>';
                     output+='<td>'+ item.file_size +'</td>';
-                    output+='<td><a href="/layers/'+ item.typename +'/preview" class="btn btn-gd-primary">{% trans "Publish/Approve Layer" %}</a> <a href="'+ item.detail_url +'" class="btn btn-gd-primary">{% trans "Edit Layer" %}</a> <a onclick="deleteLayer('+ item.id +')" class="btn btn-gd-primary">{% trans "Inactive Layer" %}</a></td>';
+                    output+='<td><a href="/layers/'+ item.typename +'/preview?user_role='+'Admin'+'" class="btn btn-gd-primary">{% trans "Publish/Approve Layer" %}</a> <a href="'+ item.detail_url +'" class="btn btn-gd-primary">{% trans "Edit Layer" %}</a> <a onclick="deleteLayer('+ item.id +')" class="btn btn-gd-primary">{% trans "Inactive Layer" %}</a></td>';
                     output+='</tr>';
                   });
                   outputpag+='<div>';

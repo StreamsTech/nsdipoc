@@ -1085,6 +1085,10 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
             if request.user.is_working_group_admin or request.user == layer.owner:
                 permissions = json.loads(request.body).get('permissions')
                 attributes = json.loads(request.body).get('attributes')
+                status = json.loads(request.body).get('status')
+                
+                layer.status = status
+                layer.save()
                 if permissions is not None and len(permissions.keys()) > 0:
                     permissions = layer.resolvePermission(permissions)
                     layer.set_permissions(permissions)

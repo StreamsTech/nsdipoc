@@ -15,7 +15,7 @@
     <div class="gd-content">
         <div class="d-title">
            
-                {% trans "Member Workspace" %}   
+                {% trans "Member Workspace" %}  
            
         </div>
 
@@ -131,6 +131,7 @@
                                                         <th>Who Denied</th>
                                                         <th>Deny Date</th>
                                                         <th>Message</th>
+                                                        <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <!--{% for denied in denied_list %}-->
@@ -268,7 +269,8 @@ $(function () {
                         output+='<td>'+ draft_list_messages_json[item.id]['layer_msg'] +'</td>';
                     }
 
-                    output+='<td><a href="'+ item.detail_url +'?user_role=member" class="btn btn-gd-primary"> {% trans "Continue for Approval" %}</a></td>';
+                    output+='<td><a href="'+ item.detail_url +'/preview?user_role=Member" class="btn btn-gd-primary"> {% trans "Continue for Approval" %}</a>'+
+                        '<a href="'+ item.detail_url +'" class="btn btn-gd-primary" style="margin-left:5px"> {% trans "Edit Layer" %}'+'</a> ';
 
                     // if(draft_list_messages_json[item.id]['mandatory_fields_msg'] == ""){
                     //     output+='<td><a href="'+ item.detail_url +'?user_role=member" class="btn btn-gd-primary"> {% trans "Continue for Approval" %}</a></td>';
@@ -277,7 +279,7 @@ $(function () {
                     //     output+='<td><button class="btn btn-gd-primary" id="mandatory-check"> {% trans "Continue for Approval" %}</button></td>';
                     // }
 
-                    output+='<td>';
+                    // output+='<td>';
                     output+='<button type="button" class="btn btn-gd-primary" onclick="deleteLayer('+ item.id +')" style="color:#fff;">{% trans "Delete Map" %}</button> <br>';
                     output+='</td>';
                     output+='</tr>';

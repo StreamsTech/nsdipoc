@@ -1211,7 +1211,7 @@ class AttributeApi(ModelResource):
         queryset = Attribute.objects.all()
         resource_name = 'layer-attributes'
         allowed_method = 'get'
-        fields = ['attribute', 'attribute_type', 'id']
+        fields = ['attribute', 'attribute_type', 'id', 'is_permitted']
 
 
 class LayerAttributeApi(ModelResource):

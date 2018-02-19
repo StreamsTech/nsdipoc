@@ -1,8 +1,9 @@
 (function(){
     angular.module('layerApp').controller('approveLayerController',
-    function($scope,layerService,uiGridConstants,$window){
+    function($scope,layerService,uiGridConstants,$window,$q,$timeout){
         $scope.layer={};
         $scope.layer_id="";
+        $scope.userRole="";
         $scope.departments=[];
         $scope.gridApi={};
         $scope.layerApprovalUrl="/api/layer-attribute-permission-set/";
@@ -58,11 +59,13 @@
 
         $scope.approveLayer=function(){
             var data=getPostLayerDataInformation();
+            data.status="PENDING";
             postLayerData($scope.layerApprovalUrl,data);
         };
 
         $scope.publishLayer=function(){
             var data=getPostLayerDataInformation();
+            data.status="ACTIVE";
             postLayerData($scope.layerApprovalUrl,data);
         };
         angular.isUndefinedOrNull = function(val) {
@@ -76,19 +79,34 @@
                                         (angular.isUndefinedOrNull(response.organization) ? 'N/A' : response.organization) +' > '+
                                         (angular.isUndefinedOrNull(response.sector) ? 'N/A' : response.sector ) +"";
                 $scope.gridOption.data=response.attributes;
-            },function(error){
-                console.log(error);
+                $scope.gridApi.grid.modifyRows($scope.gridOption.data);
+                var selectedAttribute=_.filter($scope.gridOption.data, function (attribute) {
+                    return attribute.is_permitted;
+                  });
+                angular.forEach(selectedAttribute,function(attribute){
+                    $scope.gridApi.selection.selectRow(attribute);
+                });
+                
+              },function(error){
+                  console.log(error);
             });
-            layerService.getOrganizations('/api/groups').then(function(response){
-                    $scope.departments=response.objects;
-                },function(error){
-                    console.log(error);
+            $q.all({department: layerService.getOrganizations('/api/groups'), permissions: layerService.getLayerPermissions('/security/permissions/'+layerId)})
+                    .then(function(resolutions){
+                    var departments= resolutions.department.objects;
+                    $scope.departments= _.object(_.map(departments, function(item) {
+                        return [item.slug, item];
+                     }));
+                    var permissions  = Object.keys(JSON.parse(resolutions.permissions.permissions).groups);
+                    angular.forEach(permissions,function(permission){
+                        $scope.departments[permission].IsChecked=true;
+                    });
                 });
         }
 
-        $scope.inIt=function(layerId){
+        $scope.inIt=function(layerId,userRole){
             getLayerInformation(layerId);
             $scope.layer_id=layerId;
+            $scope.userRole=userRole;
         };
     });
 })();

@@ -13,8 +13,8 @@
 {% block body_outer %}
     <div class="gd-content">
         <div class="gd-content-heading">
-            <div class="title small-content">
-                {% trans "Approve Layer" %}
+            <div class="d-title small-content">
+                {% trans "Approve Layer" %} 
             </div>
             <div class="hr"></div>
         </div>
@@ -23,7 +23,7 @@
               <div class="col-md-12">
                   <div class="panel-body">
                     <div class="row" ng-app="layerApp">
-                        <div ng-controller="approveLayerController" ng-init="inIt({{layer.id}})">
+                        <div ng-controller="approveLayerController" ng-init="inIt({{layer.id}},'{{user_role}}')">
                             <div class="col-md-5">
                                     <form class="form-horizontal" name="layer-approval-from">
                                             <div class="form-group">
@@ -49,11 +49,11 @@
                                               </div>
                                             </div>
                                             <div class="form-group">
-                                                    <label class="control-label col-sm-4" for="organization">Organizations</label>
+                                                    <label class="control-label col-sm-4" for="organization">Permitted Organizations</label>
                                                     <div class="col-sm-8">
                                                         <div class="well well-sm">
                                                                 <label class="control-label">
-                                                                        <span class="glyphicon glyphicon-list-alt"></span> Department</label> 
+                                                                        <span class="glyphicon glyphicon-list-alt"></span> Organization</label> 
                                                                         <div class="checkbox" ng-repeat="department in departments">
                                                                                 <label><input type="checkbox" value="true" ng-model="department.IsChecked">[{department.title}]</label>
                                                                             </div>
@@ -125,9 +125,11 @@
                             <div class="col-md-12">
                                 <div class="col-md-4 pull-right">
                                     <button type="button" 
+                                    ng-show="userRole=='Member'"
                                     class="btn btn-primary pull-right"
                                      ng-click="approveLayer()">Submit For Approval</button>
                                     <button type="button"
+                                    ng-show="userRole=='Admin'"
                                     class="btn btn-primary pull-right" 
                                     ng-click="publishLayer()">Publish</button>
                                 </div>
