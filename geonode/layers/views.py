@@ -189,7 +189,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
             'is_layer': True,
             'allowed_file_types': ['.cst', '.dbf', '.prj', '.shp', '.shx'],
             'categories': TopicCategory.objects.all(),
-            'organizations': GroupProfile.objects.filter(groupmember__user=request.user),
+            'organizations': GroupProfile.objects.all(),
             'user_organization': GroupProfile.objects.filter(groupmember__user=request.user).first()
         }
         return render_to_response(template, RequestContext(request, ctx))
@@ -1325,6 +1325,19 @@ def layer_permission_preview(request, layername, template='layers/layer_attribut
         _PERMISSION_MSG_VIEW)
 
     if request.method == 'GET':
+        if request.user == layer.owner:
+            if layer.status == 'DRAFT':
+                pass
+        elif request.user.is_working_group_admin:
+            if layer.status == 'PENDING':
+                pass
+        else:
+            return HttpResponse(
+                loader.render_to_string(
+                    '401.html', RequestContext(
+                        request, {
+                            'error_message': _("You dont have permission to edit this layer.")})), status=401)
+
         ctx = {
             'layer': layer,
             'organizations': GroupProfile.objects.all(),

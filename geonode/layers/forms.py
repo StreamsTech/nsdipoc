@@ -156,7 +156,8 @@ class LayerUploadForm(forms.Form):
         return cleaned
 
     def write_files(self):
-
+        import pdb;
+        pdb.set_trace()
         absolute_base_file = None
         tempdir = tempfile.mkdtemp()
         file = self.cleaned_data['base_file']

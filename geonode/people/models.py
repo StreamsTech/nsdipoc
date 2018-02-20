@@ -217,17 +217,17 @@ def profile_post_save(instance, sender, **kwargs):
             EmailAddress.objects.filter(user=instance, primary=True).update(email=instance.email)
 
 
-    #@jahangir091
-    default_group, created_group = GroupProfile.objects.get_or_create(slug='default')
-    if not default_group.title:
-        default_group.title = 'default organization'
-        default_group.save()
-    if instance != get_anonymous_user():
-        if instance.is_superuser:
-            default_group.join(instance, role='manager')
-        else:
-            default_group.join(instance, role='member')
-    #end
+    # #@jahangir091
+    # default_group, created_group = GroupProfile.objects.get_or_create(slug='default')
+    # if not default_group.title:
+    #     default_group.title = 'default organization'
+    #     default_group.save()
+    # if instance != get_anonymous_user():
+    #     if instance.is_superuser:
+    #         default_group.join(instance, role='manager')
+    #     else:
+    #         default_group.join(instance, role='member')
+    # #end
 
 
 

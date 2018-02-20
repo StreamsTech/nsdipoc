@@ -170,13 +170,12 @@ class PermissionLevelMixin(object):
 
     def resolvePermission(self, permissions):
         for gr_slug in permissions["groups"]:
-            if gr_slug != 'default':
-                group = GroupProfile.objects.get(slug=gr_slug)
-                groupMembers = group.member_queryset()
-                for gr_member in groupMembers:
-                    permissions['users'][gr_member.user.username] = []
-                    permissions['users'][gr_member.user.username].append('view_resourcebase')
-                    permissions['users'][gr_member.user.username].append('download_resourcebase')
+            group = GroupProfile.objects.get(slug=gr_slug)
+            groupMembers = group.member_queryset()
+            for gr_member in groupMembers:
+                permissions['users'][gr_member.user.username] = []
+                permissions['users'][gr_member.user.username].append('view_resourcebase')
+                permissions['users'][gr_member.user.username].append('download_resourcebase')
 
 
         return permissions

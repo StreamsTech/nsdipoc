@@ -1086,7 +1086,7 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                 permissions = json.loads(request.body).get('permissions')
                 attributes = json.loads(request.body).get('attributes')
                 status = json.loads(request.body).get('status')
-                
+
                 layer.status = status
                 layer.save()
                 if permissions is not None and len(permissions.keys()) > 0:
