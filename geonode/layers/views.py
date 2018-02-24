@@ -259,19 +259,19 @@ def layer_upload(request, template='upload/layer_upload.html'):
         errormsgs = []
         out = {'success': False}
         if form.is_valid():
-            if str(file_extension) == 'shp' and srs.IsProjected:
-                form.cleaned_data['base_file'] = data_dict['base_file']
-                form.cleaned_data['shx_file'] = data_dict['shx_file']
-                form.cleaned_data['dbf_file'] = data_dict['dbf_file']
-                form.cleaned_data['prj_file'] = data_dict['prj_file']
-                if 'xml_file' in data_dict:
-                    form.cleaned_data['xml_file'] = data_dict['xml_file']
-                """
-                if 'sbn_file' in  data_dict:
-                    form.cleaned_data['sbn_file'] = data_dict['sbn_file']
-                if 'sbx_file' in data_dict:
-                    form.cleaned_data['sbx_file'] = data_dict['sbx_file']
-                """
+            # if str(file_extension) == 'shp' and srs.IsProjected:
+            #     form.cleaned_data['base_file'] = data_dict['base_file']
+            #     form.cleaned_data['shx_file'] = data_dict['shx_file']
+            #     form.cleaned_data['dbf_file'] = data_dict['dbf_file']
+            #     form.cleaned_data['prj_file'] = data_dict['prj_file']
+            #     if 'xml_file' in data_dict:
+            #         form.cleaned_data['xml_file'] = data_dict['xml_file']
+            #     """
+            #     if 'sbn_file' in  data_dict:
+            #         form.cleaned_data['sbn_file'] = data_dict['sbn_file']
+            #     if 'sbx_file' in data_dict:
+            #         form.cleaned_data['sbx_file'] = data_dict['sbx_file']
+            #     """
 
             title = form.cleaned_data["layer_title"]
             category = form.cleaned_data["category"]
