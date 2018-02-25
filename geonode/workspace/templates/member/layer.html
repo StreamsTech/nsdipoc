@@ -15,7 +15,8 @@
     <div class="gd-content">
         <div class="d-title">
            
-                {% trans "Member Workspace" %}  
+                {% trans "Member Workspace" %} 
+        
            
         </div>
 
@@ -269,7 +270,7 @@ $(function () {
                         output+='<td>'+ draft_list_messages_json[item.id]['layer_msg'] +'</td>';
                     }
 
-                    output+='<td><a href="'+ item.detail_url +'/preview?user_role=Member" class="btn btn-gd-primary"> {% trans "Continue for Approval" %}</a>'+
+                    output+='<td><a href="'+ item.detail_url +'/preview" class="btn btn-gd-primary"> {% trans "Continue for Approval" %}</a>'+
                         '<a href="'+ item.detail_url +'" class="btn btn-gd-primary" style="margin-left:5px"> {% trans "Edit Layer" %}'+'</a> ';
 
                     // if(draft_list_messages_json[item.id]['mandatory_fields_msg'] == ""){

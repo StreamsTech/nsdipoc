@@ -3,7 +3,7 @@
     function($scope,layerService,uiGridConstants,$window,$q,$timeout){
         $scope.layer={};
         $scope.layer_id="";
-        $scope.userRole="";
+        $scope.isAdmin=false;
         $scope.departments=[];
         $scope.gridApi={};
         $scope.layerApprovalUrl="/api/layer-attribute-permission-set/";
@@ -50,7 +50,7 @@
 
         function postLayerData(url,data){
             layerService.submitLayerInformation(url,data).then(function(response){
-                $window.history.back();
+                document.location.href="/";
             },function(error){
                 console.log(error);
             });
