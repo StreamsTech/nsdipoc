@@ -189,7 +189,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
             'is_layer': True,
             'allowed_file_types': ['.cst', '.dbf', '.prj', '.shp', '.shx'],
             'categories': TopicCategory.objects.all(),
-            'organizations': GroupProfile.objects.filter(groupmember__user=request.user),
+            'organizations': GroupProfile.objects.all(),
             'user_organization': GroupProfile.objects.filter(groupmember__user=request.user).first()
         }
         return render_to_response(template, RequestContext(request, ctx))
@@ -259,19 +259,19 @@ def layer_upload(request, template='upload/layer_upload.html'):
         errormsgs = []
         out = {'success': False}
         if form.is_valid():
-            if str(file_extension) == 'shp' and srs.IsProjected:
-                form.cleaned_data['base_file'] = data_dict['base_file']
-                form.cleaned_data['shx_file'] = data_dict['shx_file']
-                form.cleaned_data['dbf_file'] = data_dict['dbf_file']
-                form.cleaned_data['prj_file'] = data_dict['prj_file']
-                if 'xml_file' in data_dict:
-                    form.cleaned_data['xml_file'] = data_dict['xml_file']
-                """
-                if 'sbn_file' in  data_dict:
-                    form.cleaned_data['sbn_file'] = data_dict['sbn_file']
-                if 'sbx_file' in data_dict:
-                    form.cleaned_data['sbx_file'] = data_dict['sbx_file']
-                """
+            # if str(file_extension) == 'shp' and srs.IsProjected:
+            #     form.cleaned_data['base_file'] = data_dict['base_file']
+            #     form.cleaned_data['shx_file'] = data_dict['shx_file']
+            #     form.cleaned_data['dbf_file'] = data_dict['dbf_file']
+            #     form.cleaned_data['prj_file'] = data_dict['prj_file']
+            #     if 'xml_file' in data_dict:
+            #         form.cleaned_data['xml_file'] = data_dict['xml_file']
+            #     """
+            #     if 'sbn_file' in  data_dict:
+            #         form.cleaned_data['sbn_file'] = data_dict['sbn_file']
+            #     if 'sbx_file' in data_dict:
+            #         form.cleaned_data['sbx_file'] = data_dict['sbx_file']
+            #     """
 
             title = form.cleaned_data["layer_title"]
             category = form.cleaned_data["category"]
@@ -1325,6 +1325,19 @@ def layer_permission_preview(request, layername, template='layers/layer_attribut
         _PERMISSION_MSG_VIEW)
 
     if request.method == 'GET':
+        if request.user == layer.owner:
+            if layer.status == 'DRAFT':
+                pass
+        elif request.user.is_working_group_admin:
+            if layer.status == 'PENDING':
+                pass
+        else:
+            return HttpResponse(
+                loader.render_to_string(
+                    '401.html', RequestContext(
+                        request, {
+                            'error_message': _("You dont have permission to edit this layer.")})), status=401)
+
         ctx = {
             'layer': layer,
             'organizations': GroupProfile.objects.all(),

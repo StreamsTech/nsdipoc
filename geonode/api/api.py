@@ -1068,7 +1068,6 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
 
     def dispatch(self, request_type, request, **kwargs):
         out = {'success': False}
-        # import pdb; pdb.set_trace()
         if not request.user.is_authenticated():
             out['errors'] = 'User is not authenticated'
             return HttpResponse(json.dumps(out), content_type='application/json', status=200)
@@ -1086,7 +1085,7 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                 permissions = json.loads(request.body).get('permissions')
                 attributes = json.loads(request.body).get('attributes')
                 status = json.loads(request.body).get('status')
-                
+
                 layer.status = status
                 layer.save()
                 if permissions is not None and len(permissions.keys()) > 0:
