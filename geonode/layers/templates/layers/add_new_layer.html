@@ -18,8 +18,8 @@
     <div class="gd-content-heading">
         <div class="row">
           <div class="col-md-6">
-              <div class="title small-content">
-                  {% trans "Add new version Layers" %}
+              <div class="d-title small-content">
+                  {% trans "Add new version" %}
               </div>
           </div>
           <div class="col-md-6">
@@ -116,7 +116,7 @@
                   </section>
               </div>
           </div>
-          <div class="col-md-6" ng-app="layerApp" ng-controller="layerVersionController">
+          <div class="col-md-6" ng-app="layerApp"  ng-cloak ng-controller="layerVersionController">
             <div class="row" ng-init="inIt({{layer.id}})">
                 <table class="table table-striped table-hover">
                     <thead>
