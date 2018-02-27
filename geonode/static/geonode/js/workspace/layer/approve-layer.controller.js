@@ -1,8 +1,9 @@
 (function(){
     angular.module('layerApp').controller('approveLayerController',
-    function($scope,layerService,uiGridConstants){
+    function($scope,layerService,uiGridConstants,$window,$q,$timeout){
         $scope.layer={};
         $scope.layer_id="";
+        $scope.isAdmin=false;
         $scope.departments=[];
         $scope.gridApi={};
         $scope.layerApprovalUrl="/api/layer-attribute-permission-set/";
@@ -37,19 +38,19 @@
             data.layer_pk =$scope.layer_id;
             var permittedOrganizations=_.map(_.filter($scope.departments,function(department){
                 return department.IsChecked;
-                }),"id");
+                }),"slug");
             angular.forEach(permittedOrganizations,function(organizationId){
                 permissions.groups[organizationId]= permissionAttributes;
             });
-            data.permissions =JSON.stringify(permissions);
+            data.permissions =permissions;//JSON.stringify(permissions);
             var selectedAttributes=_.map($scope.gridApi.selection.getSelectedRows(),"id");
-            data.attributes =JSON.stringify(selectedAttributes);
+            data.attributes =selectedAttributes;//JSON.stringify(selectedAttributes);
             return data;
         }
 
         function postLayerData(url,data){
             layerService.submitLayerInformation(url,data).then(function(response){
-                console.log(response);
+                document.location.href="/";
             },function(error){
                 console.log(error);
             });
@@ -58,14 +59,14 @@
 
         $scope.approveLayer=function(){
             var data=getPostLayerDataInformation();
-            console.log(data);
+            data.status="PENDING";
             postLayerData($scope.layerApprovalUrl,data);
         };
 
         $scope.publishLayer=function(){
             var data=getPostLayerDataInformation();
-            console.log(data);
-            // postLayerData($scope.layerApprovalUrl,data);
+            data.status="ACTIVE";
+            postLayerData($scope.layerApprovalUrl,data);
         };
         angular.isUndefinedOrNull = function(val) {
             return angular.isUndefined(val) || val === null ;
@@ -78,19 +79,34 @@
                                         (angular.isUndefinedOrNull(response.organization) ? 'N/A' : response.organization) +' > '+
                                         (angular.isUndefinedOrNull(response.sector) ? 'N/A' : response.sector ) +"";
                 $scope.gridOption.data=response.attributes;
-            },function(error){
-                console.log(error);
+                $scope.gridApi.grid.modifyRows($scope.gridOption.data);
+                var selectedAttribute=_.filter($scope.gridOption.data, function (attribute) {
+                    return attribute.is_permitted;
+                  });
+                angular.forEach(selectedAttribute,function(attribute){
+                    $scope.gridApi.selection.selectRow(attribute);
+                });
+                
+              },function(error){
+                  console.log(error);
             });
-            layerService.getOrganizations('/api/groups').then(function(response){
-                    $scope.departments=response.objects;
-                },function(error){
-                    console.log(error);
+            $q.all({department: layerService.getOrganizations('/api/groups'), permissions: layerService.getLayerPermissions('/security/permissions/'+layerId)})
+                    .then(function(resolutions){
+                    var departments= resolutions.department.objects;
+                    $scope.departments= _.object(_.map(departments, function(item) {
+                        return [item.slug, item];
+                     }));
+                    var permissions  = Object.keys(JSON.parse(resolutions.permissions.permissions).groups);
+                    angular.forEach(permissions,function(permission){
+                        $scope.departments[permission].IsChecked=true;
+                    });
                 });
         }
 
-        $scope.inIt=function(layerId){
+        $scope.inIt=function(layerId,userRole){
             getLayerInformation(layerId);
             $scope.layer_id=layerId;
+            $scope.userRole=userRole;
         };
     });
 })();

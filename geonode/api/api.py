@@ -1084,18 +1084,24 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
             if request.user.is_working_group_admin or request.user == layer.owner:
                 permissions = json.loads(request.body).get('permissions')
                 attributes = json.loads(request.body).get('attributes')
+                status = json.loads(request.body).get('status')
+
+                layer.status = status
+                layer.save()
                 if permissions is not None and len(permissions.keys()) > 0:
                     permissions = layer.resolvePermission(permissions)
                     layer.set_permissions(permissions)
                 for attr_pk in attributes:
-                    attr = Attribute.objects.get(pk=attr_pk).is_permitted = True
+                    attr = Attribute.objects.get(pk=attr_pk)
+                    attr.is_permitted = True
                     attr.save()
                 out['success'] = True
 
 
             else:
                 out['errors'] = 'You dont have permission to update permissions'
-        out['errors'] = 'Only post method is permitted'
+        else:
+            out['errors'] = 'Only post method is permitted'
         return HttpResponse(json.dumps(out), content_type='application/json', status=200)
 
 
@@ -1120,12 +1126,12 @@ class ChangeLayerVersionApi(TypeFilteredResource):
     def dispatch(self, request_type, request, **kwargs):
         if request.method == 'POST':
             out = {'success': False}
-
+        
             layer_id = json.loads(request.body).get('layer_id')
             layer_version_id = json.loads(request.body).get('version_id')
             user_id = json.loads(request.body).get('user_id')
-            user = Profile.objects.get(id=user_id)
-            request.user = user
+            # user = Profile.objects.get(id=user_id)
+            # request.user = user
 
             if layer_id and layer_version_id:
                 try:
@@ -1168,4 +1174,3 @@ class ChangeLayerVersionApi(TypeFilteredResource):
                 out['success'] = False
                 status_code = 400
             return HttpResponse(json.dumps(out), content_type='application/json', status=status_code)
-

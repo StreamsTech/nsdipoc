@@ -225,7 +225,7 @@
                                        <h4>{% trans "Layer" %}</h4>
                                        {% if "change_resourcebase" in perms_list and not resource.service %}
                                            <a class="btn btn-default btn-gd btn-block btn-xs"
-                                              href="{% url "layer_replace" resource.service_typename %}">{% trans "Replace" %}</a>
+                                           href="{% url "add_new_layer" resource.service_typename %}">{% trans "Replace" %}</a>
                                        {% endif %}
                                        {% if resource.storeType == 'dataStore' and "change_layer_data" in layer_perms %}
                                            <a class="btn btn-default btn-gd btn-block btn-xs"
@@ -258,7 +258,7 @@
  <!-- End edit layer modal -->
 
 
-            <div id="sidebar" class="panel-left slideInRight">
+            <div id="sidebar" class="panel-left layer-panel slideInRight">
 
                   
 
@@ -283,7 +283,7 @@
                                             
                                             <i class="fa fa-chevron-up" aria-hidden="true"></i>
                                             <i class="fa fa-chevron-down" aria-hidden="true"></i>
-                                            {{ resource.title|default:resource.typename }}
+                                            {{ resource.title|default:resource.typename }} {{user_role}}dasd
                                         </a>
                                     </h4>
                                 </div>
@@ -318,6 +318,14 @@
                                                         {% include "layer_templates/_deny_layer.html" %}
                                                     {% endif %}
                                                 </li>
+                                                {% if user_role == "manager" and status == 'ACTIVE' %}
+                                                <li class="list-group-item">
+                                                        <form method="post" action="{% url "layer-draft" resource.id %}">
+                                                                {% csrf_token %}
+                                                    <button type="submit" class="btn btn-gd-primary btn-md btn-block" >{% trans "Unapproved Layer" %}</button>
+                                                    </form>
+                                                </li>
+                                                {% endif %}
 
                                             {% endif %}
 
@@ -357,6 +365,13 @@
                                                         data-toggle="modal" data-target="#edit-layer">
                                                     {% trans "Edit Layer" %}
                                                 </button>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <a 
+                                                href="{% url "add_new_layer" resource.service_typename %}"
+                                                class="btn btn-gd-primary btn-md btn-block">
+                                                    {% trans "Add Version" %}
+                                                </a>
                                             </li>
                                             
                                             {% endif %}
@@ -993,11 +1008,11 @@
         var count = 0;
         function animating(){
             if(count === 0){
-                document.getElementById('sidebar').className = 'panel-left slideOutRight';
+                document.getElementById('sidebar').className = 'panel-left layer-panel slideOutRight';
           
                 count++;
             }else{
-                document.getElementById('sidebar').className = 'panel-left slideInRight show';//hide
+                document.getElementById('sidebar').className = 'panel-left layer-panel slideInRight show';//hide
            
                 count--;
             }
@@ -1022,7 +1037,7 @@
         bodyHeight = parseInt(parseInt(bodyHeight) - 53);
         console.log("bodyHeight", bodyHeight);
         GD_WRAPPER__HEIGHT = bodyHeight;
-        $("#gd-wrapper .map-details-information, #gd-wrapper .map-details-info").css("height", bodyHeight + "px");
+        $("#gd-wrapper .layer-details-information, #gd-wrapper .map-details-info").css("height", bodyHeight + "px");
     }
     $(document).ready(function () {
         // wrapper

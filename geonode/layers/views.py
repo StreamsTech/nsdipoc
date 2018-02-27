@@ -109,6 +109,7 @@ from rest_framework.response import Response
 
 from django.db import connection
 from osgeo import osr
+from geonode.settings import MEDIA_ROOT
 
 from geonode.authentication_decorators import login_required as custom_login_required
 from geonode.class_factory import ClassFactory
@@ -188,7 +189,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
             'is_layer': True,
             'allowed_file_types': ['.cst', '.dbf', '.prj', '.shp', '.shx'],
             'categories': TopicCategory.objects.all(),
-            'organizations': GroupProfile.objects.filter(groupmember__user=request.user),
+            'organizations': GroupProfile.objects.all(),
             'user_organization': GroupProfile.objects.filter(groupmember__user=request.user).first()
         }
         return render_to_response(template, RequestContext(request, ctx))
@@ -258,19 +259,19 @@ def layer_upload(request, template='upload/layer_upload.html'):
         errormsgs = []
         out = {'success': False}
         if form.is_valid():
-            if str(file_extension) == 'shp' and srs.IsProjected:
-                form.cleaned_data['base_file'] = data_dict['base_file']
-                form.cleaned_data['shx_file'] = data_dict['shx_file']
-                form.cleaned_data['dbf_file'] = data_dict['dbf_file']
-                form.cleaned_data['prj_file'] = data_dict['prj_file']
-                if 'xml_file' in data_dict:
-                    form.cleaned_data['xml_file'] = data_dict['xml_file']
-                """
-                if 'sbn_file' in  data_dict:
-                    form.cleaned_data['sbn_file'] = data_dict['sbn_file']
-                if 'sbx_file' in data_dict:
-                    form.cleaned_data['sbx_file'] = data_dict['sbx_file']
-                """
+            # if str(file_extension) == 'shp' and srs.IsProjected:
+            #     form.cleaned_data['base_file'] = data_dict['base_file']
+            #     form.cleaned_data['shx_file'] = data_dict['shx_file']
+            #     form.cleaned_data['dbf_file'] = data_dict['dbf_file']
+            #     form.cleaned_data['prj_file'] = data_dict['prj_file']
+            #     if 'xml_file' in data_dict:
+            #         form.cleaned_data['xml_file'] = data_dict['xml_file']
+            #     """
+            #     if 'sbn_file' in  data_dict:
+            #         form.cleaned_data['sbn_file'] = data_dict['sbn_file']
+            #     if 'sbx_file' in data_dict:
+            #         form.cleaned_data['sbx_file'] = data_dict['sbx_file']
+            #     """
 
             title = form.cleaned_data["layer_title"]
             category = form.cleaned_data["category"]
@@ -1158,6 +1159,26 @@ def layer_approve(request, layer_pk):
     else:
         return HttpResponseRedirect(reverse('admin-workspace-layer'))
 
+@login_required
+def layer_draft(request, layer_pk):
+    if request.method == 'POST':
+        try:
+            layer = Layer.objects.get(id=layer_pk)
+        except Layer.DoesNotExist:
+            return Http404("Map does not exist")
+
+        group = layer.group
+        managers = list( group.get_managers())
+        layer.status = 'DRAFT'
+
+        if request.user in managers or request.user.is_superuser:
+            # only managers or superuser can change status
+            layer.save()
+            messages.info(request, 'Unapproved layer successfully')
+            
+        return HttpResponseRedirect(reverse('member-workspace-layer'))            
+    else:
+        return HttpResponseRedirect(reverse('member-workspace-layer'))
 
 @login_required
 def layer_deny(request, layer_pk):
@@ -1304,6 +1325,19 @@ def layer_permission_preview(request, layername, template='layers/layer_attribut
         _PERMISSION_MSG_VIEW)
 
     if request.method == 'GET':
+        if request.user == layer.owner:
+            if layer.status == 'DRAFT':
+                pass
+        elif request.user.is_working_group_admin:
+            if layer.status == 'PENDING':
+                pass
+        else:
+            return HttpResponse(
+                loader.render_to_string(
+                    '401.html', RequestContext(
+                        request, {
+                            'error_message': _("You dont have permission to edit this layer.")})), status=401)
+
         ctx = {
             'layer': layer,
             'organizations': GroupProfile.objects.all(),
@@ -1646,9 +1680,9 @@ def add_new_layer(request, layername, template='layers/add_new_layer.html'):
 def backupCurrentVersion(layer):
 
     download_link = layer.link_set.get(name='Zipped Shapefile')
-    # r = requests.get(download_link.url)
-    r = requests.get('http://localhost:8080/geoserver/geonode/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geonode:cool&maxFeatures=50&outputFormat=SHAPE-ZIP')
-    temdir = '/home/jaha/Documents/version/' + layer.name + '/' + str(layer.current_version) + '/'
+    r = requests.get(download_link.url)
+    # r = requests.get('http://localhost:8080/geoserver/geonode/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geonode:cool&maxFeatures=50&outputFormat=SHAPE-ZIP')
+    temdir = MEDIA_ROOT + '/' + layer.name + '/' + str(layer.current_version) + '/'
     if not os.path.exists(temdir):
         os.makedirs(temdir)
     zfile = open(temdir + layer.name + '.zip', 'wb')
@@ -1664,9 +1698,9 @@ def backupCurrentVersion(layer):
 def backupPreviousVersion(layer):
 
     download_link = layer.link_set.get(name='Zipped Shapefile')
-    # r = requests.get(download_link.url)
-    r = requests.get('http://localhost:8080/geoserver/geonode/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geonode:cool&maxFeatures=50&outputFormat=SHAPE-ZIP')
-    temdir = '/home/jaha/Documents/version/' + layer.name + '/' + str(layer.current_version) + '/'
+    r = requests.get(download_link.url)
+    # r = requests.get('http://localhost:8080/geoserver/geonode/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geonode:cool&maxFeatures=50&outputFormat=SHAPE-ZIP')
+    temdir = MEDIA_ROOT + '/' + layer.name + '/' + str(layer.current_version) + '/'
     if not os.path.exists(temdir):
         os.makedirs(temdir)
     zfile = open(temdir + layer.name + '.zip', 'wb')
@@ -1679,4 +1713,3 @@ def backupPreviousVersion(layer):
     zfile.write(r.content)
     zfile.close()
     r.close()
-

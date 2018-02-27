@@ -47,6 +47,7 @@ from geonode.people.forms import ProfileForm
 from geonode.people.forms import ForgotUsernameForm, UserSignupFormExtend, UserSignupFormWithWorkingGroup
 from geonode.tasks.email import send_email
 from geonode.groups.models import GroupProfile, GroupMember
+from account.views import InviteUserView
 
 
 @login_required
@@ -253,14 +254,14 @@ def inbox(request):
     return HttpResponseRedirect(reverse('messages_inbox'))
 
 
-# class InviteUser(InviteUserView):
-#     """
-#
-#     """
-#
-#     def get_success_url(self, fallback_url=None, **kwargs):
-#
-#         return reverse('invite_user')
+class InviteUser(InviteUserView):
+    """
+    For inviting user
+    """
+
+    def get_success_url(self, fallback_url=None, **kwargs):
+
+        return reverse('invite_user')
 
 
 @login_required

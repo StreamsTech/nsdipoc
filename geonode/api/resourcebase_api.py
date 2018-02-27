@@ -772,7 +772,7 @@ class GroupsResourceWithFavorite(ModelResource):
     manager_count = fields.IntegerField()
 
     def dehydrate_member_count(self, bundle):
-        if 'HTTP_AUTHORIZATION' in bundle.equest.META:
+        if 'HTTP_AUTHORIZATION' in bundle.request.META:
             token = bundle.request.META['HTTP_AUTHORIZATION']
 
             accesstoken = AccessToken.objects.filter(token=token[7:])
@@ -1211,7 +1211,7 @@ class AttributeApi(ModelResource):
         queryset = Attribute.objects.all()
         resource_name = 'layer-attributes'
         allowed_method = 'get'
-        fields = ['attribute', 'attribute_type', 'id']
+        fields = ['attribute', 'attribute_type', 'id', 'is_permitted']
 
 
 class LayerAttributeApi(ModelResource):

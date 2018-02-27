@@ -102,3 +102,7 @@ venv
 
 #npm
 package-lock.json
+
+src/billiard
+src/kombu
+src/pip-delete-this-directory.txt
