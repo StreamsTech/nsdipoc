@@ -33,6 +33,9 @@ from django.conf import settings
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 from django.template import RequestContext, loader
+from django.views.decorators.csrf import csrf_exempt
+
+
 try:
     # Django >= 1.7
     import json
@@ -1136,6 +1139,7 @@ def map_draft(request, map_pk):
     else:
         return HttpResponseRedirect(reverse('member-workspace-map'))
 
+@csrf_exempt
 @login_required
 def map_approve(request, map_pk):
     if request.method == 'POST':
@@ -1208,7 +1212,7 @@ def map_approve(request, map_pk):
     else:
         return HttpResponseRedirect(reverse('admin-workspace-map'))
 
-
+@csrf_exempt
 @login_required
 def map_deny(request, map_pk):
     if request.method == 'POST':
