@@ -110,6 +110,7 @@ from rest_framework.response import Response
 from django.db import connection
 from osgeo import osr
 from geonode.settings import MEDIA_ROOT
+from geonode.people.models import Profile
 
 from geonode.authentication_decorators import login_required as custom_login_required
 from geonode.class_factory import ClassFactory
@@ -1069,7 +1070,9 @@ def layer_publish(request, layer_pk):
             layer_submission_activity.save()
 
             # notify organization admins about the new published layer
-            managers = list(group.get_managers())
+            working_group_admins = Profile.objects.filter(is_working_group_admin=True)
+            # managers = list(group.get_managers())
+            managers = list(working_group_admins)
             notify.send(request.user, recipient_list=managers, actor=request.user,
                         verb='pushed a new layer for approval', target=layer)
 
