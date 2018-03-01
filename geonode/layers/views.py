@@ -91,6 +91,8 @@ from geonode.utils import build_social_links
 from geonode.geoserver.helpers import cascading_delete, gs_catalog
 from geonode.geoserver.helpers import ogc_server_settings
 from geonode import GeoNodeException
+from geonode.layers.models import LayerVersionModel
+from geonode.layers.utils import file_size_with_ext
 
 from geonode.groups.models import GroupProfile
 from geonode.layers.models import LayerSubmissionActivity, LayerAuditActivity, StyleExtension, Style
@@ -107,6 +109,7 @@ from rest_framework.response import Response
 
 from django.db import connection
 from osgeo import osr
+from geonode.settings import MEDIA_ROOT
 
 from geonode.authentication_decorators import login_required as custom_login_required
 from geonode.class_factory import ClassFactory
@@ -186,7 +189,8 @@ def layer_upload(request, template='upload/layer_upload.html'):
             'is_layer': True,
             'allowed_file_types': ['.cst', '.dbf', '.prj', '.shp', '.shx'],
             'categories': TopicCategory.objects.all(),
-            'organizations': GroupProfile.objects.filter(groupmember__user=request.user),
+            'organizations': GroupProfile.objects.all(),
+            'user_organization': GroupProfile.objects.filter(groupmember__user=request.user).first()
         }
         return render_to_response(template, RequestContext(request, ctx))
     elif request.method == 'POST':
@@ -255,19 +259,19 @@ def layer_upload(request, template='upload/layer_upload.html'):
         errormsgs = []
         out = {'success': False}
         if form.is_valid():
-            if str(file_extension) == 'shp' and srs.IsProjected:
-                form.cleaned_data['base_file'] = data_dict['base_file']
-                form.cleaned_data['shx_file'] = data_dict['shx_file']
-                form.cleaned_data['dbf_file'] = data_dict['dbf_file']
-                form.cleaned_data['prj_file'] = data_dict['prj_file']
-                if 'xml_file' in data_dict:
-                    form.cleaned_data['xml_file'] = data_dict['xml_file']
-                """
-                if 'sbn_file' in  data_dict:
-                    form.cleaned_data['sbn_file'] = data_dict['sbn_file']
-                if 'sbx_file' in data_dict:
-                    form.cleaned_data['sbx_file'] = data_dict['sbx_file']
-                """
+            # if str(file_extension) == 'shp' and srs.IsProjected:
+            #     form.cleaned_data['base_file'] = data_dict['base_file']
+            #     form.cleaned_data['shx_file'] = data_dict['shx_file']
+            #     form.cleaned_data['dbf_file'] = data_dict['dbf_file']
+            #     form.cleaned_data['prj_file'] = data_dict['prj_file']
+            #     if 'xml_file' in data_dict:
+            #         form.cleaned_data['xml_file'] = data_dict['xml_file']
+            #     """
+            #     if 'sbn_file' in  data_dict:
+            #         form.cleaned_data['sbn_file'] = data_dict['sbn_file']
+            #     if 'sbx_file' in data_dict:
+            #         form.cleaned_data['sbx_file'] = data_dict['sbx_file']
+            #     """
 
             title = form.cleaned_data["layer_title"]
             category = form.cleaned_data["category"]
@@ -313,6 +317,13 @@ def layer_upload(request, template='upload/layer_upload.html'):
                     metadata_uploaded_preserve=form.cleaned_data["metadata_uploaded_preserve"],
                     user_data_epsg=epsg_code
                 )
+                file_size, file_type = form.get_type_and_size()
+                f_size = file_size_with_ext(file_size)
+                saved_layer.file_size = f_size
+                saved_layer.file_type = file_type
+                saved_layer.current_version = 1
+                saved_layer.latest_version = 1
+                saved_layer.save()
                 if admin_upload:
                     saved_layer.status = 'ACTIVE'
                     saved_layer.save()
@@ -347,6 +358,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
                 upload_session.save()
                 permissions = form.cleaned_data["permissions"]
                 if permissions is not None and len(permissions.keys()) > 0:
+                    permissions = saved_layer.resolvePermission(permissions)
                     saved_layer.set_permissions(permissions)
             finally:
                 # Delete temporary files
@@ -860,6 +872,11 @@ def layer_replace(request, layername, template='layers/layer_replace.html'):
                         overwrite=True,
                         charset=form.cleaned_data["charset"],
                     )
+                    file_size, file_type = form.get_type_and_size()
+                    f_size = file_size_with_ext(file_size)
+                    saved_layer.file_size = f_size
+                    saved_layer.file_type = file_type
+                    saved_layer.save()
                     out['success'] = True
                     out['url'] = reverse(
                         'layer_detail', args=[
@@ -1163,7 +1180,6 @@ def layer_draft(request, layer_pk):
     else:
         return HttpResponseRedirect(reverse('member-workspace-layer'))
 
-
 @login_required
 def layer_deny(request, layer_pk):
     if request.method == 'POST':
@@ -1294,6 +1310,50 @@ def finding_xlink(dic):
             item = finding_xlink(value)
             if item is not None:
                 return item
+
+
+def layer_permission_preview(request, layername, template='layers/layer_attribute_permissions_preview.html'):
+    try:
+        user_role = request.GET['user_role']
+    except:
+        user_role=None
+
+    layer = _resolve_layer(
+        request,
+        layername,
+        'base.view_resourcebase',
+        _PERMISSION_MSG_VIEW)
+
+    if request.method == 'GET':
+        if request.user == layer.owner:
+            if layer.status == 'DRAFT':
+                pass
+        elif request.user.is_working_group_admin:
+            if layer.status == 'PENDING':
+                pass
+        else:
+            return HttpResponse(
+                loader.render_to_string(
+                    '401.html', RequestContext(
+                        request, {
+                            'error_message': _("You dont have permission to edit this layer.")})), status=401)
+
+        ctx = {
+            'layer': layer,
+            'organizations': GroupProfile.objects.all(),
+            'user_role': user_role,
+
+        }
+        return render_to_response(template, RequestContext(request, ctx))
+
+
+def getPermittedAttributes(layer, user):
+    if user == layer.owner or user.is_working_group_admin:
+        return Attribute.objects.filter(layer=layer)
+    elif user.has_perm('download_resourcebase', layer.get_self_resource()):
+        return Attribute.objects.filter(layer=layer, is_permitted=True)
+    else:
+        return Attribute.objects.none()
 
 
 def save_sld_geoserver(request_method, full_path, sld_body, content_type='application/vnd.ogc.sld+xml'):
@@ -1536,3 +1596,120 @@ class GeoLocationApiView(CreateAPIView):
 
         return Response(data=dict(data=response, success=success_count, error=failed_count), status=status.HTTP_200_OK)
 # end
+
+
+@login_required
+def add_new_layer(request, layername, template='layers/add_new_layer.html'):
+    layer = _resolve_layer(
+        request,
+        layername,
+        'base.change_resourcebase',
+        _PERMISSION_MSG_MODIFY)
+
+    if request.method == 'GET':
+        ctx = {
+            'charsets': CHARSETS,
+            'layer': layer,
+            'is_featuretype': layer.is_vector(),
+            'is_layer': True,
+        }
+        return render_to_response(template,
+                                  RequestContext(request, ctx))
+    elif request.method == 'POST':
+        backupPreviousVersion(layer)
+
+        form = LayerUploadForm(request.POST, request.FILES)
+        tempdir = None
+        out = {}
+
+        if form.is_valid():
+            try:
+                tempdir, base_file = form.write_files()
+                if layer.is_vector() and is_raster(base_file):
+                    out['success'] = False
+                    out['errors'] = _("You are attempting to replace a vector layer with a raster.")
+                elif (not layer.is_vector()) and is_vector(base_file):
+                    out['success'] = False
+                    out['errors'] = _("You are attempting to replace a raster layer with a vector.")
+                else:
+                    # delete geoserver's store before upload
+                    cat = gs_catalog
+                    cascading_delete(cat, layer.typename)
+                    saved_layer = file_upload(
+                        base_file,
+                        name=layer.name,
+                        user=request.user,
+                        overwrite=True,
+                        charset=form.cleaned_data["charset"],
+                    )
+                    file_size, file_type = form.get_type_and_size()
+                    f_size = file_size_with_ext(file_size)
+                    saved_layer.file_size = f_size
+                    saved_layer.file_type = file_type
+                    saved_layer.current_version = layer.latest_version + 1
+                    saved_layer.latest_version = layer.latest_version + 1
+                    saved_layer.save()
+                    out['success'] = True
+                    out['url'] = reverse(
+                        'layer_detail', args=[
+                            saved_layer.service_typename])
+            except Exception as e:
+                out['success'] = False
+                out['errors'] = str(e)
+            finally:
+                if tempdir is not None:
+                    shutil.rmtree(tempdir)
+        else:
+            errormsgs = []
+            for e in form.errors.values():
+                errormsgs.append([escape(v) for v in e])
+
+            out['errors'] = form.errors
+            out['errormsgs'] = errormsgs
+
+        if out['success']:
+            status_code = 200
+        else:
+            status_code = 400
+        return HttpResponse(
+            json.dumps(out),
+            content_type='application/json',
+            status=status_code)
+
+
+def backupCurrentVersion(layer):
+
+    download_link = layer.link_set.get(name='Zipped Shapefile')
+    r = requests.get(download_link.url)
+    # r = requests.get('http://localhost:8080/geoserver/geonode/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geonode:cool&maxFeatures=50&outputFormat=SHAPE-ZIP')
+    temdir = MEDIA_ROOT + '/' + layer.name + '/' + str(layer.current_version) + '/'
+    if not os.path.exists(temdir):
+        os.makedirs(temdir)
+    zfile = open(temdir + layer.name + '.zip', 'wb')
+    layer_version, created= LayerVersionModel.objects.get_or_create(layer=layer, version=layer.current_version)
+    layer_version.version_name = 'version ' + str(layer.current_version)
+    layer_version.version_path = zfile.name
+    layer_version.save()
+    zfile.write(r.content)
+    zfile.close()
+    r.close()
+
+
+def backupPreviousVersion(layer):
+
+    download_link = layer.link_set.get(name='Zipped Shapefile')
+    r = requests.get(download_link.url)
+    # r = requests.get('http://localhost:8080/geoserver/geonode/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geonode:cool&maxFeatures=50&outputFormat=SHAPE-ZIP')
+    temdir = MEDIA_ROOT + '/' + layer.name + '/' + str(layer.current_version) + '/'
+    if not os.path.exists(temdir):
+        os.makedirs(temdir)
+    zfile = open(temdir + layer.name + '.zip', 'wb')
+    layer_version = LayerVersionModel.objects.create()
+    layer_version.layer = layer
+    layer_version.version = layer.latest_version
+    layer_version.version_name = 'version ' + str(layer.latest_version)
+    layer_version.version_path = zfile.name
+    layer_version.save()
+    zfile.write(r.content)
+    zfile.close()
+    r.close()

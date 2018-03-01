@@ -225,7 +225,7 @@
                                        <h4>{% trans "Layer" %}</h4>
                                        {% if "change_resourcebase" in perms_list and not resource.service %}
                                            <a class="btn btn-default btn-gd btn-block btn-xs"
-                                              href="{% url "layer_replace" resource.service_typename %}">{% trans "Replace" %}</a>
+                                           href="{% url "add_new_layer" resource.service_typename %}">{% trans "Replace" %}</a>
                                        {% endif %}
                                        {% if resource.storeType == 'dataStore' and "change_layer_data" in layer_perms %}
                                            <a class="btn btn-default btn-gd btn-block btn-xs"
@@ -285,7 +285,7 @@
                                             
                                             <i class="fa fa-chevron-up" aria-hidden="true"></i>
                                             <i class="fa fa-chevron-down" aria-hidden="true"></i>
-                                            {{ resource.title|default:resource.typename }}
+                                            {{ resource.title|default:resource.typename }} {{user_role}}dasd
                                         </a>
                                     </h4>
                                 </div>
@@ -367,6 +367,13 @@
                                                         data-toggle="modal" data-target="#edit-layer">
                                                     {% trans "Edit Layer" %}
                                                 </button>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <a 
+                                                href="{% url "add_new_layer" resource.service_typename %}"
+                                                class="btn btn-gd-primary btn-md btn-block">
+                                                    {% trans "Add Version" %}
+                                                </a>
                                             </li>
                                             
                                             {% endif %}
