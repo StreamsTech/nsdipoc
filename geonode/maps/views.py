@@ -1082,6 +1082,7 @@ def map_metadata_detail(request, mapid, template='maps/map_metadata_detail.html'
 
 
 #@jahangir091
+@csrf_exempt
 @login_required
 def map_publish(request, map_pk):
     if request.method == 'POST':

@@ -168,6 +168,9 @@ urlpatterns = patterns('',
                        url(r'^api/users', users, name='users'),
                        url(r'^api/geoserver/', include('geonode.geoserver.api.urls')),
                        url(r'^api/analytics/', include('geonode.analytics.api.urls')),
+
+                       url(r'^api/error-reporting/', include('geonode.error_reporting.api.urls')),
+
                        
                        url(r'', include(api.urls)),
 
