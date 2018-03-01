@@ -109,6 +109,7 @@
                                         <th>Who Approved</th>
                                         <th>Approve Date</th>
                                         <th>Layer Edit</th>
+                                        <th>Unapproved Layer</th>
                                     </tr>
                                 </thead>
                                 <!--{% for approved in approved_list %}-->
@@ -120,6 +121,7 @@
                                             <!--<td>{{ approved.owner }}</td>-->
                                             <!--<td>{{ approved.last_auditor }}</td>-->
                                             <!--<td>{{ approved.date_updated }}</td>-->
+                                            <!--<td><a href="{{ approved.detail_url }}" class="btn btn-gd-primary">{% trans "Edit" %}</a></td>-->
                                             <!--<td><a href="{{ approved.detail_url }}" class="btn btn-gd-primary">{% trans "Edit" %}</a></td>-->
                                         <!--</tr>-->
                                     </tbody>
@@ -554,6 +556,8 @@
                     output+='<td>'+ item.last_auditor +'</td>';
                     output+='<td>'+ item.date_updated +'</td>';
                     output+='<td><a href="'+ item.detail_url +'" class="btn btn-gd-primary">{% trans "Edit" %}</a></td>';
+                    output+='<td><button type="button" class="btn btn-gd-primary" onclick="deleteLayer('+ item.id +')" style="color:#fff;">{% trans "Delete Layer" %}</button></td>';
+                    output+='<td><a href="'+ item.detail_url +'?user_role=manager" class="btn btn-gd-primary">{% trans "Unapproved" %}</a></td>';                    
                     output+='</tr>';
                   });
                   outputpag+='<div>';

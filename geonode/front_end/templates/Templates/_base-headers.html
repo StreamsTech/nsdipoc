@@ -25,6 +25,8 @@
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}geonode/css/menu.css?v={{ VERSION }}" rel="stylesheet" />
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}.components/angular-ui-grid/ui-grid.min.css">
 
+
+
 <script>
     {% autoescape off %}
     {% if config %}
@@ -32,6 +34,7 @@
     {% else %}
     window.mapConfig = {{viewer}};
     {%endif%}
+    window.access_token = '{{access_token}}';
     window.GeoServerHttp2Root = '{{GEOSERVER_BASE_URL}}';
     window.GeoServerTileRoot = '{{GEOSERVER_BASE_URL}}' + 'wms';
     {% endautoescape %}
@@ -50,6 +53,7 @@
 <script src="{{ STATIC_URL }}Scripts/util/appMessages.js"></script>
 <script src="{{ STATIC_URL }}Scripts/lib/toastr.min.js"></script>
 <script src="{{ STATIC_URL }}Scripts/util/surfToastr.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.18/angular-sanitize.min.js"></script>
 
 {% endblock %} {% block extra_script %}
 <script type="text/javascript" src="https://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
@@ -84,6 +88,7 @@
 <script src="{{ STATIC_URL }}Scripts/Directives/tableHeightAdjuster.js"></script>
 <script src="{{ STATIC_URL }}Scripts/Directives/TreeAngle.js"></script>
 <script src="{{ STATIC_URL }}Scripts/Directives/attributeDefinitionDirective.js"></script>
+<script src="{{ STATIC_URL }}Scripts/Directives/attributeGridDirective.js"></script>
 <script src="{{ STATIC_URL }}Scripts/Directives/classifierDefinitionDirective.js"></script>
 <script src="{{ STATIC_URL }}Scripts/Directives/labelingEditorDirective.js"></script>
 <script src="{{ STATIC_URL }}Scripts/Directives/visualizationEditorDirective.js"></script>
@@ -109,8 +114,9 @@
 <script src="{{ STATIC_URL }}Scripts/Directives/visualizationLegends.js"></script>
 <script src="{{ STATIC_URL }}Scripts/Directives/printMapTilteOptions.js"></script>
 <script src="{{ STATIC_URL }}Scripts/Directives/minMaxValidator.js"></script>
+<script src="{{ STATIC_URL }}Scripts/Directives/QueryBuilder/queryBuilderDirective.js"></script>
 <script src="{{ STATIC_URL }}Scripts/util/appModule.js"></script>
-<script src="{{ STATIC_URL }}maps/js/update-map.controller.js"></script>
+<script src="{{ STATIC_URL }}maps/js/map.controller.js"></script>
 
 <script src="{{ STATIC_URL }}Scripts/util/sldTemplates.js"></script>
 <script src="{{ STATIC_URL }}Scripts/util/sldGenerator.js"></script>
@@ -247,10 +253,12 @@
 <script src="{{ STATIC_URL }}layers/js/layer.service.js"></script>
 <script src="{{ STATIC_URL }}layers/js/attribute-view.controller.js"></script>
 <script src="{{ STATIC_URL }}layers/js/feature-preview.controller.js"></script>
+<script src="{{ STATIC_URL }}layers/js/layers-save.controller.js"></script>
 
 <script src="{{ STATIC_URL }}geonode/js/system-settings/system-settings.module.js"></script>
 <script src="{{ STATIC_URL }}geonode/js/system-settings/system-settings.service.js"></script>
     
 <script src="{{ STATIC_URL }}maps/js/share-map.controller.js"></script>
+
 
 {% endblock extra_script %} 

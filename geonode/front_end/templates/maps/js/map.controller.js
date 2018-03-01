@@ -1,10 +1,10 @@
 (function() {
     appModule
-        .controller('MapUpdateController', MapUpdateController);
+        .controller('MapController', MapController);
 
-    MapUpdateController.$inject = ['mapService', '$window', 'analyticsService', 'LayerService', '$scope', 'layerService'];
+    MapController.$inject = ['mapService', '$window', 'analyticsService', 'LayerService', '$scope', 'layerService', 'queryOutputFactory', '$rootScope'];
 
-    function MapUpdateController(mapService, $window, analyticsService, LayerService, $scope, oldLayerService) {
+    function MapController(mapService, $window, analyticsService, LayerService, $scope, oldLayerService, queryOutputFactory, $rootScope) {
         var self = this;
         var re = /\d*\/embed/;
         var map = mapService.getMap();
@@ -27,6 +27,26 @@
         function errorFn() {
 
         }
+
+        $scope.changeStyle = function(layerId, styleId) {
+            var layer = mapService.getLayer(layerId);
+            if (styleId) {
+                LayerService.getStyle(styleId)
+                    .then(function(res) {
+                        layer.setStyle(res);
+                        layer.refresh();
+                    });
+            } else {
+                layer.setStyle(LayerService.getNewStyle());
+                layer.refresh();
+            }
+        };
+
+        $scope.group = { "a": "AND", "rules": [] };
+        $scope.getQueryResult = function() {
+            var query = queryOutputFactory.getOutput($scope.group);
+            $rootScope.$broadcast('filterDataWithCqlFilter', query);
+        };
 
         function getGeoServerSettings() {
             self.propertyNames = [];
@@ -169,7 +189,7 @@
 
                 analyticsService.saveAnalytics(data, url);
             });
-        })();
+        });
 
         $scope.$on("$destroy", function() {
             ol.Observable.unByKey(keyPointerDrag);
