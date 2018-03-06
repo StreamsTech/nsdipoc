@@ -50,6 +50,7 @@ from guardian.shortcuts import get_objects_for_user
 
 # @jahangir091
 from slugify import slugify
+from notify.signals import notify
 from user_messages.models import UserThread
 from taggit.models import Tag
 from django.core.serializers.json import DjangoJSONEncoder
@@ -1085,6 +1086,9 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                 permissions = json.loads(request.body).get('permissions')
                 attributes = json.loads(request.body).get('attributes')
                 status = json.loads(request.body).get('status')
+                if request.user.is_working_group_admin:
+                    notify.send(request.user, recipient=layer.owner, actor=request.user,
+                                target=layer, verb='approved your layer')
 
                 layer.status = status
                 layer.save()
