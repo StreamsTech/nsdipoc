@@ -106,7 +106,7 @@
         $scope.inIt=function(layerId,userRole){
             getLayerInformation(layerId);
             $scope.layer_id=layerId;
-            $scope.userRole=userRole;
+            $scope.userRole= (userRole == 'true');
         };
     });
 })();
