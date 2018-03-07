@@ -1074,6 +1074,7 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
             return HttpResponse(json.dumps(out), content_type='application/json', status=200)
 
         if request.method == 'POST':
+          
             out = {'success': False}
             layer_pk = json.loads(request.body).get('layer_pk')
             try:
@@ -1095,6 +1096,9 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                 if permissions is not None and len(permissions.keys()) > 0:
                     permissions = layer.resolvePermission(permissions)
                     layer.set_permissions(permissions)
+                wog_admins = Profile.objects.filter(is_working_group_admin=True)
+                for wga in wog_admins:
+                    layer.set_managers_permissions(wga)
                 for attr_pk in attributes:
                     attr = Attribute.objects.get(pk=attr_pk)
                     attr.is_permitted = True
