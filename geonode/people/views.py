@@ -214,6 +214,13 @@ class CreateUser(SignupView):
                 user.save()
         return user
 
+    def after_signup(self, form):
+
+        if self.created_user.section:
+            add_user_to_organization(self.created_user)
+        signals.user_signed_up.send(sender=SignupForm, user=self.created_user, form=form)
+
+
 
 def activateuser(request, username):
     if request.method == 'GET':
@@ -274,3 +281,8 @@ def get_current_user(request):
             status=200,
             content_type='application/javascript')
 # end
+
+
+def add_user_to_organization(user):
+    organization = user.section.organization
+    organization.join(user, role='member')
