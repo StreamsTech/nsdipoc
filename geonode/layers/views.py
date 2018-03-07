@@ -1077,7 +1077,8 @@ def layer_publish(request, layer_pk):
                         verb='pushed a new layer for approval', target=layer)
 
             # set all the permissions for all the managers of the group for this layer
-            layer.set_managers_permissions()
+            for manager in managers:
+                layer.set_managers_permissions(manager)
 
             messages.info(request, 'Pushed layer succesfully for approval')
             return HttpResponseRedirect(reverse('member-workspace-layer'))
@@ -1316,10 +1317,6 @@ def finding_xlink(dic):
 
 
 def layer_permission_preview(request, layername, template='layers/layer_attribute_permissions_preview.html'):
-    try:
-        user_role = request.GET['user_role']
-    except:
-        user_role=None
 
     layer = _resolve_layer(
         request,
@@ -1344,7 +1341,7 @@ def layer_permission_preview(request, layername, template='layers/layer_attribut
         ctx = {
             'layer': layer,
             'organizations': GroupProfile.objects.all(),
-            'user_role': user_role,
+
 
         }
         return render_to_response(template, RequestContext(request, ctx))
