@@ -21,8 +21,8 @@
         };
         $scope.setVersion=function(layer){
             var data={
-                layer_id : layer.id,
-                version_id : layer.version
+                layer_id : $scope.layer_id,
+                version_id : layer.id
             };
             layerService.setVersion($scope.versionSettingUrl,data).then(function(response){
                 $window.location.reload();
