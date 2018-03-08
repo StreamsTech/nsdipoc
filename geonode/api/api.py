@@ -94,7 +94,7 @@ from geonode.security.views import _perms_info, _perms_info_json
 from .authorization import GeoNodeAuthorization
 from geonode.base.models import FavoriteResource, DockedResource
 from geonode.layers.models import Attribute
-from geonode.layers.views import backupCurrentVersion
+from geonode.layers.views import backupCurrentVersion, backupAciveLayer
 from geonode.geoserver.helpers import gs_catalog, cascading_delete
 from geonode.layers.utils import unzip_file
 from  geonode.layers.utils import file_size_with_ext
@@ -1137,9 +1137,6 @@ class ChangeLayerVersionApi(TypeFilteredResource):
         
             layer_id = json.loads(request.body).get('layer_id')
             layer_version_id = json.loads(request.body).get('version_id')
-            user_id = json.loads(request.body).get('user_id')
-            # user = Profile.objects.get(id=user_id)
-            # request.user = user
 
             if layer_id and layer_version_id:
                 try:
@@ -1149,13 +1146,14 @@ class ChangeLayerVersionApi(TypeFilteredResource):
                     out['errors'] = 'layer does not exist'
                 else:
 
-                    backupCurrentVersion(layer)
-                    layer_version = LayerVersionModel.objects.get(id=layer_version_id)
+                    # backupCurrentVersion(layer)
+                    backupAciveLayer(layer)
+                    selected_version_model = LayerVersionModel.objects.get(id=layer_version_id)
 
                     cat = gs_catalog
                     cascading_delete(cat, layer.typename)
 
-                    base_file = unzip_file(layer_version.version_path, '.shp', tempdir=None)
+                    base_file = unzip_file(selected_version_model.version_path, '.shp', tempdir=None)
 
                     saved_layer = file_upload(
                         base_file,
@@ -1167,7 +1165,7 @@ class ChangeLayerVersionApi(TypeFilteredResource):
                     # file_size, file_type = form.get_type_and_size()
                     # saved_layer.file_size = file_size
                     # saved_layer.file_type = file_type
-                    saved_layer.current_version = layer_version.version
+                    saved_layer.current_version = selected_version_model.version
                     saved_layer.save()
                     out['success'] = True
                     out['url'] = reverse(

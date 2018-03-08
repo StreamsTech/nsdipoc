@@ -1618,8 +1618,8 @@ def add_new_layer(request, layername, template='layers/add_new_layer.html'):
         return render_to_response(template,
                                   RequestContext(request, ctx))
     elif request.method == 'POST':
-        backupPreviousVersion(layer)
-
+        # backupPreviousVersion(layer)
+        backupAciveLayer(layer)
         form = LayerUploadForm(request.POST, request.FILES)
         tempdir = None
         out = {}
@@ -1711,6 +1711,32 @@ def backupPreviousVersion(layer):
     layer_version.version_name = 'version ' + str(layer.latest_version)
     layer_version.version_path = zfile.name
     layer_version.save()
+    zfile.write(r.content)
+    zfile.close()
+    r.close()
+
+
+def backupAciveLayer(layer):
+    # import pdb; pdb.set_trace()
+    download_link = layer.link_set.get(name='Zipped Shapefile')
+    r = requests.get(download_link.url)
+    temdir = MEDIA_ROOT + '/' + layer.name + '/' + str(layer.current_version) + '/'
+    if not os.path.exists(temdir):
+        os.makedirs(temdir)
+    zfile = open(temdir + layer.name + '.zip', 'wb')
+
+    bk_versions = LayerVersionModel.objects.filter(layer=layer, version=layer.current_version)
+
+    if bk_versions.exists():
+        version_model = bk_versions[0]
+    else:
+        version_model = LayerVersionModel.objects.create()
+
+    version_model.layer = layer
+    version_model.version = layer.current_version
+    version_model.version_name = 'version ' + str(layer.current_version)
+    version_model.version_path = zfile.name
+    version_model.save()
     zfile.write(r.content)
     zfile.close()
     r.close()
