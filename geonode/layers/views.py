@@ -184,14 +184,16 @@ def layer_upload(request, template='upload/layer_upload.html'):
     db_logger = logging.getLogger('db')
     if request.method == 'GET':
         mosaics = Layer.objects.filter(is_mosaic=True).order_by('name')
+        organizations = GroupProfile.objects.all()
+        user_organization = organizations.filter(groupmember__user=request.user).first()
         ctx = {
             'mosaics': mosaics,
             'charsets': CHARSETS,
             'is_layer': True,
             'allowed_file_types': ['.cst', '.dbf', '.prj', '.shp', '.shx'],
             'categories': TopicCategory.objects.all(),
-            'organizations': GroupProfile.objects.all(),
-            'user_organization': GroupProfile.objects.filter(groupmember__user=request.user).first()
+            'organizations': organizations.exclude(id=user_organization.id),
+            'user_organization': user_organization
         }
         return render_to_response(template, RequestContext(request, ctx))
     elif request.method == 'POST':
@@ -1678,7 +1680,6 @@ def add_new_layer(request, layername, template='layers/add_new_layer.html'):
 
 
 def backupCurrentVersion(layer):
-
     download_link = layer.link_set.get(name='Zipped Shapefile')
     r = requests.get(download_link.url)
     # r = requests.get('http://localhost:8080/geoserver/geonode/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geonode:cool&maxFeatures=50&outputFormat=SHAPE-ZIP')
