@@ -55,6 +55,8 @@ from django.template import RequestContext
 from django.utils.translation import ugettext as _
 from django.template import RequestContext, loader
 from django.core.files import File
+from django.views.decorators.csrf import csrf_exempt
+
 try:
     import json
 except ImportError:
@@ -1088,6 +1090,7 @@ def layer_publish(request, layer_pk):
         return HttpResponseRedirect(reverse('member-workspace-layer'))
 
 
+@csrf_exempt
 @login_required
 def layer_approve(request, layer_pk):
     if request.method == 'POST':
@@ -1186,6 +1189,9 @@ def layer_draft(request, layer_pk):
     else:
         return HttpResponseRedirect(reverse('member-workspace-layer'))
 
+
+
+@csrf_exempt
 @login_required
 def layer_deny(request, layer_pk):
     if request.method == 'POST':
