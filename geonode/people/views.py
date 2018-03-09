@@ -139,7 +139,7 @@ def forgot_username(request):
 class CreateUser(SignupView):
     template_name = "account/create_user.html"
 
-    form_class = UserSignupFormExtend
+    # form_class = UserSignupFormExtend
 
     def get_form_class(self):
         if self.request.user.is_superuser:
@@ -147,6 +147,13 @@ class CreateUser(SignupView):
 
         else:
             return UserSignupFormExtend
+
+    def get_form_kwargs(self):
+        kwargs = super(CreateUser, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+
 
     def get(self, *args, **kwargs):
         if self.request.user.is_authenticated() and (self.request.user.is_superuser or self.request.user.is_manager_of_any_group):

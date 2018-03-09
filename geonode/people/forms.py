@@ -30,6 +30,7 @@ from geonode import settings
 from account.models import EmailAddress
 from account.forms import SignupForm
 from geonode.groups.models import SectionModel
+from geonode.groups.views import userOrganizationSections
 
 # Ported in from django-registration
 attrs_dict = {'class': 'required'}
@@ -108,6 +109,7 @@ class ProfileForm(forms.ModelForm):
         raise forms.ValidationError(_("A user is registered with this email address."))
 
 
+
 class UserSignupFormExtend(SignupForm):
     section = forms.ModelChoiceField(queryset=SectionModel.objects.all(),
                                   help_text=_('select section for this user'),
@@ -116,7 +118,9 @@ class UserSignupFormExtend(SignupForm):
                                     )
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         super(UserSignupFormExtend, self).__init__(*args, **kwargs)
+        self.fields['section'].queryset = userOrganizationSections(self.user)
         self.fields.keyOrder = ['section', 'username', 'password', 'password_confirm', 'email']
 
 

@@ -574,7 +574,7 @@ class SectiontmentList(ListView):
     model = SectionModel
 
     def get_queryset(self):
-        return SectionModel.objects.all()
+        return userOrganizationSections(self.request.user)
 
 
 class SectionCreate(CreateView):
@@ -619,3 +619,9 @@ class SectionDelete(DeleteView):
 
     def get_object(self):
         return SectionModel.objects.get(pk=self.kwargs['section_pk'])
+
+
+def userOrganizationSections(user):
+    user_organization = GroupProfile.objects.filter(groupmember__user=user).first()
+    org_sections = SectionModel.objects.filter(organization = user_organization)
+    return org_sections
