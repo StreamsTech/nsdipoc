@@ -1543,6 +1543,7 @@ $(document).ready(function() {
             $('#uploadsignlayer').attr('action', '/account/login/?next=/people');
         }
 </script>
+{% comment %}
 {% if not request.user.is_authenticated %}
 <div class="modal fade modal_top_mar" id="welcomeHelpModal" tabindex="-1" role="dialog" aria-labelledby="memberModalLabel" aria-hidden="true">
     <div class="modal-dialog home-modal-border">
@@ -1674,6 +1675,8 @@ $(document).ready(function() {
 </div>
 
 {% endif %}
+
+{% endcomment %}
 
 <style type="text/css">
 </style>
