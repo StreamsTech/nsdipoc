@@ -14,7 +14,7 @@
     <div class="gd-content">
         <div class="gd-content-heading">
             <div class="d-title small-content">
-                {% trans "Approve Layer" %}  {{request.user.is_working_group_admin}}
+                {% trans "Approve Layer" %} 
             </div>
             <div class="hr"></div>
         </div>
@@ -125,11 +125,11 @@
                             <div class="col-md-12">
                                 <div class="col-md-4 pull-right">
                                     <button type="button" 
-                                    ng-show="!userRole"
+                                    ng-if="!userRole"
                                     class="btn btn-primary pull-right"
                                      ng-click="approveLayer()">Submit For Approval</button>
                                     <button type="button"
-                                    ng-show="userRole"
+                                    ng-if="userRole"
                                     class="btn btn-primary pull-right" 
                                     ng-click="publishLayer()">Publish</button>
                                 </div>

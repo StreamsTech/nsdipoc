@@ -4,6 +4,8 @@
         $scope.layerApprovalUrl="/api/layer-version-api/?layer_id=";
         $scope.versionSettingUrl="/api/change-layer-version-api/";
         $scope.layers=[];
+        $scope.isDisable=false;
+        $scope.postLayerId=undefined;
         angular.isUndefinedOrNull = function(val) {
             return angular.isUndefined(val) || val === null ;
         };
@@ -21,11 +23,15 @@
         };
         $scope.setVersion=function(layer){
             var data={
-                layer_id : layer.id,
-                version_id : layer.version
+                layer_id : $scope.layer_id,
+                version_id : layer.id
             };
+            $scope.postLayerId=layer.id;
+            $scope.isDisable=true;
             layerService.setVersion($scope.versionSettingUrl,data).then(function(response){
-                $window.location.reload();
+                // $window.location.reload();
+                $scope.isDisable=false;
+                $scope.postLayerId=undefined;
             });
         };
     });

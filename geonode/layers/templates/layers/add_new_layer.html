@@ -133,11 +133,14 @@
                         <td>
                             <button type="button" class="btn btn-primary btn-sm" 
                             ng-hide="{{layer.current_version}}==layer.version"
-                            ng-disabled="{{layer.current_version}}==layer.version"
-                            ng-click="setVersion(layer)">Set This Version [{layer.version}]</button>
+                            ng-disabled="isDisable"
+                            ng-click="setVersion(layer)">set version [{layer.version}]</button>
                             <span ng-show="{{layer.current_version}}==layer.version">
                                 Current Version
                                 <span class="glyphicon glyphicon-asterisk"></span>
+                            </span>
+                            <span ng-if="{{layer.current_version}}!==layer.version" ng-show="postLayerId==layer.id">
+                                <i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
                             </span>
                         </td>
                       </tr>

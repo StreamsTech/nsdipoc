@@ -75,9 +75,9 @@
             layerService.getLayerInformation('/api/layer-attributes-permission/'+layerId+'/').then(function(response){
                 $scope.layer=response;
                 $scope.layer.access_level=response.limited_access ? 'Public' : 'Limited';
-                $scope.layer.belongs_to="" + (angular.isUndefinedOrNull(response.department) ? 'N/A' : response.department) +' > '+
-                                        (angular.isUndefinedOrNull(response.organization) ? 'N/A' : response.organization) +' > '+
-                                        (angular.isUndefinedOrNull(response.sector) ? 'N/A' : response.sector ) +"";
+                $scope.layer.belongs_to="" + (angular.isUndefinedOrNull(response.sector) ? 'N/A' : response.sector) +' > '+
+                                        (angular.isUndefinedOrNull(response.department) ? 'N/A' : response.department) +' > '+
+                                        (angular.isUndefinedOrNull(response.organization) ? 'N/A' : response.organization ) +"";
                 $scope.gridOption.data=response.attributes;
                 $scope.gridApi.grid.modifyRows($scope.gridOption.data);
                 var selectedAttribute=_.filter($scope.gridOption.data, function (attribute) {
@@ -106,7 +106,7 @@
         $scope.inIt=function(layerId,userRole){
             getLayerInformation(layerId);
             $scope.layer_id=layerId;
-            $scope.userRole=userRole;
+            $scope.userRole= (userRole == 'True' || userRole=='true');
         };
     });
 })();

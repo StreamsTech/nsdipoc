@@ -57,9 +57,9 @@
                           <li><a href="#approved" id="Approved_list_layers_admin" data-toggle="tab">{% trans "Approved" %}</a></li>
                           <li><a href="#user-drafts" id="Admin_userdraft" data-toggle="tab">{% trans "User Drafts" %}</a></li>
                           <li><a href="#denied-layers" id="Admin_dined_list" data-toggle="tab">{% trans "Denied Layers" %}</a></li>
-                          <li><a href="#free-layers" id="Admin_dined_list" data-toggle="tab">{% trans "Free" %}</a></li>
-                          <li><a href="#limited-layers" id="Admin_dined_list" data-toggle="tab">{% trans "Limited" %}</a></li>
-                          <li><a href="#archived-layers" id="Admin_dined_list" data-toggle="tab">{% trans "Archived" %}</a></li>
+                          <!-- <li><a href="#free-layers" id="Admin_dined_list" data-toggle="tab">{% trans "Free" %}</a></li> -->
+                          <!-- <li><a href="#limited-layers" id="Admin_dined_list" data-toggle="tab">{% trans "Limited" %}</a></li> -->
+                          <!-- <li><a href="#archived-layers" id="Admin_dined_list" data-toggle="tab">{% trans "Archived" %}</a></li> -->
                         </ul>
                     <div class="tab-content">
                       <article id="user-approval-request" class="tab-pane active">
@@ -555,7 +555,9 @@
                     output+='<td>'+ item.owner +'</td>';
                     output+='<td>'+ item.last_auditor +'</td>';
                     output+='<td>'+ item.date_updated +'</td>';
-                    output+='<td><a href="'+ item.detail_url +'" class="btn btn-gd-primary">{% trans "Edit" %}</a></td>';
+                    output+='<td><a href="'+ item.detail_url +'" class="btn btn-gd-primary">{% trans "Edit" %}</a>'+
+                    '<a href="/layers/'+ item.typename +'/preview" class="btn btn-gd-primary" style="margin-left:5px">{% trans "Edit Permission" %}</a>'
+                    +'</td>';
                     output+='</tr>';
                   });
                   outputpag+='<div>';
