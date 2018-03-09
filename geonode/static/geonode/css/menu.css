@@ -11,25 +11,30 @@ and open the template in the editor.
 */
 
 /* -----------------------------------------------------------------------------
+
   SLIDE AND PUSH MENUS COMPONENT
+
 ----------------------------------------------------------------------------- */
 /**
  * Menu overview.
  */
- .c-menu {
+.c-menu {
     position: fixed;
     /*z-index: 200;*/
     z-index: 9999;
     /*background-color: #67b5d1;*/
-    background-color: #61646a;
+    background-color: #fff;
     -webkit-transition: -webkit-transform 0.3s;
     transition: transform 0.3s;
+    -webkit-box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.35);
+    -moz-box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.35);
+    box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.35);
 }
 
 .c-menu__items {
     list-style: none;
     margin: 0;
-    padding: 10px 0 0;
+    padding: 0;
 }
 
 /**
@@ -51,7 +56,6 @@ and open the template in the editor.
     width: 100%;
     height: 100%;
     overflow-y: scroll;
-    background-color: #00489c;
 }
 @media all and (min-width: 320px) {
     .c-menu--slide-left,
@@ -76,7 +80,7 @@ and open the template in the editor.
 .c-menu--slide-right .c-menu__item.active,
 .c-menu--push-left .c-menu__item:hover,
 .c-menu--push-right .c-menu__item:hover{
-    background-color: #3896e2;
+    background-color: #c5f3ff;
 }
 .c-menu--slide-left .c-menu__item:first-child,
 .c-menu--slide-right .c-menu__item:first-child,
@@ -97,6 +101,11 @@ and open the template in the editor.
 .c-menu--push-right .c-menu__link {
     display: block;
     padding: 12px 24px;
+    color: #000;
+}
+.c-menu__link:hover
+{
+    background-color: #1e4d73;
     color: #fff;
 }
 
@@ -104,10 +113,11 @@ and open the template in the editor.
 .c-menu--slide-right .c-menu__link .fa,
 .c-menu--push-left .c-menu__link .fa,
 .c-menu--push-right .c-menu__link .fa{
-    margin-left: 10px;
-    margin-right: 20px;
+    margin-right: 15px;
     font-size: 18px;
-    color:#3896e2;
+    color: #3896e2;
+    display: inline-block;
+    width: 25px;
 }
 
 .c-menu--slide-left .c-menu__close,
@@ -115,9 +125,8 @@ and open the template in the editor.
 .c-menu--push-left .c-menu__close,
 .c-menu--push-right .c-menu__close {
     display: block;
-    padding: 12px 24px;
+    padding: 10px;
     width: 100%;
-    background-color: #00489c;
 }
 
 /**
@@ -182,6 +191,7 @@ and open the template in the editor.
  * for each version, followed by individual styles.
  *
  * The various versions are governed by modifier classes.
+
 /**
  * Common modifiers for top/bottom menus
  */
@@ -330,7 +340,7 @@ body.has-active-menu {
 .c-menu__close {
     color: #fff;
     /*background-color: #3184a1;*/
-    background-color: #5a5d63;
+    background-color: #fff;
     font-size: 14px;
     border: none;
     box-shadow: none;
@@ -346,14 +356,16 @@ body.has-active-menu {
     outline: none;
 }
 .c-menu__close .c-menu_gd_close {
-    color: #FFFFFF;
+    background: rgba(56, 150, 226, 100) none repeat scroll 0 0;
+    border: 1px solid #3896e2;
+    color: #fff;
     cursor: pointer;
-    padding: 0 10px;
+    padding: 1px 6px;
+    border-radius: 2px;
 }
 .c-menu__close .c-menu_gd_close:hover {
     text-decoration: none;
 }
 .c-menu__item .c-menu__link img {
-    margin-left: 10px;
     margin-right: 20px;
 }
