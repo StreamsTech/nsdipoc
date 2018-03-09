@@ -1,6 +1,6 @@
 ﻿mapModule.factory('BaseMapTool', [
-        'ol', 'google', 'jantrik.Event', 'reprojection',
-        function (ol, google, Event, reprojection) {
+        'ol', 'google', 'jantrik.Event', 'reprojection','urlResolver',
+        function (ol, google, Event, reprojection,urlResolver) {
 
             function BaseMapTool(olMap, googleMap) {
                 var _thisTool = this;
@@ -258,7 +258,50 @@
             function getOlBaseMaps() {
     
                 var baseLayers = [
+                    {
     
+                        title: 'Vector',
+    
+                        olLayer: new ol.layer.Tile({
+    
+                            title: 'Vector',
+    
+                            visible: false,
+    
+                            source: new ol.source.TileWMS({
+                                url: urlResolver.resolveGeoserverTile(),
+                                params: {'LAYERS': 'cite:sob_base_map_vector_group', 'TILED': true},
+                                serverType: 'geoserver',
+                                // Countries have transparency, so do not fade tiles:
+                                transition: 0
+                              })
+    
+                        }),
+                        groupName: 'SOB'
+    
+                    },
+                    {
+    
+                        title: 'Raster',
+    
+                        olLayer: new ol.layer.Tile({
+    
+                            title: 'Raster',
+    
+                            visible: false,
+    
+                            source: new ol.source.TileWMS({
+                                url: urlResolver.resolveGeoserverTile(),
+                                params: {'LAYERS': 'cite:78L11AR', 'TILED': true},
+                                serverType: 'geoserver',
+                                // Countries have transparency, so do not fade tiles:
+                                transition: 0
+                              })
+    
+                        }),
+                        groupName: 'SOB'
+    
+                    },
                     {
     
                         title: 'Map Quest Satellite',
