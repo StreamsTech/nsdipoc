@@ -142,10 +142,18 @@
                                 value={{user_organization.id}}>
                             <div class="col-md-4" id="organization-checkbox">
                                     {% for organization in organizations %}
-
-                                    <div class="checkbox" style="padding-top: 0%;margin-top: 0%">
-                                            <label><input type="checkbox" value={{ organization.slug }}>{{ organization.title }}</label>
-                                    </div>
+                                         {% if user_organization.slug != organization.slug %}
+                                            <div class="checkbox" style="padding-top: 0%;margin-top: 0%">
+                                                    <label><input type="checkbox" 
+                                                        value={{ organization.slug }}>{{ organization.title }} </label>
+                                            </div>
+                                            {% else %}
+                                                <div class="checkbox" style="padding-top: 0%;margin-top: 0%;display: none">
+                                                    <label><input type="checkbox" 
+                                                        checked 
+                                                        value={{ organization.slug }}>{{ organization.title }} </label>
+                                                </div>
+                                        {% endif %}   
                                     {% endfor %}
                             </div>
                         </div>

@@ -29,9 +29,11 @@
             $scope.postLayerId=layer.id;
             $scope.isDisable=true;
             layerService.setVersion($scope.versionSettingUrl,data).then(function(response){
-                // $window.location.reload();
+                document.location.href="/layers/";
                 $scope.isDisable=false;
                 $scope.postLayerId=undefined;
+            },function(error){
+                document.location.href="/layers/";
             });
         };
     });
