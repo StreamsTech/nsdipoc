@@ -369,6 +369,7 @@
                                                     {% trans "Edit Layer" %}
                                                 </button>
                                             </li>
+                                            {% if status == 'ACTIVE' %}
                                             <li class="list-group-item">
                                                 <a 
                                                 href="{% url "add_new_layer" resource.service_typename %}"
@@ -376,6 +377,7 @@
                                                     {% trans "Add Version" %}
                                                 </a>
                                             </li>
+                                            {% endif %}
                                             
                                             {% endif %}
                                             <!--

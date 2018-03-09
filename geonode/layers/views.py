@@ -194,7 +194,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
             'is_layer': True,
             'allowed_file_types': ['.cst', '.dbf', '.prj', '.shp', '.shx'],
             'categories': TopicCategory.objects.all(),
-            'organizations': organizations.exclude(id=user_organization.id),
+            'organizations': organizations,
             'user_organization': user_organization
         }
         return render_to_response(template, RequestContext(request, ctx))

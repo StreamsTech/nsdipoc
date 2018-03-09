@@ -126,12 +126,23 @@
                                 <div class="col-md-4 pull-right">
                                     <button type="button" 
                                     ng-if="!userRole"
+                                    ng-disabled="isDisabledButton"
                                     class="btn btn-primary pull-right"
-                                     ng-click="approveLayer()">Submit For Approval</button>
+                                     ng-click="approveLayer()">Submit For Approval
+                                     <span ng-show="isDisabledButton">
+                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+                                    </span>
+                                    </button>
                                     <button type="button"
                                     ng-if="userRole"
+                                    ng-disabled="isDisabledButton"
                                     class="btn btn-primary pull-right" 
-                                    ng-click="publishLayer()">Publish</button>
+                                    ng-click="publishLayer()">Publish
+                                    <span ng-show="isDisabledButton">
+                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+                                    </span>
+                                    </button>
+                                    
                                 </div>
                             </div>
                         </div>

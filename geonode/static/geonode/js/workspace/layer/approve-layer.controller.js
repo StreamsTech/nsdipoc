@@ -6,6 +6,7 @@
         $scope.isAdmin=false;
         $scope.departments=[];
         $scope.gridApi={};
+        $scope.isDisabledButton=false;
         $scope.layerApprovalUrl="/api/layer-attribute-permission-set/";
         $scope.gridOption = {
             enableRowSelection: true,
@@ -49,9 +50,12 @@
         }
 
         function postLayerData(url,data){
+            $scope.isDisabledButton=true;
             layerService.submitLayerInformation(url,data).then(function(response){
-                document.location.href="/";
+                document.location.href="/layers/";
+                $scope.isDisabledButton=false;
             },function(error){
+                $scope.isDisabledButton=false;
                 console.log(error);
             });
         }
