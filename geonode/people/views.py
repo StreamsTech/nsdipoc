@@ -38,16 +38,14 @@ from user_messages.models import UserThread
 
 from account import signals
 from account.forms import SignupForm
-from account.views import SignupView #, InviteUserVie
+from account.views import SignupView, InviteUserView
 from account.utils import default_redirect
-from account.models import SignupCode
 
 from geonode.people.models import Profile
 from geonode.people.forms import ProfileForm
-from geonode.people.forms import ForgotUsernameForm, UserSignupFormExtend, UserSignupFormWithWorkingGroup
+from geonode.people.forms import ForgotUsernameForm
 from geonode.tasks.email import send_email
 from geonode.groups.models import GroupProfile, GroupMember
-from account.views import InviteUserView
 
 
 @login_required
@@ -139,15 +137,6 @@ def forgot_username(request):
 class CreateUser(SignupView):
     template_name = "account/create_user.html"
 
-    form_class = UserSignupFormExtend
-
-    def get_form_class(self):
-        if self.request.user.is_superuser:
-            return UserSignupFormWithWorkingGroup
-
-        else:
-            return UserSignupFormExtend
-
     def get(self, *args, **kwargs):
         if self.request.user.is_authenticated() and (self.request.user.is_superuser or self.request.user.is_manager_of_any_group):
             return super(SignupView, self).get(*args, **kwargs)
@@ -175,51 +164,6 @@ class CreateUser(SignupView):
             user.backend = "django.contrib.auth.backends.ModelBackend"
         auth.login(self.request, user)
         self.request.session.set_expiry(0)
-
-    def create_user(self, form, commit=True, model=None, **kwargs):
-        User = model
-
-        if User is None:
-            User = get_user_model()
-        user = User(**kwargs)
-        username = form.cleaned_data.get("username")
-        code = form.cleaned_data['code']
-
-        try:
-            signup_code = SignupCode.objects.get(code=code)
-            if not username:
-                username = signup_code.username
-        except SignupCode.DoesNotExist:
-            username = form.cleaned_data.get("username", '').strip()
-            if not username:
-                username = self.generate_username(form)
-
-            user.username = username
-            section = form.cleaned_data.get("section")
-            user.email = form.cleaned_data["email"].strip()
-            password = form.cleaned_data.get("password")
-            working_group_admin = form.cleaned_data.get("is_working_group_admin")
-            if section:
-                user.section = section
-
-            if working_group_admin:
-                user.is_working_group_admin = working_group_admin
-
-            if password:
-                user.set_password(password)
-            else:
-                user.set_unusable_password()
-
-            if commit:
-                user.save()
-        return user
-
-    def after_signup(self, form):
-
-        if self.created_user.section:
-            add_user_to_organization(self.created_user)
-        signals.user_signed_up.send(sender=SignupForm, user=self.created_user, form=form)
-
 
 
 def activateuser(request, username):
@@ -263,7 +207,7 @@ def inbox(request):
 
 class InviteUser(InviteUserView):
     """
-    For inviting user
+
     """
 
     def get_success_url(self, fallback_url=None, **kwargs):
@@ -281,8 +225,3 @@ def get_current_user(request):
             status=200,
             content_type='application/javascript')
 # end
-
-
-def add_user_to_organization(user):
-    organization = user.section.organization
-    organization.join(user, role='member')

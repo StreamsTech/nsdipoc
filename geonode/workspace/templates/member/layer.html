@@ -15,8 +15,7 @@
     <div class="gd-content">
         <div class="d-title">
            
-                {% trans "Member Workspace" %} 
-        
+                {% trans "Member Workspace" %}   
            
         </div>
 
@@ -132,7 +131,6 @@
                                                         <th>Who Denied</th>
                                                         <th>Deny Date</th>
                                                         <th>Message</th>
-                                                        <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <!--{% for denied in denied_list %}-->
@@ -163,9 +161,8 @@
                                                         <th>Serial No</th>
                                                         <th>Layer Title</th>
                                                         <th>Organization</th>
-                                                        <th>File Type</th>
-                                                        <th>File Size</th>
-                                                        <th>Downloaded Count</th>
+                                                        <th>Activator</th>
+                                                        <th>Activation Date</th>
                                                         <th>Message</th>
                                                         <th>Layer Edit</th>
                                                     </tr>
@@ -270,17 +267,14 @@ $(function () {
                         output+='<td>'+ draft_list_messages_json[item.id]['layer_msg'] +'</td>';
                     }
 
-                    output+='<td><a href="'+ item.detail_url +'/preview" class="btn btn-gd-primary"> {% trans "Continue for Approval" %}</a>'+
-                        '<a href="'+ item.detail_url +'" class="btn btn-gd-primary" style="margin-left:5px"> {% trans "Edit Layer" %}'+'</a> ';
+                    if(draft_list_messages_json[item.id]['mandatory_fields_msg'] == ""){
+                        output+='<td><a href="'+ item.detail_url +'?user_role=member" class="btn btn-gd-primary"> {% trans "Continue for Approval" %}</a></td>';
+                    }
+                    else{
+                        output+='<td><button class="btn btn-gd-primary" id="mandatory-check"> {% trans "Continue for Approval" %}</button></td>';
+                    }
 
-                    // if(draft_list_messages_json[item.id]['mandatory_fields_msg'] == ""){
-                    //     output+='<td><a href="'+ item.detail_url +'?user_role=member" class="btn btn-gd-primary"> {% trans "Continue for Approval" %}</a></td>';
-                    // }
-                    // else{
-                    //     output+='<td><button class="btn btn-gd-primary" id="mandatory-check"> {% trans "Continue for Approval" %}</button></td>';
-                    // }
-
-                    // output+='<td>';
+                    output+='<td>';
                     output+='<button type="button" class="btn btn-gd-primary" onclick="deleteLayer('+ item.id +')" style="color:#fff;">{% trans "Delete Map" %}</button> <br>';
                     output+='</td>';
                     output+='</tr>';
@@ -447,9 +441,8 @@ $(function () {
                     output+='<td>'+ offset +'</td>';
                     output+='<td><a href="'+ item.detail_url +'">'+ item.title+'</a></td>';
                     output+='<td>'+ item.group +'</td>';
-                    output+='<td>'+ item.file_type +'</td>';
-                    output+='<td>'+ item.file_size +'</td>';
-                    output+='<td>'+ item.download_count +'</td>';
+                    output+='<td>'+ item.last_auditor +'</td>';
+                    output+='<td>'+ item.date_updated +'</td>';
 
                     if(denied_list_messages_json[item.id]['layer_msg'] != "Completed"){
                          output+='<td style="color: #EC971F;">'+ denied_list_messages_json[item.id]['layer_msg'] +'</td>';

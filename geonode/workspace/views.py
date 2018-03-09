@@ -6,8 +6,6 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth import get_user_model
 from django.http import HttpResponseForbidden
-from django.db.models import Sum
-
 
 from guardian.models import UserObjectPermission
 
@@ -98,8 +96,6 @@ class AdminWorkspaceLayer(ListView):
         context['approved_list'] = Layer.objects.filter(status='ACTIVE', group__in=groups).order_by('date_updated')
         context['user_draft_list'] = Layer.objects.filter(status='DRAFT', group__in=groups).order_by('date_updated')
         context['denied_list'] = Layer.objects.filter(status='DENIED', group__in=groups).order_by('date_updated')  # [:15]
-        context['total_layer'] = Layer.objects.all().count()
-        context['total_layer_size'] = Layer.objects.aggregate(Sum('file_size'))['file_size__sum']
         return context
 
 

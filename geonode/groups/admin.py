@@ -20,7 +20,7 @@
 
 from django.contrib import admin
 
-from geonode.groups.models import GroupMember, GroupProfile, GroupInvitation, SectionModel
+from geonode.groups.models import GroupMember, GroupProfile, GroupInvitation
 
 
 class GroupMemberInline(admin.TabularInline):
@@ -37,4 +37,3 @@ class GroupAdmin(admin.ModelAdmin):
 admin.site.register(GroupProfile, GroupAdmin)
 
 admin.site.register(GroupInvitation)
-admin.site.register(SectionModel)
