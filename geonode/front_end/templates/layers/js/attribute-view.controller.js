@@ -43,27 +43,31 @@
 
         function getFeatureDetails(url, layerName, propertyName) {
             LayerService.getFeatureDetails(url, layerName, propertyName).then(function (res) {
-                self.attributeDetails = [];
-                self.propertyNames.push('fid');
-                res.features.forEach(function (e) {
-                    var obj = e.properties;
-                    obj.fid = parseInt(e.id.split('.')[1]);
-                    self.attributeDetails.push(obj);
-                });
-                self.gridOptions.data = self.attributeDetails;
-
-                self.gridOptions.columnDefs = [];
-                self.propertyNames.forEach(function(e) {
-                    self.gridOptions.columnDefs.push({
-                        field: e,
-                        displayName: e
+                if(propertyName.length>0){
+                    self.attributeDetails = [];
+                    self.propertyNames.push('fid');
+                    res.features.forEach(function (e) {
+                        var obj = e.properties;
+                        obj.fid = parseInt(e.id.split('.')[1]);
+                        self.attributeDetails.push(obj);
                     });
-                });
-                $('#attribute_view_left').hide();
+                    self.gridOptions.data = self.attributeDetails;
+
+                    self.gridOptions.columnDefs = [];
+                    self.propertyNames.forEach(function(e) {
+                        self.gridOptions.columnDefs.push({
+                            field: e,
+                            displayName: e
+                        });
+                    });
+                }
+                
+                // $('#attribute_view_left').hide();
             }, errorFn);
         }
 
         function getLayerFeature(url, layerName) {
+            $('#attribute_view_left').hide();
             $q.all({featureNames: LayerService.getLayerFeatureByName(url, layerName), permissionDetails: getLayerAttributePermissions('/api/layer-attributes-permission/'+self.layerId+'/')})
                 .then(function(resolutions){
                     var res=resolutions['featureNames'];
@@ -77,7 +81,7 @@
                             return e.attribute;
                         });
                     }
-
+                    
                     res.featureTypes.forEach(function (featureType) {
                         featureType.properties.forEach(function (e) {
                             if (e.name !== 'the_geom' && _.contains(permittedAttributesNames,e.name))
@@ -85,6 +89,7 @@
                         }, this);
                     }, this);
                     getFeatureDetails(url, layerName, self.propertyNames);
+                    // $('#attribute_view_left').hide();
                 },errorFn);
 
         }

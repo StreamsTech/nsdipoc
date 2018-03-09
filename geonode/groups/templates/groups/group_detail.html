@@ -62,9 +62,11 @@
                             <li><a href="#acitivity" id="qroup_activity" data-toggle="tab"><i class="fa fa-dot-circle-o"></i> {% trans "Activity" %}</a></li>
                               {% endif %}
                             <li><a href="#qtionanswer" id="qst_ans" data-target="#qtionanswer" data-toggle="tab"><i class="fa fa-comment-o"></i> {% trans "Question/Answer" %}</a></li>
+                            {% comment %}
                               {% if request.user.is_superuser or request.user in object.get_managers %}
                             <li><a href="{% url "user-invitation-list" object.slug %}"><i class="fa fa-user-plus"></i> {% trans "Member Requests" %}</a></li>
                               {% endif %}
+                            {% endcomment %}
                           </ul>
                 </div> 
 
