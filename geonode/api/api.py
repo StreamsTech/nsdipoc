@@ -1097,9 +1097,13 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                 wog_admins = Profile.objects.filter(is_working_group_admin=True)
                 for wga in wog_admins:
                     layer.set_managers_permissions(wga)
-                for attr_pk in attributes:
-                    attr = Attribute.objects.get(pk=attr_pk)
-                    attr.is_permitted = True
+                layer_attributes = Attribute.objects.filter(layer=layer)
+                for attr in layer_attributes:
+                    if attr.id in attributes:
+                        attr.is_permitted = True
+                    else:
+                        attr.is_permitted = False
+
                     attr.save()
                 out['success'] = True
 
