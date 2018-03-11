@@ -167,24 +167,25 @@
                                 {% endif %}
                             </ul>
                         </li>
-
+                        
+                        {% if request.user.is_manager_of_any_group %}
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                aria-haspopup="true" aria-expanded="false">{% trans "Administration" %}<span class="caret"></span></a>
                             <!--<a href="#">explore<span class="sr-only">(current)</span></a> -->
                             <ul class="dropdown-menu">
                                 <li id="nav_maps">
-                                  <a href="/">{% trans "Layers" %}</a>
+                                  <a href="{% url "member-workspace-layer" %}">{% trans "Layers" %}</a>
                                 </li>
                                 <li id="nav_layers">
-                                  <a href="/">{% trans "Users" %}</a>
+                                  <a href="{% url "admin-workspace-user-list" %}">{% trans "Users" %}</a>
                                 </li>
                                 <li id="nav_layers">
-                                    <a href="/">{% trans "Setup" %}</a>
+                                    <a href="{{ user.get_absolute_url }}">{% trans "Setup" %}</a>
                                   </li>
                             </ul>
                         </li>
-
+                        {% endif %}
                         
 
                         <li><a href="{% url "news-list" %}">{% trans "NEWS" %}</a></li>
@@ -709,6 +710,7 @@
                 </a>
             </li>
             {% endif %}
+            {% comment %}
             {% if user.is_manager_of_any_group %}
             <li class="c-menu__item">
                 <a href="{% url "invite_user" %}" class="c-menu__link">
@@ -717,6 +719,7 @@
                 </a>
             </li>
             {% endif %}
+            {% endcomment %}
             {% if user.is_staff %}
             <li class="c-menu__item">
                 <a href="{% url "admin:index" %}" class="c-menu__link">

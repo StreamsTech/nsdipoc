@@ -41,7 +41,9 @@
                                     <div class="circle">{{total_layer}} Layers</div>
                             </div>
                             <div class="col-md-2">
-                                    <div class="circle">{{total_layer_size}} KB</div>
+                                    <div class="circle">
+                                            {% widthratio total_layer_size 1024 1 %} MB
+                                    </div>
                             </div>
                             <div class="col-md-2">
                                     <div class="circle">1 Archived</div>
