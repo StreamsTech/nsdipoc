@@ -90,7 +90,7 @@ class GroupUpdateForm(forms.ModelForm):
 
     class Meta:
         model = GroupProfile
-        exclude = ['group', 'favorite', 'docked']
+        exclude = ['group', 'favorite', 'docked', 'access']
 
 
 class GroupMemberForm(forms.Form):

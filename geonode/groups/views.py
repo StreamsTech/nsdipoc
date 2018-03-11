@@ -79,16 +79,17 @@ def group_update(request, slug):
             group = form.save(commit=False)
             group.save()
             form.save_m2m()
-            if request.POST['admin']:
-                user = Profile.objects.get(id=request.POST['admin'])
-                group.join(user, role="manager")
+            # import pdb; pdb.set_trace()
+            # if request.POST['admin']:
+            #     user = Profile.objects.get(id=request.POST['admin'])
+            #     group.join(user, role="manager")
             return HttpResponseRedirect(
                 reverse(
                     "group_detail",
                     args=[
                         group.slug]))
     else:
-        form = GroupForm(instance=group)
+        form = GroupUpdateForm(instance=group)
 
     return render_to_response("groups/group_update.html", {
         "form": form,
