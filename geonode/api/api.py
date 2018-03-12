@@ -1115,6 +1115,77 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
         return HttpResponse(json.dumps(out), content_type='application/json', status=200)
 
 
+class ResourcePermissionPreviewApi(TypeFilteredResource):
+    class Meta:
+        resource_name = 'resource-attribute-permission-set'
+        allowed_methods = ['post']
+
+    def dispatch(self, request_type, request, **kwargs):
+        out = {'success': False}
+        if not request.user.is_authenticated():
+            out['errors'] = 'User is not authenticated'
+            return HttpResponse(json.dumps(out), content_type='application/json', status=200)
+
+        if request.method == 'POST':
+            import pdb; pdb.set_trace()
+            out = {'success': False}
+
+            resource_pk = json.loads(request.body).get('resource_pk')
+            permissions = json.loads(request.body).get('permissions')
+            attributes = json.loads(request.body).get('attributes')
+            status = json.loads(request.body).get('status')
+
+            try:
+                resource = ResourceBase.objects.get(id=resource_pk)
+            except:
+                out['errors'] = 'Invalid resource id'
+                return HttpResponse(json.dumps(out), content_type='application/json', status=200)
+
+            if resource.resource_type == 'layer':
+                target_resource = Layer.objects.get(id=resource_pk)
+                verb = 'approved your layer'
+
+            elif resource.resource_type == 'map':
+                target_resource = Map.objects.get(id=resource_pk)
+                verb = 'approved your map'
+            elif resource.resource_type == 'document':
+                target_resource = Document.objects.get(id=resource_pk)
+                verb = 'approved your document'
+
+            if request.user.is_working_group_admin or request.user == target_resource.owner:
+
+                if request.user.is_working_group_admin:
+                    notify.send(request.user, recipient=target_resource.owner, actor=request.user,
+                                target=target_resource, verb=verb)
+
+                target_resource.status = status
+                target_resource.save()
+                if permissions is not None and len(permissions.keys()) > 0:
+                    permissions = target_resource.resolvePermission(permissions)
+                    target_resource.set_permissions(permissions)
+                wog_admins = Profile.objects.filter(is_working_group_admin=True)
+                for wga in wog_admins:
+                    target_resource.set_managers_permissions(wga)
+
+                if attributes and target_resource.resource_type == 'layer':
+                    layer_attributes = Attribute.objects.filter(layer=target_resource)
+                    for attr in layer_attributes:
+                        if attr.id in attributes:
+                            attr.is_permitted = True
+                        else:
+                            attr.is_permitted = False
+                        attr.save()
+
+                out['success'] = True
+
+
+            else:
+                out['errors'] = 'You dont have permission to update permissions'
+        else:
+            out['errors'] = 'Only post method is permitted'
+        return HttpResponse(json.dumps(out), content_type='application/json', status=200)
+
+
 class ChangeLayerVersionApi(TypeFilteredResource):
     """
     This api changes layer version
