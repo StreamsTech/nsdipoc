@@ -550,8 +550,9 @@ def new_map_json(request):
         data = json.loads(request.body)
         title = data['about']['title']
         category_id = int(data['about']['category'])
-        organization_id = int(data['about']['organization'])
-        group = GroupProfile.objects.get(id=organization_id)
+        # organization_id = int(data['about']['organization'])
+        # group = GroupProfile.objects.get(id=organization_id)
+        group = GroupProfile.objects.get(groupmember__user=request.user)
 
 
         map_obj = Map(owner=request.user, zoom=0,
