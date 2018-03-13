@@ -1426,7 +1426,7 @@ def map_permission_preview(request, mapid, template='maps/map_attribute_permissi
                             'error_message': _("You dont have permission to edit this map.")})), status=401)
 
         ctx = {
-            'document': map,
+            'map': map,
             'organizations': GroupProfile.objects.all(),
 
 
