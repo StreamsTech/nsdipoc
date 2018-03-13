@@ -1127,7 +1127,6 @@ class ResourcePermissionPreviewApi(TypeFilteredResource):
             return HttpResponse(json.dumps(out), content_type='application/json', status=200)
 
         if request.method == 'POST':
-            import pdb; pdb.set_trace()
             out = {'success': False}
 
             resource_pk = json.loads(request.body).get('resource_pk')
