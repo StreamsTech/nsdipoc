@@ -1,12 +1,129 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+{% extends 'site_base.html' %}
+{% load i18n %}
 
-    this is map permission template
-</head>
-<body>
+{% block title %}{% trans "Admin Workspace" %}{% endblock %}
 
-</body>
-</html>
+{% comment %}
+{% block subnav %}
+<li><a href="{% url "actstream_object_feed" content_type_id=ctype.pk  object_id=actor.pk %}">RSS</a></li>
+<li><a href="{% url "actstream_object_feed_atom" content_type_id=ctype.pk  object_id=actor.pk %}">ATOM</a></li>
+{% endblock %}
+{% endcomment %}
+
+{% block body_outer %}
+    <div class="gd-content">
+        <div class="gd-content-heading">
+            <div class="d-title small-content">
+                {% trans "Approve Map" %}
+            </div>
+            <div class="hr"></div>
+        </div>
+        <div class="gd-content-body gd-history transparent top-bottom-margin-20px">
+            <div class="row">
+              <div class="col-md-12">
+                  <div class="panel-body">
+                    <div class="row" ng-app="mapPermissionApp">
+                        <div ng-controller="approveMapController" ng-init="inIt({{map.id}},'{{request.user.is_working_group_admin}}')">
+                            <div class="col-md-6">
+                                    <form class="form-horizontal" name="layer-approval-from">
+                                            <div class="form-group">
+                                              <label class="control-label col-sm-4" for="title">Title</label>
+                                              <div class="col-sm-8"> 
+                                                <input type="text" 
+                                                class="form-control"
+                                                 id="title"
+                                                 disabled
+                                                 value="{{map.title}}"
+                                                 placeholder="Enter layer title">
+                                              </div>
+                                            </div>
+                                            <div class="form-group">
+                                                    <label class="control-label col-sm-4" for="organization">Permitted Organizations</label>
+                                                    <div class="col-sm-8">
+                                                        <div class="well well-sm">
+                                                                <label class="control-label">
+                                                                        <span class="glyphicon glyphicon-list-alt"></span> Organization</label> 
+                                                                        <div class="checkbox" ng-repeat="department in departments">
+                                                                                <label><input type="checkbox" value="true" ng-model="department.IsChecked">[{department.title}]</label>
+                                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                  </div>
+                                            <div class="form-group">
+                                                        <label class="control-label col-sm-4" for="fileType">Created By</label>
+                                                        <div class="col-sm-8"> 
+                                                          <input type="text"
+                                                           class="form-control" 
+                                                           id="fileType" 
+                                                           value="{{map.owner}}"
+                                                           disabled
+                                                           placeholder="Enter owner">
+
+                                                        </div>
+                                             </div>
+                                             <div class="form-group">
+                                                    <label class="control-label col-sm-4" for="section">Belongs To</label>
+                                                    <div class="col-sm-8"> 
+                                                      <input type="text"
+                                                       class="form-control" 
+                                                       id="section" 
+                                                       value="{{map.group.department.sector.title}} > {{map.group.department.title}} > {{map.group.title}} "
+                                                       disabled
+                                                       placeholder="Enter Belongs to">
+                                                    </div>
+                                                </div>
+                                         <div class="form-group">
+                                                <label class="control-label col-sm-4" for="uploadTime">Created Time</label>
+                                                <div class="col-sm-8"> 
+                                                  <input type="text" 
+                                                  class="form-control"
+                                                   id="uploadTime" 
+                                                   disabled
+                                                   value="{{map.date_created}}"
+                                                   placeholder="Enter created time">
+                                                </div>
+                                            </div>
+                                          </form>
+    
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="col-md-4">
+                                    <button type="button" 
+                                    ng-if="!userRole"
+                                    ng-disabled="isDisabledButton"
+                                    class="btn btn-primary pull-right"
+                                     ng-click="approveLayer()">Submit For Approval
+                                     <span ng-show="isDisabledButton">
+                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+                                    </span>
+                                    </button>
+                                    <button type="button"
+                                    ng-if="userRole"
+                                    ng-disabled="isDisabledButton"
+                                    class="btn btn-primary pull-right" 
+                                    ng-click="publishLayer()">Publish
+                                    <span ng-show="isDisabledButton">
+                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+                                    </span>
+                                    </button>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>    
+              </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_script %}
+<script src="{{ STATIC_URL }}geonode/js/workspace/map/map.permission.module.js"></script>
+<script src="{{ STATIC_URL }}geonode/js/workspace/map/map-permission.service.js"></script>
+<script src="{{ STATIC_URL }}geonode/js/workspace/map/approve-map.controller.js"></script>
+<script src="/static/.components//angular-cookies/angular-cookies.js"></script>
+{{ block.super }}
+{% endblock %}
