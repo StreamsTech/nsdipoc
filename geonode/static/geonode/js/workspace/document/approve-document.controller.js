@@ -1,7 +1,7 @@
 (function(){
-    angular.module('mapPermissionApp').controller('approveMapController',
-    function($scope,mapPermissionService,uiGridConstants,$window,$q,$timeout){
-        $scope.mapId="";
+    angular.module('documentPermissionApp').controller('approveDocumentController',
+    function($scope,documentPermissionService,uiGridConstants,$window,$q,$timeout){
+        $scope.documentId="";
         $scope.isAdmin=false;
         $scope.departments=[];
         $scope.layerApprovalUrl="/api/resource-attribute-permission-set/";
@@ -15,7 +15,7 @@
             var permissionAttributes=
           ['view_resourcebase', 'download_resourcebase'];
             var data={};
-            data.resource_pk =$scope.mapId;
+            data.resource_pk =$scope.documentId;
             var permittedOrganizations=_.map(_.filter($scope.departments,function(department){
                 return department.IsChecked;
                 }),"slug");
@@ -29,8 +29,8 @@
 
         function postLayerData(url,data){
             $scope.isDisabledButton=true;
-            mapPermissionService.submitMapInformation(url,data).then(function(response){
-                document.location.href="/maps/";
+            documentPermissionService.submitDocumentInformation(url,data).then(function(response){
+                document.location.href="/documents/";
                 $scope.isDisabledButton=false;
             },function(error){
                 $scope.isDisabledButton=false;
@@ -55,7 +55,7 @@
             return angular.isUndefined(val) || val === null ;
         };
         function getLayerInformation(layerId){
-           mapPermissionService.getOrganizations('/api/groups')
+           documentPermissionService.getOrganizations('/api/groups')
                     .then(function(response){
                     var departments= response.objects;
                     $scope.departments= _.object(_.map(departments, function(item) {
@@ -64,9 +64,9 @@
                 });
         }
 
-        $scope.inIt=function(mapId,userRole){
+        $scope.inIt=function(documentId,userRole){
             getLayerInformation('');
-            $scope.mapId=mapId;
+            $scope.documentId=documentId;
             $scope.userRole= (userRole == 'True' || userRole=='true');
         };
     });

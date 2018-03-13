@@ -801,7 +801,7 @@ def document_delete(request, document_pk):
 #end
 
 
-def document_permission_preview(request, docid, template='document/document_attribute_permissions_preview.html'):
+def document_permission_preview(request, docid, template='documents/document_attribute_permissions_preview.html'):
 
     try:
         document = Document.objects.get(id=docid)
