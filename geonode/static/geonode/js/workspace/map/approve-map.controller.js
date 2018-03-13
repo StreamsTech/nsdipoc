@@ -30,7 +30,7 @@
         function postLayerData(url,data){
             $scope.isDisabledButton=true;
             mapPermissionService.submitMapInformation(url,data).then(function(response){
-//                document.location.href="/maps/";
+                document.location.href="/maps/";
                 $scope.isDisabledButton=false;
             },function(error){
                 $scope.isDisabledButton=false;
