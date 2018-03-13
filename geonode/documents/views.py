@@ -799,3 +799,33 @@ def document_delete(request, document_pk):
         return HttpResponseRedirect(reverse('member-workspace-document'))
 
 #end
+
+
+def document_permission_preview(request, docid, template='document/document_attribute_permissions_preview.html'):
+
+    try:
+        document = Document.objects.get(id=docid)
+    except Document.DoesNotExist:
+        raise Http404('requested document does not exists')
+
+    if request.method == 'GET':
+        if request.user == document.owner:
+            if document.status == 'DRAFT':
+                pass
+        elif request.user.is_working_group_admin:
+            if document.status == 'PENDING':
+                pass
+        else:
+            return HttpResponse(
+                loader.render_to_string(
+                    '401.html', RequestContext(
+                        request, {
+                            'error_message': _("You dont have permission to edit this document.")})), status=401)
+
+        ctx = {
+            'document': document,
+            'organizations': GroupProfile.objects.all(),
+
+
+        }
+        return render_to_response(template, RequestContext(request, ctx))

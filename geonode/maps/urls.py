@@ -82,6 +82,7 @@ urlpatterns = patterns(
         name='maplayer_attributes'),
     # url(r'^change-poc/(?P<ids>\w+)$', 'change_poc', name='maps_change_poc'),
 
+    url(r'^(?P<mapid>[^/]+)/preview$', 'map_permission_preview', name="map_permission_preview"),
 
     #@jahangjir091
     # urls for publishing maps through workspace
