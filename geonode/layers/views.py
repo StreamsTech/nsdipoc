@@ -280,9 +280,10 @@ def layer_upload(request, template='upload/layer_upload.html'):
 
             title = form.cleaned_data["layer_title"]
             category = form.cleaned_data["category"]
-            organization_id = form.cleaned_data["organization"]
+            # organization_id = form.cleaned_data["organization"]
             admin_upload = form.cleaned_data["admin_upload"]
-            group = GroupProfile.objects.get(id=organization_id)
+            # group = GroupProfile.objects.get(id=organization_id)
+            group = GroupProfile.objects.get(groupmember__user=request.user)
             # Replace dots in filename - GeoServer REST API upload bug
             # and avoid any other invalid characters.
             # Use the title if possible, otherwise default to the filename
