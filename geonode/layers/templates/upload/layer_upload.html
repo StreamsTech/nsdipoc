@@ -135,11 +135,9 @@
                             </div>
                         </div>
                         <div class="row">
-                          <input
-                                style="display: none"
-                                type="text"
-                                id="id-select-organization"
-                                value={{user_organization.id}}>
+                            <div class="checkbox" style="padding-top: 0%;margin-top: 0%">
+                                        <label><input type="checkbox" id="select_all">Select All</label>
+                                    </div>
                             <div class="col-md-4" id="organization-checkbox">
                                     {% for organization in organizations %}
                                          {% if user_organization.slug != organization.slug %}
@@ -359,6 +357,18 @@
     {#<script type="text/javascript" src="{% static 'geonode/js/upload/cookie.js' %}"></script>#}
     {#<script type="text/javascript" src="{% static 'geonode/js/geo-dash/papaparse.min.js' %}"></script>#}
     <script type="text/javascript">
+            $('#select_all').click(function() {
+                  if(this.checked) {
+                       $('#organization-checkbox :checkbox').each(function() {
+                            this.checked = true;
+                       });
+                  }
+                  else {
+                  $('#organization-checkbox :checkbox').each(function() {
+                            this.checked = false;
+                       });
+                  }
+            });
         {% autoescape off %}
 
             csrf_token = "{{ csrf_token }}",

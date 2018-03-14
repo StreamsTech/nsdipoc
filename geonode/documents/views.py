@@ -213,12 +213,12 @@ class DocumentUploadView(CreateView):
         db_logger = logging.getLogger('db')
 
         #@jahangir091
-        group_id = self.request.POST.get('org-id', None)
+        # group_id = self.request.POST.get('org-id', None)
         category_id = self.request.POST.get('category-id', None)
-        try:
-            group = GroupProfile.objects.get(pk=group_id)
-        except GroupProfile.DoesNotExist:
-            raise Http404('Selected organization does not exists')
+        # try:
+        #     group = GroupProfile.objects.get(pk=group_id)
+        # except GroupProfile.DoesNotExist:
+        #     raise Http404('Selected organization does not exists')
         try:
             category = [TopicCategory.objects.get(gn_description=category_id)]
 
@@ -227,7 +227,7 @@ class DocumentUploadView(CreateView):
         except TopicCategory.DoesNotExist:
             db_logger.error('Selected category does not exists')
             raise Http404('Selected category does not exists')
-        self.object.group = group
+        self.object.group = GroupProfile.objects.get(groupmember__user=self.request.user)
         self.object.category = category
         #end
 
@@ -240,7 +240,19 @@ class DocumentUploadView(CreateView):
         self.object.is_published = is_published
 
         self.object.save()
-        self.object.set_permissions(form.cleaned_data['permissions'])
+        # self.object.set_permissions(form.cleaned_data['permissions'])
+        # import pdb; pdb.set_trace()
+        self.object.set_default_permissions()
+        permissions = _perms_info_json(self.object)
+        perm_dict = json.loads(permissions)
+        if 'download_resourcebase' in perm_dict['groups']['anonymous']:
+            perm_dict['groups']['anonymous'].remove('download_resourcebase')
+        if 'view_resourcebase' in perm_dict['groups']['anonymous']:
+            perm_dict['groups']['anonymous'].remove('view_resourcebase')
+        #
+        self.object.set_permissions(perm_dict)
+
+
         document_layers = []
         if '' not in resource_ids:
 
@@ -787,3 +799,33 @@ def document_delete(request, document_pk):
         return HttpResponseRedirect(reverse('member-workspace-document'))
 
 #end
+
+
+def document_permission_preview(request, docid, template='documents/document_attribute_permissions_preview.html'):
+
+    try:
+        document = Document.objects.get(id=docid)
+    except Document.DoesNotExist:
+        raise Http404('requested document does not exists')
+
+    if request.method == 'GET':
+        if request.user == document.owner:
+            if document.status == 'DRAFT':
+                pass
+        elif request.user.is_working_group_admin:
+            if document.status == 'PENDING':
+                pass
+        else:
+            return HttpResponse(
+                loader.render_to_string(
+                    '401.html', RequestContext(
+                        request, {
+                            'error_message': _("You dont have permission to edit this document.")})), status=401)
+
+        ctx = {
+            'document': document,
+            'organizations': GroupProfile.objects.all(),
+
+
+        }
+        return render_to_response(template, RequestContext(request, ctx))

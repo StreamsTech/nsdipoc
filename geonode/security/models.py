@@ -258,8 +258,9 @@ class PermissionLevelMixin(object):
         """
 
         if manager:
-            for perm in LAYER_ADMIN_PERMISSIONS:
-                assign_perm(perm, manager, self.layer)
+            if self.polymorphic_ctype.name == 'layer':
+                for perm in LAYER_ADMIN_PERMISSIONS:
+                    assign_perm(perm, manager, self.layer)
 
             for perm in ADMIN_PERMISSIONS:
                 assign_perm(perm, manager, self.get_self_resource())

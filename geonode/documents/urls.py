@@ -42,6 +42,8 @@ urlpatterns = patterns('geonode.documents.views',
                            name='document_metadata_detail'),
                        url(r'^(?P<docid>\d+)/metadata$', 'document_metadata', name='document_metadata'),
 
+                       url(r'^(?P<docid>\d+)/preview$', 'document_permission_preview', name="document_permission_preview"),
+
 
 	#@jahangir091
                        # urls for publishing documents through workspace

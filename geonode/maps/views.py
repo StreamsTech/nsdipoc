@@ -27,7 +27,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.core.serializers.json import DjangoJSONEncoder
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotAllowed, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotAllowed, HttpResponseServerError, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.conf import settings
 from django.template import RequestContext
@@ -550,8 +550,9 @@ def new_map_json(request):
         data = json.loads(request.body)
         title = data['about']['title']
         category_id = int(data['about']['category'])
-        organization_id = int(data['about']['organization'])
-        group = GroupProfile.objects.get(id=organization_id)
+        # organization_id = int(data['about']['organization'])
+        # group = GroupProfile.objects.get(id=organization_id)
+        group = GroupProfile.objects.get(groupmember__user=request.user)
 
 
         map_obj = Map(owner=request.user, zoom=0,
@@ -1401,3 +1402,33 @@ class MapLayerRetrieveUpdateAPIView(RetrieveUpdateAPIView):
             return Response(dict(success =True))
         return Response(dict(success =False))
 #end
+
+
+def map_permission_preview(request, mapid, template='maps/map_attribute_permissions_preview.html'):
+
+    try:
+        map = Map.objects.get(id=mapid)
+    except Map.DoesNotExist:
+        raise Http404('requested map does not exist')
+
+    if request.method == 'GET':
+        if request.user == map.owner:
+            if map.status == 'DRAFT':
+                pass
+        elif request.user.is_working_group_admin:
+            if map.status == 'PENDING':
+                pass
+        else:
+            return HttpResponse(
+                loader.render_to_string(
+                    '401.html', RequestContext(
+                        request, {
+                            'error_message': _("You dont have permission to edit this map.")})), status=401)
+
+        ctx = {
+            'map': map,
+            'organizations': GroupProfile.objects.all(),
+
+
+        }
+        return render_to_response(template, RequestContext(request, ctx))

@@ -185,7 +185,7 @@
                       <img ng-if="item.thumbnail_url == null" ng-src="/static/geonode/img/missing_thumb.png" alt="{{ group.title }}" class="group-logo" />
                     </a>
                   </div>
-                      <div class="checkbox-overlay">
+                      <div class="checkbox-overlay" ng-if="false">
                           <div class="checkbox" ng-if="cart" ng-click="cart.toggleItem(item)">
                               <label>
                                   <span ng-show="cart.isActive(item.id)" class="fa-stack fa-lg">
