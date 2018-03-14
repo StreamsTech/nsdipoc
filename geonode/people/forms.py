@@ -128,3 +128,8 @@ class UserSignupFormExtend(SignupForm):
 class UserSignupFormWithWorkingGroup(SignupForm):
     is_working_group_admin = forms.BooleanField(help_text=_('Select if the user is a member of working group'),
                                     label=_('Is member of working group?'), required=False)
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(UserSignupFormWithWorkingGroup, self).__init__(*args, **kwargs)
+        self.fields.keyOrder = ['is_working_group_admin', 'username', 'password', 'password_confirm', 'email']
