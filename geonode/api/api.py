@@ -1092,11 +1092,13 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                 layer.status = status
                 layer.save()
                 if permissions is not None and len(permissions.keys()) > 0:
-                    permissions = layer.resolvePermission(permissions)
+                    # permissions = layer.resolvePermission(permissions)
                     layer.set_permissions(permissions)
-                wog_admins = Profile.objects.filter(is_working_group_admin=True)
-                for wga in wog_admins:
-                    layer.set_managers_permissions(wga)
+                # wog_admins = Profile.objects.filter(is_working_group_admin=True)
+                # for wga in wog_admins:
+                #     layer.set_managers_permissions(wga)
+                w_group = GroupProfile.objects.get(slug='working-group')
+                layer.set_working_group_permissions(w_group)
                 layer_attributes = Attribute.objects.filter(layer=layer)
                 for attr in layer_attributes:
                     if attr.id in attributes:
@@ -1160,11 +1162,13 @@ class ResourcePermissionPreviewApi(TypeFilteredResource):
                 target_resource.status = status
                 target_resource.save()
                 if permissions is not None and len(permissions.keys()) > 0:
-                    permissions = target_resource.resolvePermission(permissions)
+                    # permissions = target_resource.resolvePermission(permissions)
                     target_resource.set_permissions(permissions)
-                wog_admins = Profile.objects.filter(is_working_group_admin=True)
-                for wga in wog_admins:
-                    target_resource.set_managers_permissions(wga)
+                # wog_admins = Profile.objects.filter(is_working_group_admin=True)
+                # for wga in wog_admins:
+                #     target_resource.set_managers_permissions(wga)
+                w_group = GroupProfile.objects.ge(slug='working-group')
+                resource.set_working_group_permissions(w_group)
 
                 if attributes and target_resource.resource_type == 'layer':
                     layer_attributes = Attribute.objects.filter(layer=target_resource)
