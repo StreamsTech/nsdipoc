@@ -681,6 +681,13 @@
                     <span style="text-align:left;">{% trans "Create User" %}</span>
                   </a>
               </li>
+            <li class="c-menu__item">
+                  <a href="{% url "organization-layers-backup" %}" class="c-menu__link">
+                    <i class="fa fa-user-plus"></i>
+                    <span style="text-align:left;">{% trans "Backup Organization Layers" %}</span>
+                  </a>
+              </li>
+
             {% endif %}
             <li class="c-menu__item">
                 <a href="{% url "recent-activity" %}" class="c-menu__link">
@@ -738,6 +745,7 @@
                     <span style="text-align:left;">{% trans "Metadata Backup" %}</span>
                 </a>
             </li>
+
             <li class="c-menu__item">
                 <a href="{% url "data-backup" %}" class="c-menu__link">
                     <i ><img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help"></i>
