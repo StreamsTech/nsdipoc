@@ -27,6 +27,7 @@ import shutil
 import sys
 import traceback
 import uuid
+import time
 
 import requests
 import xmltodict
@@ -34,6 +35,13 @@ import requests
 import string
 import random
 import shutil
+import os
+import requests
+import shutil
+import tempfile
+import logging
+import hashlib
+
 from osgeo import gdal, osr
 from geonode.layers.utils import (
     reprojection,
@@ -56,6 +64,13 @@ from django.utils.translation import ugettext as _
 from django.template import RequestContext, loader
 from django.core.files import File
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.core import serializers
+from django.conf import settings
+from django.core.mail import send_mail
 
 try:
     import json
@@ -116,6 +131,20 @@ from geonode.people.models import Profile
 
 from geonode.authentication_decorators import login_required as custom_login_required
 from geonode.class_factory import ClassFactory
+from geonode.base.models import ResourceBase
+from geonode.layers.utils import unzip_file
+from geonode.layers.models import Layer
+from geonode.base.enumerations import CHARSETS
+from geonode.layers.utils import file_upload
+from geonode.geoserver.helpers import cascading_delete, gs_catalog
+from geonode.groups.models import GroupProfile
+from geonode.settings import MEDIA_ROOT
+from geonode.layers.forms import OrganizationLayersUploadForm
+
+
+
+db_logger = logging.getLogger('db')
+now = time.time()
 
 if 'geonode.geoserver' in settings.INSTALLED_APPS:
     from geonode.geoserver.helpers import _render_thumbnail
@@ -1749,3 +1778,183 @@ def backupAciveLayer(layer):
     zfile.write(r.content)
     zfile.close()
     r.close()
+
+
+@login_required
+def backupOrganizationLayers(request):
+    out = {}
+    out['success'] = False
+    if request.user.is_authenticated() and request.user.is_manager_of_any_group:
+        user_organization = GroupProfile.objects.filter(groupmember__user=request.user).first()
+        try:
+            backupOrganizationLayersMetadata(user_organization, request)
+        except Exception as ex:
+            out['success'] = False
+            out['errors'] = str(ex)
+        else:
+            out['success'] = True
+            out['message'] = 'Please check your email.' \
+                             'A download link has been sent to your mail.'
+
+    if out['success']:
+        status_code = 200
+    else:
+        status_code = 400
+
+    return HttpResponse(
+        json.dumps(out),
+        content_type='application/json',
+        status=status_code)
+
+
+
+def restoreBackedupOrganizationLayers(request, template='layers/organization_layer_restore.html'):
+
+
+    if request.method == 'GET':
+        ctx = {
+            'charsets': CHARSETS,
+            'form': OrganizationLayersUploadForm,
+        }
+        return render_to_response(template,
+                                  RequestContext(request, ctx))
+    elif request.method == 'POST':
+
+        out = {}
+        form = OrganizationLayersUploadForm(request.POST, request.FILES)
+        tempdir = tempfile.mkdtemp()
+        if form.is_valid():
+            file_list = form.get_files(tempdir)
+            layer_files = []
+            for file in file_list:
+                file_location = tempdir + '/' + file
+                if  os.path.isfile(file_location):
+                    filename, extension = os.path.splitext(os.path.basename(file_location))
+
+                    if extension == '.txt':
+                        metadata_file = file_location
+                    elif extension == '.zip':
+                        l = []
+                        l.append(filename)
+                        l.append(file_location)
+                        layer_files.append(l)
+
+            for l in layer_files:
+                layer_name = l[0]
+                layer_loc = l[1]
+                layer = Layer.objects.get(name=layer_name)
+
+
+                try:
+                    restoreLayer(layer, layer_loc)
+                    out['success'] = True
+                except Exception as e:
+                    out['success'] = False
+                    out['errors'] = str(e)
+            try:
+                restoreOrganizationLayersMetadata(metadata_file)
+            except Exception as e:
+                out['errors'] = str(e)
+
+        else:
+            errormsgs = []
+            for e in form.errors.values():
+                errormsgs.append([escape(v) for v in e])
+
+            out['errors'] = form.errors
+            out['errormsgs'] = errormsgs
+
+
+        if tempdir is not None:
+            shutil.rmtree(tempdir)
+
+        if out['success']:
+            status_code = 200
+        else:
+            status_code = 400
+
+        return HttpResponse(
+            json.dumps(out),
+            content_type='application/json',
+            status=status_code)
+
+
+def backupOneLayer(layer, temdir):
+    download_link = layer.link_set.get(name='Zipped Shapefile')
+    r = requests.get(download_link.url)
+    zfile = open(temdir + '/' + layer.name + '.zip', 'wb')
+    zfile.write(r.content)
+    zfile.close()
+    r.close()
+
+
+def backupOrganizationLayersMetadata(organization, request):
+    layer_objects = Layer.objects.filter(group=organization)
+    resource_base_objects = ResourceBase.objects.filter(group=organization)
+    jsonSerializer = serializers.get_serializer("json")
+    json_serializer = jsonSerializer()
+    all_objects = list(layer_objects) + list(resource_base_objects)
+
+    temdir = MEDIA_ROOT + '/backup/organization/' + organization.slug
+    if not os.path.exists(temdir):
+        os.makedirs(temdir)
+    metadata_location = temdir + '/metadata.txt'
+    with open(metadata_location, "w") as out:
+        json_serializer.serialize(all_objects, stream=out)
+
+    for l in layer_objects:
+        backupOneLayer(l, temdir)
+
+    send_mail_to_admin(request, organization, temdir)
+
+
+
+
+def restoreLayer(layer, file_path):
+    cat = gs_catalog
+    cascading_delete(cat, layer.typename)
+    # file_path = '/home/streamstech/nsdipoc/geonode/uploaded/backup/organization/or2/vcvc.zip'
+
+    base_file = unzip_file(file_path, '.shp', tempdir=None)
+    user = layer.owner
+    saved_layer = file_upload(
+        base_file,
+        name=layer.name,
+        user=user,
+        overwrite=True,
+        # charset=form.cleaned_data["charset"],
+    )
+    # saved_layer.save()
+
+
+def restoreOrganizationLayersMetadata(metadata_file):
+    # with open("/home/streamstech/bk/or2/metadata.txt", "r") as out:
+    with open(metadata_file, "r") as out:
+        data = out.read()
+
+    for obj in serializers.deserialize("json", data):
+        obj.save()
+
+
+def send_mail_to_admin(request, organization, temdir):
+    hash_str = str(organization.slug) + "_" + str(now)
+
+    zip_file_name = hashlib.sha224(hash_str).hexdigest()
+    # zip_file_name += MEDIA_ROOT + '/backup/organization/'
+    shutil.make_archive(MEDIA_ROOT + '/backup/organization/' + zip_file_name, 'zip', temdir)
+    shutil.rmtree(temdir)
+    org_download_link = "http://" +  request.META['HTTP_HOST'] + "/uploaded/backup/organization/" + zip_file_name + ".zip"
+
+    # Send email
+    subject = 'Download Organizations Layers'
+    from_email = settings.EMAIL_FROM
+    recipient_list = [str(request.user.email)]  # str(request.user.email)
+    html_message = "<a href='" + org_download_link + "'>Please go to the following link to download organizations layers:</a> <br/><br/><br/>" + org_download_link
+
+    try:
+
+        send_mail(subject=subject, message=html_message, from_email=from_email, recipient_list=recipient_list,
+                  fail_silently=False, html_message=html_message)
+    except Exception as e:
+        # print e
+        db_logger.exception(e)

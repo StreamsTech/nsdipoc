@@ -24,6 +24,7 @@ import zipfile
 import autocomplete_light
 import requests
 import shapefile
+from zipfile import ZipFile
 
 from django.conf import settings
 from django import forms
@@ -370,3 +371,15 @@ class LayerStyleUploadForm(forms.Form):
     name = forms.CharField(required=False)
     update = forms.BooleanField(required=False)
     sld = forms.FileField()
+
+
+class OrganizationLayersUploadForm(forms.Form):
+
+    uploaded_file = forms.FileField(required=True)
+
+    def get_files(self, tempdir):
+        upld_file = self.cleaned_data.get('uploaded_file')
+        the_zip = ZipFile(upld_file)
+        the_zip.extractall(tempdir)
+        files_list = the_zip.namelist()
+        return files_list
