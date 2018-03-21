@@ -364,7 +364,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
                 upload_session.save()
                 permissions = form.cleaned_data["permissions"]
                 if permissions is not None and len(permissions.keys()) > 0:
-                    permissions = saved_layer.resolvePermission(permissions)
+                    # permissions = saved_layer.resolvePermission(permissions)
                     saved_layer.set_permissions(permissions)
             finally:
                 # Delete temporary files
@@ -536,7 +536,7 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
     #     pass
 
     xlink = style_chart_legend_color(layer)
-
+    import pdb; pdb.set_trace()
     context_dict = {
         "resource": layer,
         'perms_list': get_perms(request.user, layer.get_self_resource()),
@@ -1082,8 +1082,10 @@ def layer_publish(request, layer_pk):
                         verb='pushed a new layer for approval', target=layer)
 
             # set all the permissions for all the managers of the group for this layer
-            for manager in managers:
-                layer.set_managers_permissions(manager)
+            # for manager in managers:
+            #     layer.set_managers_permissions(manager)
+            w_group = GroupProfile.objects.get(slug='working-group')
+            layer.set_working_group_permissions(w_group)
 
             messages.info(request, 'Pushed layer succesfully for approval')
             return HttpResponseRedirect(reverse('member-workspace-layer'))

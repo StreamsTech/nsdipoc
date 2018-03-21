@@ -210,9 +210,9 @@ def group_members_add(request, slug):
                         if layer.owner != user:
                             permissions.filter(object_pk=layer.pk).delete()
             group.join(user, role=role)
-        if role == 'manager':
-            for layer in Layer.objects.filter(group=group):
-                layer.set_managers_permissions()
+        # if role == 'manager':
+        #     for layer in Layer.objects.filter(group=group):
+        #         layer.set_managers_permissions()
 
     return redirect("group_detail", slug=group.slug)
 

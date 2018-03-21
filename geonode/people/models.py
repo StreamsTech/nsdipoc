@@ -42,6 +42,7 @@ from taggit.managers import TaggableManager
 
 from geonode.base.enumerations import COUNTRIES
 from geonode.groups.models import GroupProfile
+# from geonode.groups.views import set_user_to_workign_group_admin
 
 from account.models import EmailAddress
 
@@ -216,6 +217,13 @@ def profile_post_save(instance, sender, **kwargs):
         if not created:
             EmailAddress.objects.filter(user=instance, primary=True).update(email=instance.email)
 
+    if instance.is_working_group_admin:
+        # set_user_to_workign_group_admin(instance)
+        working_group, created = GroupProfile.objects.get_or_create(slug='working-group')
+        if not working_group.title:
+            working_group.title = 'working group'
+        working_group.save()
+        working_group.join(instance, role='manager')
 
     # #@jahangir091
     # default_group, created_group = GroupProfile.objects.get_or_create(slug='default')

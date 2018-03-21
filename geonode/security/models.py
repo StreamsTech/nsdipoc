@@ -251,6 +251,19 @@ class PermissionLevelMixin(object):
         set_owner_permissions(self)
 
 
+    def set_working_group_permissions(self, group):
+        """
+        assign all admin permissions to all the managers of the group for this layer
+        """
+        import pdb; pdb.set_trace()
+
+        if group:
+            if self.polymorphic_ctype.name == 'layer':
+                for perm in LAYER_ADMIN_PERMISSIONS:
+                    assign_perm(perm, group.group, self.layer)
+
+            for perm in ADMIN_PERMISSIONS:
+                assign_perm(perm, group.group, self.get_self_resource())
 #@jahangir091
     def set_managers_permissions(self, manager=None):
         """
