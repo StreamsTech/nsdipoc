@@ -234,7 +234,7 @@ def post_save_document(instance, *args, **kwargs):
 def create_thumbnail(sender, instance, created, **kwargs):
     from geonode.tasks.update import create_document_thumbnail
 
-    create_document_thumbnail.delay(object_id=instance.id)
+    create_document_thumbnail(object_id=instance.id)
 
 
 def update_documents_extent(sender, **kwargs):
@@ -269,7 +269,7 @@ class DocumentSubmissionActivity(models.Model):
         unique_together = (('document', 'group', 'iteration'),)
 
     def __str__(self):
-        return self.document.name
+        return self.document.title
 
 
 class DocumentAuditActivity(models.Model):

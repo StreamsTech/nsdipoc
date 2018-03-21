@@ -155,12 +155,12 @@ class DocumentCreateForm(TranslationModelForm):
     """
     The document upload form.
     """
-    permissions = forms.CharField(
-        widget=HiddenInput(
-            attrs={
-                'name': 'permissions',
-                'id': 'permissions'}),
-        required=True)
+    # permissions = forms.CharField(
+    #     widget=HiddenInput(
+    #         attrs={
+    #             'name': 'permissions',
+    #             'id': 'permissions'}),
+    #     required=True)
     resource = forms.CharField(
         required=False,
         label=_("Link to"),
@@ -172,20 +172,20 @@ class DocumentCreateForm(TranslationModelForm):
     class Meta:
         model = Document
         fields = ['title', 'doc_file', 'doc_url']
-        widgets = {
-            'name': HiddenInput(attrs={'cols': 80, 'rows': 20}),
-        }
+        # widgets = {
+        #     'name': HiddenInput(attrs={'cols': 80, 'rows': 20}),
+        # }
 
-    def clean_permissions(self):
-        """
-        Ensures the JSON field is JSON.
-        """
-        permissions = self.cleaned_data['permissions']
-
-        try:
-            return json.loads(permissions)
-        except ValueError:
-            raise forms.ValidationError(_("Permissions must be valid JSON."))
+    # def clean_permissions(self):
+    #     """
+    #     Ensures the JSON field is JSON.
+    #     """
+    #     permissions = self.cleaned_data['permissions']
+    #
+    #     try:
+    #         return json.loads(permissions)
+    #     except ValueError:
+    #         raise forms.ValidationError(_("Permissions must be valid JSON."))
 
     def clean(self):
         """

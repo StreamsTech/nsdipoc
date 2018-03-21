@@ -94,6 +94,9 @@ urlpatterns = patterns('',
                        (r'^workspace/', include('geonode.workspace.urls')),
                        #end
 
+                       # nsdi views
+                       url(r'^nsdi/', include('geonode.nsdi.urls')),
+
 
 
                        # Catalogue views
@@ -118,7 +121,7 @@ urlpatterns = patterns('',
 
                        # Social views
                        (r"^account/", include("account.urls")),
-                       (r'^people/', include('geonode.people.urls')),
+                       (r'^user/', include('geonode.people.urls')),
                        (r'^avatar/', include('avatar.urls')),
                        (r'^comments/', include('dialogos.urls')),
                        (r'^ratings/', include('agon_ratings.urls')),
@@ -151,7 +154,7 @@ urlpatterns = patterns('',
                        (r'^i18n/', include('django.conf.urls.i18n')),
                        (r'^autocomplete/', include('autocomplete_light.urls')),
                        (r'^admin/', include(admin.site.urls)),
-                       (r'^groups/', include('geonode.groups.urls')),
+                       (r'^organization/', include('geonode.groups.urls')),
                        (r'^documents/', include('geonode.documents.urls')),
                        (r'^services/', include('geonode.services.urls')),
 
@@ -164,6 +167,7 @@ urlpatterns = patterns('',
                        url(r'^api/adminRole', admin_role, name='adminRole'),
                        url(r'^api/users', users, name='users'),
                        url(r'^api/geoserver/', include('geonode.geoserver.api.urls')),
+
                        url(r'^api/error-reporting/', include('geonode.error_reporting.api.urls')),
                        
                        url(r'^api/analytics/', include('geonode.analytics.api.urls')),

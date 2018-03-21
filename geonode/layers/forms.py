@@ -24,6 +24,7 @@ import zipfile
 import autocomplete_light
 import requests
 import shapefile
+from zipfile import ZipFile
 
 from django.conf import settings
 from django import forms
@@ -271,12 +272,29 @@ class LayerUploadForm(forms.Form):
                                 writable.write(c)
                     else:
                         # with open(path, 'wb') as writable:
-                        with open(path, 'r+b') as writable:
+                        with open(path, 'wb') as writable:
                             for c in f.chunks():
                                 writable.write(c)
             absolute_base_file = os.path.join(tempdir,
                                               self.cleaned_data["base_file"].name)
         return tempdir, absolute_base_file
+
+    def get_type_and_size(self):
+        file = self.cleaned_data['base_file']
+        filename = file.name
+        extension = os.path.splitext(filename)[1]
+        file_type = None
+
+        if extension.lower() == '.osm':
+            file_type = ".osm"
+        elif extension.lower() == '.csv':
+            file_type = ".csv"
+        elif zipfile.is_zipfile(self.cleaned_data['base_file']):
+            file_type = ".zip"
+        else:
+            file_type = ".shp"
+
+        return file.size, file_type
 
 
 class NewLayerUploadForm(LayerUploadForm):
@@ -353,3 +371,15 @@ class LayerStyleUploadForm(forms.Form):
     name = forms.CharField(required=False)
     update = forms.BooleanField(required=False)
     sld = forms.FileField()
+
+
+class OrganizationLayersUploadForm(forms.Form):
+
+    uploaded_file = forms.FileField(required=True)
+
+    def get_files(self, tempdir):
+        upld_file = self.cleaned_data.get('uploaded_file')
+        the_zip = ZipFile(upld_file)
+        the_zip.extractall(tempdir)
+        files_list = the_zip.namelist()
+        return files_list

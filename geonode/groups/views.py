@@ -25,7 +25,7 @@ from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.views.generic import ListView, UpdateView, DeleteView
+from django.views.generic import ListView, UpdateView, DeleteView, CreateView
 from django.contrib.contenttypes.models import ContentType
 
 
@@ -34,12 +34,12 @@ from guardian.models import UserObjectPermission
 from notify.signals import notify
 
 from geonode.groups.forms import GroupInviteForm, GroupForm, GroupUpdateForm, GroupMemberForm
-from geonode.groups.models import GroupProfile, GroupInvitation, GroupMember
+from geonode.groups.models import GroupProfile, GroupInvitation, GroupMember, SectionModel
 from geonode.people.models import Profile
 from geonode.base.libraries.decorators import superuser_check
 from geonode.layers.models import Layer
 from geonode.groups.models import QuestionAnswer
-from geonode.groups.forms import QuestionForm, AnsewerForm
+from geonode.groups.forms import QuestionForm, AnsewerForm, SectionForm
 from geonode.settings import ANONYMOUS_USER_ID
 from geonode import settings
 
@@ -79,16 +79,17 @@ def group_update(request, slug):
             group = form.save(commit=False)
             group.save()
             form.save_m2m()
-            if request.POST['admin']:
-                user = Profile.objects.get(id=request.POST['admin'])
-                group.join(user, role="manager")
+            # import pdb; pdb.set_trace()
+            # if request.POST['admin']:
+            #     user = Profile.objects.get(id=request.POST['admin'])
+            #     group.join(user, role="manager")
             return HttpResponseRedirect(
                 reverse(
                     "group_detail",
                     args=[
                         group.slug]))
     else:
-        form = GroupForm(instance=group)
+        form = GroupUpdateForm(instance=group)
 
     return render_to_response("groups/group_update.html", {
         "form": form,
@@ -209,9 +210,9 @@ def group_members_add(request, slug):
                         if layer.owner != user:
                             permissions.filter(object_pk=layer.pk).delete()
             group.join(user, role=role)
-        if role == 'manager':
-            for layer in Layer.objects.filter(group=group):
-                layer.set_managers_permissions()
+        # if role == 'manager':
+        #     for layer in Layer.objects.filter(group=group):
+        #         layer.set_managers_permissions()
 
     return redirect("group_detail", slug=group.slug)
 
@@ -565,3 +566,63 @@ def accept_user_invitation(request, slug, user_pk):
         return redirect("user-invitation-list", slug=slug)
 
 #end
+
+
+#CRUD for Section
+class SectiontmentList(ListView):
+
+    template_name = 'section_list.html'
+    model = SectionModel
+
+    def get_queryset(self):
+        return userOrganizationSections(self.request.user)
+
+
+class SectionCreate(CreateView):
+
+    template_name = 'section_create.html'
+    model = SectionModel
+
+    def get_form_class(self):
+        return SectionForm
+        # return  form
+
+    def get_form_kwargs(self):
+        kwargs = super(SectionCreate, self).get_form_kwargs()
+
+        # get users, note: you can access request using: self.request
+
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def get_success_url(self):
+        return reverse('section_list')
+
+
+class SectionUpdate(UpdateView):
+    template_name = 'section_create.html'
+    model = SectionModel
+    form_class = SectionForm
+
+    def get_object(self):
+        return SectionModel.objects.get(pk=self.kwargs['section_pk'])
+
+    def get_success_url(self):
+        return reverse('section_list')
+
+
+class SectionDelete(DeleteView):
+    template_name = 'section_delete.html'
+    model = SectionModel
+
+    def get_success_url(self):
+        return reverse('section_list')
+
+    def get_object(self):
+        return SectionModel.objects.get(pk=self.kwargs['section_pk'])
+
+
+def userOrganizationSections(user):
+    user_organization = GroupProfile.objects.filter(groupmember__user=user).first()
+    org_sections = SectionModel.objects.filter(organization = user_organization)
+    return org_sections

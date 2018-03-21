@@ -106,7 +106,6 @@ def message_search(request,
 
             threads_all = Thread.ordered(Thread.objects.search_message(request.user, search_text))
 
-            # import pdb;pdb.set_trace()
 
     return render_to_response(template_name, {
         "threads_all": threads_all,

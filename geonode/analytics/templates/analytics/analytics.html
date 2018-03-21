@@ -18,13 +18,13 @@
     .hidden {
         display: none;
     }
-    
+
     /* Safari */
     @-webkit-keyframes spin {
       0% { -webkit-transform: rotate(0deg); }
       100% { -webkit-transform: rotate(360deg); }
     }
-    
+
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
@@ -36,10 +36,10 @@
     </div>
 
 
-           
+
     <div class="row">
-      
-        
+
+
         {% comment %}
         <div class="col-md-2">
             <h3 class="text-center">58%</h3>
@@ -51,7 +51,7 @@
         <div class="col-md-3">
                 <div class="panel panel-default analytics-box">
                 <div class="panel-body">
-                    
+
             <div class="round round-info pull-left"><i class="fa fa-map-o" aria-hidden="true"></i></div>
             <div class="pull-left">
             <h3>{{ map_loads }}</h3>
@@ -61,7 +61,7 @@
             </div>
         </div>
 
-        
+
         <div class="col-md-3">
                 <div class="panel panel-default analytics-box">
                         <div class="panel-body">
@@ -73,11 +73,11 @@
             </div>
             </div>
         </div>
-       
-   
-   
-   
-       
+
+
+
+
+
         {% comment %}
         <div class="col-md-2">
                 <div class="panel panel-default analytics-box">
@@ -104,7 +104,7 @@
             </div>
             </div>
         </div>
-        
+
         <div class="col-md-3">
                 <div class="panel panel-default analytics-box">
                         <div class="panel-body">
@@ -115,7 +115,7 @@
             </div>
             </div>
         </div>
-        
+
     </div>
 
 </div>
@@ -132,10 +132,10 @@
             <a onclick='showMapData()' id="mapData" class="btn btn-default">Map Data</a>
             <a onclick='showLayerData()' id="layerData" class="btn btn-primary active">Layer Data</a>
             <a onclick='showDocumentData()' id="documentData" class="btn btn-default">Document Data</a>
-        </div>  
-        </div>  
-        
-    </div> 
+        </div>
+        </div>
+
+    </div>
     <div class="row">
         <div class="col-md-12">
             <div class="loader hidden" style="margin: 30px auto" id="analyticsLoader"></div>

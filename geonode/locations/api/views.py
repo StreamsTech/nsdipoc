@@ -48,5 +48,4 @@ class NearestPointAPIView(APIView):
                 layer_name + " ORDER BY distance limit 10) t;")
 
             all_data = cursor.fetchall()
-        # import pdb;pdb.set_trace()
         return JsonResponse(all_data, safe=False)

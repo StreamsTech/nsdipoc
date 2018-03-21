@@ -190,7 +190,7 @@ class LayerListAPIView(AnalyticsMixin, ListAPIView):
 
         layer_load_data = self.format_data(query=self.get_queryset())
         pin_point_data = self.format_data(model_instance=PinpointUserActivity, filters=dict(layer_id__isnull=False))
-        
+
         results = self.get_analytics(layer_load_data, ['object_id','last_modified_date', 'activity_type']) + self.get_analytics(pin_point_data, keys)
         
         for r in results:
@@ -217,7 +217,7 @@ class DocumentListAPIView(AnalyticsMixin, ListAPIView):
     def get(self, request, **kwargs):
         keys = ['object_id', 'last_modified_date', 'activity_type']
 
-        document_load_data = self.format_data(query=self.get_queryset())
+        document_load_data = self.format_data(query=self.get_queryset(),extra_field=dict(activity_type='load'))
         
 
         results = self.get_analytics(document_load_data, keys)

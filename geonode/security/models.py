@@ -35,6 +35,7 @@ from django.contrib.auth.models import Group, Permission
 from django.conf import settings
 from guardian.utils import get_user_obj_perms_model
 from guardian.shortcuts import assign_perm, get_groups_with_perms
+from geonode.groups.models import GroupProfile
 
 
 logger = logging.getLogger("geonode.security.models")
@@ -167,6 +168,19 @@ class PermissionLevelMixin(object):
             assign_perm('change_layer_data', self.owner, self)
             assign_perm('change_layer_style', self.owner, self)
 
+    def resolvePermission(self, permissions):
+        for gr_slug in permissions["groups"]:
+            group = GroupProfile.objects.get(slug=gr_slug)
+            groupMembers = group.member_queryset()
+            for gr_member in groupMembers:
+                permissions['users'][gr_member.user.username] = []
+                permissions['users'][gr_member.user.username].append('view_resourcebase')
+                permissions['users'][gr_member.user.username].append('download_resourcebase')
+
+
+        return permissions
+
+
     def set_permissions(self, perm_spec):
         """
         Sets an object's the permission levels based on the perm_spec JSON.
@@ -237,6 +251,19 @@ class PermissionLevelMixin(object):
         set_owner_permissions(self)
 
 
+    def set_working_group_permissions(self, group):
+        """
+        assign all admin permissions to all the managers of the group for this layer
+        """
+        import pdb; pdb.set_trace()
+
+        if group:
+            if self.polymorphic_ctype.name == 'layer':
+                for perm in LAYER_ADMIN_PERMISSIONS:
+                    assign_perm(perm, group.group, self.layer)
+
+            for perm in ADMIN_PERMISSIONS:
+                assign_perm(perm, group.group, self.get_self_resource())
 #@jahangir091
     def set_managers_permissions(self, manager=None):
         """
@@ -244,8 +271,9 @@ class PermissionLevelMixin(object):
         """
 
         if manager:
-            for perm in LAYER_ADMIN_PERMISSIONS:
-                assign_perm(perm, manager, self.layer)
+            if self.polymorphic_ctype.name == 'layer':
+                for perm in LAYER_ADMIN_PERMISSIONS:
+                    assign_perm(perm, manager, self.layer)
 
             for perm in ADMIN_PERMISSIONS:
                 assign_perm(perm, manager, self.get_self_resource())

@@ -135,17 +135,24 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4">
-                                <select id="id-select-organization" class="col-md-12" >
-                                    <option value='' selected="selected">.......................</option>
+                            <div class="checkbox" style="padding-top: 0%;margin-top: 0%">
+                                        <label><input type="checkbox" id="select_all">Select All</label>
+                                    </div>
+                            <div class="col-md-4" id="organization-checkbox">
                                     {% for organization in organizations %}
-                                    {% if request.user in organization.get_managers %}
-                                        <option value={{ organization.id }} data-isadmin="true">{{ organization.title }}</option>
-                                    {% else %}
-                                        <option value={{ organization.id }} data-isadmin="false">{{ organization.title }}</option>
-                                    {% endif %}
+                                         {% if user_organization.slug != organization.slug %}
+                                            <div class="checkbox" style="padding-top: 0%;margin-top: 0%">
+                                                    <label><input type="checkbox" 
+                                                        value={{ organization.slug }}>{{ organization.title }} </label>
+                                            </div>
+                                            {% else %}
+                                                <div class="checkbox" style="padding-top: 0%;margin-top: 0%;display: none">
+                                                    <label><input type="checkbox" 
+                                                        checked 
+                                                        value={{ organization.slug }}>{{ organization.title }} </label>
+                                                </div>
+                                        {% endif %}   
                                     {% endfor %}
-                                </select>
                             </div>
                         </div>
                         <div class="block-separator"></div>
@@ -320,14 +327,6 @@
                     <div class="projection-alert">
 
                     </div>
-                    {% if GEONODE_SECURITY_ENABLED %}
-                        <div class="gd-content-body full-pad-30px" style="padding-top: 0px;">
-                            <div class="sidebar-title">{% trans "Permissions" %}</div>
-                            <form id="permission_form">
-                                {% include "_permissions.html" %}
-                            </form>
-                        </div>
-                    {% endif %}
                     <section class="gd-content-body full-pad-20px">
                         <div class="row">
                             <div class="col-md-12">
@@ -358,6 +357,18 @@
     {#<script type="text/javascript" src="{% static 'geonode/js/upload/cookie.js' %}"></script>#}
     {#<script type="text/javascript" src="{% static 'geonode/js/geo-dash/papaparse.min.js' %}"></script>#}
     <script type="text/javascript">
+            $('#select_all').click(function() {
+                  if(this.checked) {
+                       $('#organization-checkbox :checkbox').each(function() {
+                            this.checked = true;
+                       });
+                  }
+                  else {
+                  $('#organization-checkbox :checkbox').each(function() {
+                            this.checked = false;
+                       });
+                  }
+            });
         {% autoescape off %}
 
             csrf_token = "{{ csrf_token }}",
@@ -430,11 +441,11 @@
             });
         }
     </script>
-    {% if GEONODE_SECURITY_ENABLED %}
-        {% with resource=layer %}
-            {% include "_permissions_form_js.html" %}
-        {% endwith %}
-    {% endif %}
+    <!--{% if GEONODE_SECURITY_ENABLED %}-->
+        <!--{% with resource=layer %}-->
+            <!--{% include "_permissions_form_js.html" %}-->
+        <!--{% endwith %}-->
+    <!--{% endif %}-->
     <script type="text/javascript">
         // file-input multiple files
 

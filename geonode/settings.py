@@ -282,6 +282,7 @@ GEONODE_APPS = (
     'geonode.dashboard',
     'geonode.cms',
     'geonode.workspace',
+    'geonode.nsdi',
 
     'rest_framework',
     'rest_framework_gis',
@@ -1130,10 +1131,11 @@ DATABASE_ROUTERS = ['geonode.db_router.DbRouter']
 
 # REST_FRAMEWORK settings
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-#     'PAGE_SIZE': 50
-# }
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 50
+}
+
 
 
 # There are 3 ways to override GeoNode settings:

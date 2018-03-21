@@ -50,6 +50,7 @@ from guardian.shortcuts import get_objects_for_user
 
 # @jahangir091
 from slugify import slugify
+from notify.signals import notify
 from user_messages.models import UserThread
 from taggit.models import Tag
 from django.core.serializers.json import DjangoJSONEncoder
@@ -76,7 +77,7 @@ from geonode.base.models import Region
 from geonode.base.models import HierarchicalKeyword
 from geonode.base.models import ThesaurusKeywordLabel
 
-from geonode.layers.models import Layer
+from geonode.layers.models import Layer, LayerVersionModel
 from geonode.maps.models import Map
 from geonode.documents.models import Document
 from geonode.groups.models import GroupProfile
@@ -92,6 +93,11 @@ from geonode.maps.models import WmsServer
 from geonode.security.views import _perms_info, _perms_info_json
 from .authorization import GeoNodeAuthorization
 from geonode.base.models import FavoriteResource, DockedResource
+from geonode.layers.models import Attribute
+from geonode.layers.views import backupCurrentVersion, backupAciveLayer
+from geonode.geoserver.helpers import gs_catalog, cascading_delete
+from geonode.layers.utils import unzip_file
+from  geonode.layers.utils import file_size_with_ext
 
 CONTEXT_LOG_FILE = None
 
@@ -568,6 +574,12 @@ class LayerUpload(TypeFilteredResource):
                         title=form.cleaned_data["layer_title"],
                         metadata_uploaded_preserve=form.cleaned_data["metadata_uploaded_preserve"]
                     )
+                    file_size, file_type = form.get_type_and_size()
+                    f_size = file_size_with_ext(file_size)
+                    saved_layer.file_size = f_size
+                    saved_layer.file_type = file_type
+                    saved_layer.current_version = 1
+                    saved_layer.save()
                 except Exception as e:
                     exception_type, error, tb = sys.exc_info()
                     logger.exception(e)
@@ -1012,3 +1024,235 @@ def createToken(user):
                                expires=datetime.datetime.now() + datetime.timedelta(
                                    seconds=oauth2_settings.ACCESS_TOKEN_EXPIRE_SECONDS),
                                token=token)
+
+
+
+
+class LayerDownloadCountApi(TypeFilteredResource):
+
+    class Meta:
+        resource_name = 'layer-download-count'
+
+    def dispatch(self, request_type, request, **kwargs):
+        if request.method == 'POST':
+            out = {'success': False}
+
+            layer_id = json.loads(request.body).get('layer_id')
+
+            if layer_id:
+                try:
+                    layer = Layer.objects.get(id=layer_id)
+                except Layer.DoesNotExist:
+                    status_code = 404
+                    out['errors'] = 'layer does not exist'
+                else:
+                    layer.download_count = layer.download_count + 1
+                    layer.save()
+                    out['success'] = 'True'
+                    status_code = 200
+
+            else:
+                out['error'] = 'Access denied'
+                out['success'] = False
+                status_code = 400
+            return HttpResponse(json.dumps(out), content_type='application/json', status=status_code)
+
+
+
+class LayerPermissionPreviewApi(TypeFilteredResource):
+
+    class Meta:
+        resource_name = 'layer-attribute-permission-set'
+        allowed_methods = ['post']
+
+    def dispatch(self, request_type, request, **kwargs):
+        out = {'success': False}
+        if not request.user.is_authenticated():
+            out['errors'] = 'User is not authenticated'
+            return HttpResponse(json.dumps(out), content_type='application/json', status=200)
+
+        if request.method == 'POST':
+          
+            out = {'success': False}
+            layer_pk = json.loads(request.body).get('layer_pk')
+            try:
+                layer = Layer.objects.get(id=layer_pk)
+            except:
+                out['errors'] = 'No layer found with this layer pk'
+                return HttpResponse(json.dumps(out), content_type='application/json', status=200)
+
+            if request.user.is_working_group_admin or request.user == layer.owner:
+                permissions = json.loads(request.body).get('permissions')
+                attributes = json.loads(request.body).get('attributes')
+                status = json.loads(request.body).get('status')
+                if request.user.is_working_group_admin:
+                    notify.send(request.user, recipient=layer.owner, actor=request.user,
+                                target=layer, verb='approved your layer')
+
+                layer.status = status
+                layer.save()
+                if permissions is not None and len(permissions.keys()) > 0:
+                    # permissions = layer.resolvePermission(permissions)
+                    layer.set_permissions(permissions)
+                # wog_admins = Profile.objects.filter(is_working_group_admin=True)
+                # for wga in wog_admins:
+                #     layer.set_managers_permissions(wga)
+                w_group = GroupProfile.objects.get(slug='working-group')
+                layer.set_working_group_permissions(w_group)
+                layer_attributes = Attribute.objects.filter(layer=layer)
+                for attr in layer_attributes:
+                    if attr.id in attributes:
+                        attr.is_permitted = True
+                    else:
+                        attr.is_permitted = False
+
+                    attr.save()
+                out['success'] = True
+
+
+            else:
+                out['errors'] = 'You dont have permission to update permissions'
+        else:
+            out['errors'] = 'Only post method is permitted'
+        return HttpResponse(json.dumps(out), content_type='application/json', status=200)
+
+
+class ResourcePermissionPreviewApi(TypeFilteredResource):
+    class Meta:
+        resource_name = 'resource-attribute-permission-set'
+        allowed_methods = ['post']
+
+    def dispatch(self, request_type, request, **kwargs):
+        out = {'success': False}
+        if not request.user.is_authenticated():
+            out['errors'] = 'User is not authenticated'
+            return HttpResponse(json.dumps(out), content_type='application/json', status=200)
+
+        if request.method == 'POST':
+            out = {'success': False}
+
+            resource_pk = json.loads(request.body).get('resource_pk')
+            permissions = json.loads(request.body).get('permissions')
+            attributes = json.loads(request.body).get('attributes')
+            status = json.loads(request.body).get('status')
+
+            try:
+                resource = ResourceBase.objects.get(id=resource_pk)
+            except:
+                out['errors'] = 'Invalid resource id'
+                return HttpResponse(json.dumps(out), content_type='application/json', status=200)
+
+            if resource.resource_type == 'layer':
+                target_resource = Layer.objects.get(id=resource_pk)
+                verb = 'approved your layer'
+
+            elif resource.resource_type == 'map':
+                target_resource = Map.objects.get(id=resource_pk)
+                verb = 'approved your map'
+            elif resource.resource_type == 'document':
+                target_resource = Document.objects.get(id=resource_pk)
+                verb = 'approved your document'
+
+            if request.user.is_working_group_admin or request.user == target_resource.owner:
+
+                if request.user.is_working_group_admin:
+                    notify.send(request.user, recipient=target_resource.owner, actor=request.user,
+                                target=target_resource, verb=verb)
+
+                target_resource.status = status
+                target_resource.save()
+                if permissions is not None and len(permissions.keys()) > 0:
+                    # permissions = target_resource.resolvePermission(permissions)
+                    target_resource.set_permissions(permissions)
+                # wog_admins = Profile.objects.filter(is_working_group_admin=True)
+                # for wga in wog_admins:
+                #     target_resource.set_managers_permissions(wga)
+                w_group = GroupProfile.objects.ge(slug='working-group')
+                resource.set_working_group_permissions(w_group)
+
+                if attributes and target_resource.resource_type == 'layer':
+                    layer_attributes = Attribute.objects.filter(layer=target_resource)
+                    for attr in layer_attributes:
+                        if attr.id in attributes:
+                            attr.is_permitted = True
+                        else:
+                            attr.is_permitted = False
+                        attr.save()
+
+                out['success'] = True
+
+
+            else:
+                out['errors'] = 'You dont have permission to update permissions'
+        else:
+            out['errors'] = 'Only post method is permitted'
+        return HttpResponse(json.dumps(out), content_type='application/json', status=200)
+
+
+class ChangeLayerVersionApi(TypeFilteredResource):
+    """
+    This api changes layer version
+    if there is multiple available versions of a layer
+    then user can select any version and then
+    the layer will changed to that selected version
+    and the pevious or current version will be archaived as
+    an odler version
+    it takes body parameters:
+        'layer_id'
+        'version_id'
+        'user_id'
+    """
+
+    class Meta:
+        resource_name = 'change-layer-version-api'
+        list_allowed_methods = ['post']
+
+    def dispatch(self, request_type, request, **kwargs):
+        if request.method == 'POST':
+            out = {'success': False}
+        
+            layer_id = json.loads(request.body).get('layer_id')
+            layer_version_id = json.loads(request.body).get('version_id')
+
+            if layer_id and layer_version_id:
+                try:
+                    layer = Layer.objects.get(pk=layer_id)
+                except Layer.DoesNotExist:
+                    status_code = 404
+                    out['errors'] = 'layer does not exist'
+                else:
+
+                    # backupCurrentVersion(layer)
+                    backupAciveLayer(layer)
+                    selected_version_model = LayerVersionModel.objects.get(id=layer_version_id)
+
+                    cat = gs_catalog
+                    cascading_delete(cat, layer.typename)
+
+                    base_file = unzip_file(selected_version_model.version_path, '.shp', tempdir=None)
+
+                    saved_layer = file_upload(
+                        base_file,
+                        name=layer.name,
+                        user=request.user,
+                        overwrite=True,
+                        # charset=form.cleaned_data["charset"],
+                    )
+                    # file_size, file_type = form.get_type_and_size()
+                    # saved_layer.file_size = file_size
+                    # saved_layer.file_type = file_type
+                    saved_layer.current_version = selected_version_model.version
+                    saved_layer.save()
+                    out['success'] = True
+                    out['url'] = reverse(
+                        'layer_detail', args=[
+                            saved_layer.service_typename])
+
+                    out['success'] = 'True'
+                    status_code = 200
+
+            else:
+                out['error'] = 'Access denied'
+                out['success'] = False
+                status_code = 400
+            return HttpResponse(json.dumps(out), content_type='application/json', status=status_code)
