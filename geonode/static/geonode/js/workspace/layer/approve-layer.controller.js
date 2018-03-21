@@ -7,7 +7,7 @@
         $scope.departments=[];
         $scope.gridApi={};
         $scope.isDisabledButton=false;
-        $scope.layerApprovalUrl="/api/layer-attribute-permission-set/";
+        $scope.layerApprovalUrl="/api/resource-attribute-permission-set/";
         $scope.gridOption = {
             enableRowSelection: true,
             enableSelectAll: true,
@@ -36,7 +36,7 @@
             var permissionAttributes=
           ['view_resourcebase', 'download_resourcebase'];
             var data={};
-            data.layer_pk =$scope.layer_id;
+            data.resource_pk =$scope.layer_id;
             var permittedOrganizations=_.map(_.filter($scope.departments,function(department){
                 return department.IsChecked;
                 }),"slug");
