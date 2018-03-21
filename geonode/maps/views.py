@@ -1113,8 +1113,9 @@ def map_publish(request, map_pk):
             map_submission_activity.save()
 
             # set all the permissions for all the managers of the group for this map
-            map.set_managers_permissions()
-
+            # map.set_managers_permissions()
+            w_group = GroupProfile.objects.get(slug='working-group')
+            map.set_working_group_permissions(w_group)
             messages.info(request, 'Pushed map successfully')
             return HttpResponseRedirect(reverse('member-workspace-map'))
     else:
@@ -1146,6 +1147,7 @@ def map_draft(request, map_pk):
 def map_approve(request, map_pk):
     if request.method == 'POST':
         form = ResourceApproveForm(request.POST)
+        print form
         if form.is_valid():
             try:
                 map = Map.objects.get(id=map_pk)

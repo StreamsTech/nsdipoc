@@ -118,19 +118,22 @@ function layerService($rootScope, layerRepository, featureService, layerStyleGen
             defaultStyleSld = defaultStyleSld.replace(reClassifier, classificationSlds.classificationStyle);
             defaultStyleSld = defaultStyleSld.replace(reLabel, labelingSld);
 
+            surfLayer.Style = style;
             layerRenderingModeFactory.setLayerRenderingMode(surfLayer);
 
-            if (surfLayer.Style.VisualizationSettings) {
-                visualizationService.getVisualizationSld(surfLayer, surfLayer.Style.VisualizationSettings)
+			var q = $q.defer();
+            if (surfLayer.Style.visualizationSettings) {
+                visualizationService.getVisualizationSld(surfLayer, surfLayer.Style.visualizationSettings)
                     .then(function(visSld) {
-                        if (visualizationService.isChart(surfLayer.Style.VisualizationSettings)) {
+                        if (visualizationService.isChart(surfLayer.Style.visualizationSettings)) {
                             defaultStyleSld = defaultStyleSld.replace(chartSldRegex, visSld);
-                        } else if (visualizationService.isHeatMap(surfLayer.Style.VisualizationSettings)) {
+                        } else if (visualizationService.isHeatMap(surfLayer.Style.visualizationSettings)) {
                             defaultStyleSld = visSld;
                         }
 
                         return doAction();
                     });
+				return q.promise;
             } else {
                 return doAction();
             }
@@ -231,7 +234,7 @@ function layerService($rootScope, layerRepository, featureService, layerStyleGen
         fetchWMSFeatures: function(params) {
             return layerRepository.getWMS(undefined, params);
         },
-        fetchLayers: function(url) {
+        fetchWmsLayers: function(url) {
             var mappedLayer = [];
             return $q(function(resolve, reject) {
                 if (!url)
@@ -246,6 +249,22 @@ function layerService($rootScope, layerRepository, featureService, layerStyleGen
                     });
                 }
             });
+        },
+        fetchLayers: function() {
+            var mappedLayer = [];
+            var deferred = $q.defer();
+            layerRepository.getLayers()
+                .then(function(res) {
+                    mappedLayer = res.map(function(e) {
+                        return _map({
+                            Name: e.detail_url.match(/\w+:\w+/)[0],
+                            bbox: ol.proj.transformExtent([e.bbox_x0, e.bbox_y0, e.bbox_x1, e.bbox_y1], 'EPSG:4326', 'EPSG:3857'),
+                            geoserverUrl: $window.GeoServerHttp2Root + 'wms?access_token=' + $window.mapConfig.access_token
+                        });
+                    });
+                    deferred.resolve(mappedLayer);
+                });
+            return deferred.promise;
         },
         map: function(layer, order) {
             return _map(layer, order);

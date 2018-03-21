@@ -641,8 +641,9 @@ def document_publish(request, document_pk):
             notify.send(request.user, recipient_list = managers, actor=request.user,
                         verb='pushed a new document for approval', target=document)
             # set all the permissions for all the managers of the group for this documentt
-            document.set_managers_permissions()
-
+            # document.set_managers_permissions()
+            w_group = GroupProfile.objects.get(slug='working-group')
+            document.set_working_group_permissions(w_group)
             messages.info(request, 'Pushed document succesfully for approval')
             return HttpResponseRedirect(reverse('member-workspace-document'))
     else:

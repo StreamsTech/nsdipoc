@@ -1137,6 +1137,7 @@ REST_FRAMEWORK = {
 }
 
 
+
 # There are 3 ways to override GeoNode settings:
 # 1. Using environment variables, if your changes to GeoNode are minimal.
 # 2. Creating a downstream project, if you are doing a lot of customization.

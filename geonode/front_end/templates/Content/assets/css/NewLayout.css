@@ -472,7 +472,7 @@ a
     background-color: #fff;
    border-bottom: 1px solid #ccc;
    left: 0;
-   top: 0;
+   top: -1px;
    width: 100%;
    height: 36px;
 }
@@ -556,6 +556,11 @@ a
 }
 
     .navbar .nav > li button:hover
+    {
+        background-color: #d9e1e7;
+        outline: 1px solid #c2c7d3;
+    }
+    .navbar .nav > li button.active
     {
         background-color: #d9e1e7;
         outline: 1px solid #c2c7d3;
@@ -1074,7 +1079,7 @@ input:focus:invalid:focus, textarea:focus:invalid:focus, select:focus:invalid:fo
 }
 .fixed-table-container-inner
 {
-    height: 250px;
+    height: 210px;
     overflow-y: auto;
     border: 1px solid #ccc;
 }

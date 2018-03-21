@@ -464,3 +464,7 @@ class TermsAndConditionUpdateView(UpdateView):
 
     def get_form_class(self):
         return FooterSubSectionsUpdateForm
+
+
+
+
