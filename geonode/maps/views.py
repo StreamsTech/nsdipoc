@@ -1147,6 +1147,7 @@ def map_draft(request, map_pk):
 def map_approve(request, map_pk):
     if request.method == 'POST':
         form = ResourceApproveForm(request.POST)
+        print form
         if form.is_valid():
             try:
                 map = Map.objects.get(id=map_pk)

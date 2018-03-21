@@ -64,6 +64,7 @@ from django.utils.translation import ugettext as _
 from django.template import RequestContext, loader
 from django.core.files import File
 from django.views.decorators.csrf import csrf_exempt
+
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
@@ -71,6 +72,7 @@ from django.template import RequestContext
 from django.core import serializers
 from django.conf import settings
 from django.core.mail import send_mail
+
 
 try:
     import json
@@ -565,7 +567,7 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
     #     pass
 
     xlink = style_chart_legend_color(layer)
-    import pdb; pdb.set_trace()
+
     context_dict = {
         "resource": layer,
         'perms_list': get_perms(request.user, layer.get_self_resource()),
@@ -590,7 +592,6 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
     else:
         u = uuid.uuid1()
         access_token = u.hex
-
     context_dict["viewer"] = json.dumps(
         map_obj.viewer_json(request.user, access_token, * (NON_WMS_BASE_LAYERS + [maplayer])))
     context_dict["preview"] = getattr(
@@ -1222,7 +1223,6 @@ def layer_draft(request, layer_pk):
         return HttpResponseRedirect(reverse('member-workspace-layer'))
 
 
-
 @csrf_exempt
 @login_required
 def layer_deny(request, layer_pk):
@@ -1285,7 +1285,7 @@ def layer_delete(request, layer_pk):
         except:
             return Http404("requested layer does not exists")
         else:
-            if layer.status == 'ACTIVE' and (request.user == request.user.is_superuser or request.user == layer.owner or request.user in layer.group.get_managers()):
+            if layer.status == 'DRAFT' and (request.user.is_superuser or request.user == layer.owner or request.user in layer.group.get_managers()):
                 layer.status = "DELETED"
                 layer.save()
 
