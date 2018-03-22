@@ -1779,7 +1779,7 @@ def backupAciveLayer(layer):
     zfile.close()
     r.close()
 
-
+from geonode.layers.tasks import backupOrganizationLayersMetadata
 @login_required
 def backupOrganizationLayers(request):
     out = {}
@@ -1787,7 +1787,9 @@ def backupOrganizationLayers(request):
     if request.user.is_authenticated() and request.user.is_manager_of_any_group:
         user_organization = GroupProfile.objects.filter(groupmember__user=request.user).first()
         try:
-            backupOrganizationLayersMetadata(user_organization, request)
+            host = request.META['HTTP_HOST']
+            #used celery for backup layers asynchronously
+            backupOrganizationLayersMetadata.delay( host, request.user.id)
         except Exception as ex:
             out['success'] = False
             out['errors'] = str(ex)
@@ -1879,37 +1881,6 @@ def restoreBackedupOrganizationLayers(request, template='layers/organization_lay
             status=status_code)
 
 
-def backupOneLayer(layer, temdir):
-    download_link = layer.link_set.get(name='Zipped Shapefile')
-    r = requests.get(download_link.url)
-    zfile = open(temdir + '/' + layer.name + '.zip', 'wb')
-    zfile.write(r.content)
-    zfile.close()
-    r.close()
-
-
-def backupOrganizationLayersMetadata(organization, request):
-    layer_objects = Layer.objects.filter(group=organization)
-    resource_base_objects = ResourceBase.objects.filter(group=organization)
-    jsonSerializer = serializers.get_serializer("json")
-    json_serializer = jsonSerializer()
-    all_objects = list(layer_objects) + list(resource_base_objects)
-
-    temdir = MEDIA_ROOT + '/backup/organization/' + organization.slug
-    if not os.path.exists(temdir):
-        os.makedirs(temdir)
-    metadata_location = temdir + '/metadata.txt'
-    with open(metadata_location, "w") as out:
-        json_serializer.serialize(all_objects, stream=out)
-
-    for l in layer_objects:
-        backupOneLayer(l, temdir)
-
-    send_mail_to_admin(request, organization, temdir)
-
-
-
-
 def restoreLayer(layer, file_path):
     cat = gs_catalog
     cascading_delete(cat, layer.typename)
@@ -1935,26 +1906,3 @@ def restoreOrganizationLayersMetadata(metadata_file):
     for obj in serializers.deserialize("json", data):
         obj.save()
 
-
-def send_mail_to_admin(request, organization, temdir):
-    hash_str = str(organization.slug) + "_" + str(now)
-
-    zip_file_name = hashlib.sha224(hash_str).hexdigest()
-    # zip_file_name += MEDIA_ROOT + '/backup/organization/'
-    shutil.make_archive(MEDIA_ROOT + '/backup/organization/' + zip_file_name, 'zip', temdir)
-    shutil.rmtree(temdir)
-    org_download_link = "http://" +  request.META['HTTP_HOST'] + "/uploaded/backup/organization/" + zip_file_name + ".zip"
-
-    # Send email
-    subject = 'Download Organizations Layers'
-    from_email = settings.EMAIL_FROM
-    recipient_list = [str(request.user.email)]  # str(request.user.email)
-    html_message = "<a href='" + org_download_link + "'>Please go to the following link to download organizations layers:</a> <br/><br/><br/>" + org_download_link
-
-    try:
-
-        send_mail(subject=subject, message=html_message, from_email=from_email, recipient_list=recipient_list,
-                  fail_silently=False, html_message=html_message)
-    except Exception as e:
-        # print e
-        db_logger.exception(e)
