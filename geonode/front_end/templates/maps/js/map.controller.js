@@ -97,7 +97,7 @@
             if ($rootScope.layerId)
             $scope.group = { "a": "AND", "rules": [] };
         });
-
+        
         function getGeoServerSettings() {
             self.propertyNames = [];
             LayerService.getGeoServerSettings()
@@ -129,7 +129,7 @@
          function getMapId(){
             if(!isLayerPage()){
                 return user_href[4];
-            }else
+            }else 
                 return "";
          }
 
@@ -149,15 +149,15 @@
             var loadData=getMapOrLayerLoadNonGISData();
             if(parseInt(loadData.id)){
                 analyticsService.postNonGISData(analyticsNonGISUrl,loadData).then(function(response){
-
+            
                 },function(error){
                     console.log(error);
                 });
             }
-        }
+        }        
 
         var analyticsGISUrl='api/analytics/gis/';
-        var postAnalyticsData=$interval( function(){
+        var postAnalyticsData=$interval( function(){ 
             analyticsService.postGISAnalyticsToServer(analyticsGISUrl);
          }, 60000);
          postMapOrLayerLoadData();
@@ -166,7 +166,7 @@
         var keyPointerDrag, keySingleClick, keyChangeResolution,keyMoveEnd;
         (function() {
 
-
+            
             function getAnalyticsGISData(coordinateArray,activityType){
                 var data={
                     layer_id:undefined,
@@ -203,7 +203,7 @@
                     }else{
                         analyticsService.saveGISAnalyticsToLocalStorage(analyticsData);
                     }
-
+                        
                 }else{
                     var dragCoordinate=ol.proj.transform(map.getView().getCenter(), 'EPSG:3857','EPSG:4326');
                     var analyticsData=getAnalyticsGISData(dragCoordinate,"pan");

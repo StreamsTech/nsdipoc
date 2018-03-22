@@ -253,15 +253,15 @@
                        </div>
                    </div>
                    </div>
-               </div>
+               </div>   
                {% endif %}
-
+          
  <!-- End edit layer modal -->
 
 
             <div id="sidebar" class="panel-left layer-panel" style="max-width: 600px;min-width: 300px;width: 300px">
 
-
+                  
 
                 <!-- <div class="layer-mini-slider" id="mini-slider" onclick="closeNav();">
                         <span>
@@ -271,7 +271,7 @@
 
                       <button class="sidebar-toggle-btn" onclick="animating()"><i class="fa fa-navicon fa-2x py-1 p-1" style="color: #1B97D3"></i></button>
 
-
+                      
 
           <div class="margin-zero right-pad-zero overlay_layerdetails" id="myNav">
                 <div class="splitter">
@@ -283,7 +283,7 @@
                                     <h4 class="panel-title">
                                         <a role="button" data-toggle="collapse" data-parent="#accordion1"
                                            href="#collapse1-per" aria-expanded="true" aria-controls="collapseOne">
-
+                                            
                                             <i class="fa fa-chevron-up" aria-hidden="true"></i>
                                             <i class="fa fa-chevron-down" aria-hidden="true"></i>
                                             {{ resource.title|default:resource.typename }}
@@ -358,7 +358,7 @@
                                                 </a>
                                               </li>
                                               {% endcomment %}
-
+                                       
                                         {% if GEOSERVER_BASE_URL %}
                                             {% get_obj_perms request.user for resource.layer as "layer_perms" %}
                                         {% endif %}
@@ -369,7 +369,7 @@
                                                     {% trans "Edit Layer" %}
                                                 </button>
                                             </li>
-
+                                            
                                             {% endif %}
                                             <!--
                                             <li class="list-group-item lastchild">
@@ -416,7 +416,7 @@
                                                 <a role="button" data-toggle="collapse"
                                                    data-parent="#accordion" href="#collapse7-per" aria-expanded="false"
                                                    aria-controls="collapseTwo">
-
+                                                    
                                                     <i class="fa fa-chevron-up" aria-hidden="true"></i>
                                                     <i class="fa fa-chevron-down" aria-hidden="true"></i>
                                                     {% trans "Permissions" %}
@@ -443,7 +443,7 @@
                                             <a role="button" data-toggle="collapse"
                                                data-parent="#accordion2" href="#collapse-leg" aria-expanded="false"
                                                aria-controls="collapse2">
-
+                                               
                                                 <i class="fa fa-chevron-up" aria-hidden="true"></i>
                                                 <i class="fa fa-chevron-down" aria-hidden="true"></i>
                                                 {% trans "Legend" %}
@@ -470,7 +470,7 @@
                                         <a role="button" data-toggle="collapse"
                                            data-parent="#accordion3" href="#collapse3-map" aria-expanded="false"
                                            aria-controls="collapseTwo">
-
+                                            
                                             <i class="fa fa-chevron-up" aria-hidden="true"></i>
                                             <i class="fa fa-chevron-down" aria-hidden="true"></i>
                                             {% trans "Maps using this layer" %}
@@ -501,7 +501,7 @@
                                         <a role="button" data-toggle="collapse"
                                            data-parent="#accordion" href="#collapse4-create" aria-expanded="false"
                                            aria-controls="collapseTwo">
-
+                                            
                                             <i class="fa fa-chevron-up" aria-hidden="true"></i>
                                             <i class="fa fa-chevron-down" aria-hidden="true"></i>
                                             {% trans "Create a map using this layer" %}
@@ -524,7 +524,7 @@
                                             <a role="button" data-toggle="collapse"
                                                data-parent="#accordion" href="#collapse5" aria-expanded="false"
                                                aria-controls="collapseTwo">
-
+                                                
                                                 <i class="fa fa-chevron-up" aria-hidden="true"></i>
                                                 <i class="fa fa-chevron-down" aria-hidden="true"></i>
                                                 {% trans "Documents related to this layer" %}
@@ -553,7 +553,7 @@
                                             <a role="button" data-toggle="collapse"
                                                data-parent="#accordion" href="#collapse6-styles" aria-expanded="false"
                                                aria-controls="collapseTwo">
-
+                                               
                                                 <i class="fa fa-chevron-up" aria-hidden="true"></i>
                                                 <i class="fa fa-chevron-down" aria-hidden="true"></i>
                                                 {% trans "Styles" %}
@@ -581,16 +581,16 @@
                                                                 {{ style.styleextension.title|truncatechars:20 }}
                                                             {% else %}
                                                                 {{ style.name|truncatechars:20 }}
-                                                            {% endif %}
+                                                            {% endif %}                                                            
                                                         </label>
-
+                                                 
 
                                                         {% comment %}
                                                         <a href="{{ GEOSERVER_BASE_URL }}{{ style.absolute_url }}">
                                                             {{ style.sld_title }}
                                                         </a>
                                                         {% endcomment %}
-
+                                                        
                                                     </li>
                                                 {% empty %}
                                                     <li>{% trans "No styles associated with this layer" %}</li>
@@ -608,7 +608,7 @@
                                             <a role="button" data-toggle="collapse"
                                                data-parent="#accordion" href="#collapse8" aria-expanded="false"
                                                aria-controls="collapseTwo">
-
+                                               
                                                 <i class="fa fa-chevron-up" aria-hidden="true"></i>
                                                 <i class="fa fa-chevron-down" aria-hidden="true"></i>
                                                 {% trans "External service layer" %}
@@ -632,7 +632,7 @@
                                         <a role="button" data-toggle="collapse"
                                            data-parent="#accordion" href="#collapse9" aria-expanded="false"
                                            aria-controls="collapseTwo">
-
+                                           
                                             <i class="fa fa-chevron-up" aria-hidden="true"></i>
                                             <i class="fa fa-chevron-down" aria-hidden="true"></i>
                                             {% trans "About" %}
@@ -670,7 +670,7 @@
                                         <a role="button" data-toggle="collapse"
                                            data-parent="#accordion" href="#collapse10" aria-expanded="false"
                                            aria-controls="collapseTwo">
-
+                                            
                                             <i class="fa fa-chevron-up" aria-hidden="true"></i>
                                             <i class="fa fa-chevron-down" aria-hidden="true"></i>
                                             Information
@@ -774,7 +774,7 @@
                             </div>
                         </div>
                     </div>
-
+          
 
           </div> <!-- col-md-4 -->
           </div>
@@ -787,9 +787,9 @@
 
                   <li role="presentation" class="active" id="map" onclick="activeTab('map')" style="float: right">
                       <a  aria-controls="profile" role="tab" data-toggle="tab" href="javascript:void(0)"><i class="fa fa-map-o" aria-hidden="true"></i> {% trans "Map" %}</a></li>
-                </ul>
-
-
+                </ul>     
+           
+            
                 <div class="col-md-12" id="myNav_map_left" style="padding: 0">
 
             <div id="embedded_map" class="mrg-btm">
@@ -798,7 +798,7 @@
                                 <!-- <div id="embedded_map"> -->
                                     <!-- <div id="the_map"></div> -->
                                     {% include 'maps/_map-view-panel.html'%}
-
+        
                                 <!-- </div> -->
                             </div>
                         </div>
@@ -813,10 +813,10 @@
                     <!--<img  src="{{ STATIC_URL }}geonode/images/caret-left.png" onclick="closeNav();" class="img-responsive expand_view close_carlet" title="Expand to view layer options" alt="Mini-left">-->
                   <!--</span>-->
               </div>
-
+             
           </div>
 
-
+          
           <div class="col-md-12" id="attribute_view_left" style="overflow-y: auto;">
                 {% include "layers/_layer_attribute_view.html" %}
         </div>
@@ -904,7 +904,7 @@
             if (!results[2]) return '';
             return decodeURIComponent(results[2].replace(/\+/g, " "));
         }
-
+    
                     function activeTab(tabId){
                         $('#myTabs a[id=#'+tabId+']').tab('show');
                         console.log($('#myTabs a[id=#'+tabId+']').tab('show'));
@@ -914,7 +914,7 @@
                         }else {
                             $('#attribute_view_left').hide();
                             $('#myNav_map_left').show();
-                        }
+                        }           
                     }
     </script>
     <script type="text/javascript">
@@ -963,7 +963,7 @@
     {% include 'rating.html' %}
     {% include 'request_download.html' %}
     <script>
-        var layerId
+        var layerId    
         $( document ).ready(function() {
             layerId=layer_info;
          });
@@ -1031,8 +1031,8 @@
                 }
             }
             });
-
-
+        
+        
     </script>
     <script type="text/javascript">
        $("#comment_submit_btn").click(function(event) {
@@ -1087,12 +1087,12 @@
         function animating(){
             if(count === 0){
                 $('#sidebar').animate({
-                        'left' : -$( "#sidebar" ).width()
+                        'left' : -$( "#sidebar" ).width()    
                     });
                 count++;
             }else{
                 $('#sidebar').animate({
-                        'left' : '0px'
+                        'left' : '0px'    
                     });
                 count--;
                 }
@@ -1132,3 +1132,4 @@
     });
 </script>
 {% endblock extra_script %}
+

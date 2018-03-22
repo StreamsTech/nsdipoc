@@ -1131,10 +1131,10 @@ DATABASE_ROUTERS = ['geonode.db_router.DbRouter']
 
 # REST_FRAMEWORK settings
 
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 50
-}
+# REST_FRAMEWORK = {
+#     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+#     'PAGE_SIZE': 50
+# }
 
 
 

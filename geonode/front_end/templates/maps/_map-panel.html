@@ -246,13 +246,6 @@
                     <i class="fa fa-bar-chart"></i>                                 
                                 </button>
             </li>
-            <li draft-only>
-                <button class="control-button icon" 
-                ng-style="{'background-color':isHeatMapVisible ? 'red' : 'white'}"
-                ng-click="addHeatMap()" title="Toggle Heat Map">
-                    <i class="fa fa-map"></i>                                 
-                                </button>
-            </li>
 
             <li>
                 <!-- <button class="control-button icon icon32 icon-help" ng-click="action.openHelp('Url.Action(" Help ", "Document ")')" title="Open Help">
@@ -304,25 +297,24 @@
                         <h3 class="panel-title">Query</h3>
                     </div>
                     <div class="panel-body">
-
-                                <input type="checkbox" checked
+                        
+                                <input type="checkbox" checked 
                                 ng-model="isBoundaryBoxEnabled"
-
+                                
                                 > Query by current map extent</label>
-
+                        
                         <div class="clearfix"></div>
                         <query-builder layer-id="layerId" group="group"></query-builder>
                     </div>
 
                     <div class="panel-footer">
-                        <a href=""
+                        <a href="" 
                         ng-click="getQueryResult()"
                         class="btn btn-gd-primary btn-sm pull-right icon-btn-color">
-                                                        Query <i class="fa fa-binoculars" style="font-size: 16px;" aria-hidden="true"></i>
+                                                        Query <i class="fa fa-binoculars" style="font-size: 16px;" aria-hidden="true"></i>    
                                                     </a>
-                        <a href=""
+                        <a href="" 
                         ng-click="disableQuery()"
-
                         class="btn btn-default pull-right" target="_self" style="margin-right: 5px;">
                                                             Cancel <i class="fa fa-times" aria-hidden="true"></i></a>
 
