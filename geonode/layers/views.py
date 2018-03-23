@@ -1906,3 +1906,13 @@ def restoreOrganizationLayersMetadata(metadata_file):
     for obj in serializers.deserialize("json", data):
         obj.save()
 
+
+def organizationLayerBackupView(request, template='layers/org_layer_bk.html'):
+    """
+    This view is for backup organization layers.
+    """
+    context_dict = {
+
+    }
+
+    return render_to_response(template, RequestContext(request, context_dict))

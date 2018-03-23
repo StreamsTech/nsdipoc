@@ -51,6 +51,7 @@ urlpatterns = patterns(
     url(r'^(?P<layername>[^/]*)/metadata_detail$', 'layer_metadata_detail', name='layer_metadata_detail'),
     url(r'^(?P<layername>[^/]*)/feature_catalogue$', 'layer_feature_catalogue', name='layer_feature_catalogue'),
     url(r'^organization/layers/backup$', 'backupOrganizationLayers', name='organization-layers-backup'),
+    url(r'^organization/layers/backup/view$', 'organizationLayerBackupView', name='organization-layers-backup-view'),
 
 #@jahangir091
 #layer publish activity urls
