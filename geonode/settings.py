@@ -1078,7 +1078,8 @@ SEARCH_FILTERS = {
 NOTIFICATION_QUEUE_ALL = False
 
 # BROKER_URL = os.getenv('BROKER_URL', "django://")
-CELERY_BROKER_URL = 'amqp://geodash:admin1234@localhost:5672/myvhost'
+# CELERY_BROKER_URL = 'amqp://geodash:admin1234@localhost:5672/myvhost'
+# CELERY_BROKER_URL = 'amqp://localhost'
 CELERY_ALWAYS_EAGER = True
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
 CELERY_IGNORE_RESULT = True
@@ -1131,10 +1132,11 @@ DATABASE_ROUTERS = ['geonode.db_router.DbRouter']
 
 # REST_FRAMEWORK settings
 
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 50
-}
+# REST_FRAMEWORK = {
+#     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+#     'PAGE_SIZE': 50
+# }
+
 
 
 # There are 3 ways to override GeoNode settings:

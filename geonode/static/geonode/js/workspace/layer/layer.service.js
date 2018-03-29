@@ -53,6 +53,9 @@
         this.getLayerPermissions=function(url){
             return get(url);  
         };
+        this.backupOrganizationLayers=function (url) {
+            return get(url);
+        };
 
     });
 })();
