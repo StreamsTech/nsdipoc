@@ -21,6 +21,7 @@
 
         function _mapLayers(layer) {
             return {
+                "bbox": [layer.LayerExtent.MinX, layer.LayerExtent.MinY, layer.LayerExtent.MaxX, layer.LayerExtent.MaxY],
                 "source": layer.source,
                 "name": layer.Name,
                 "title": layer.Name,
@@ -362,7 +363,7 @@
 
                 $q.all([p1, p2, p3])
                     .then(function() {
-                        map.addLayer(layer, true);
+                        map.addLayer(layer, false);
                     });
             },
             removeLayer: function(layerId) {
@@ -446,9 +447,10 @@
             getMap: function() {
                 return map.getMap();
             },
-            getBbox: function(destinationProj) {
+            getBbox: function(destinationProj,extent) {
                 var epsg4326Extent, projection;
-                var extent = this.getMapExtent();
+                if(!extent)
+                        extent = this.getMapExtent();
                 if (destinationProj) {
                     projection = this.getProjection();
                     epsg4326Extent = ol.proj.transformExtent(extent, projection, destinationProj);

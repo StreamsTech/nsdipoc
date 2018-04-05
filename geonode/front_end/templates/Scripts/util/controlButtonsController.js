@@ -1,5 +1,6 @@
-﻿appModule.controller("controlButtonsController", ["$scope", "$modal", "$timeout", "$rootScope", "$window", "projectService", 'mapModes', 'mapService', 'dirtyManager', 'featureService', 'interactionHandler', 'mapTools', 'CircleDrawTool', 'LayerService', 'urlResolver', '$q',
-    function($scope, $modal, $timeout, $rootScope, $window, projectService, mapModes, mapService, dirtyManager, featureService, interactionHandler, mapTools, CircleDrawTool, LayerService, urlResolver, $q) {
+﻿appModule.controller("controlButtonsController",
+    ["$scope", "$modal", "$timeout", "$rootScope", "$window", "projectService", 'mapModes', 'mapService', 'dirtyManager', 'featureService', 'interactionHandler', 'mapTools', 'CircleDrawTool', 'LayerService', 'urlResolver', '$q','BoxDrawTool','SurfMap',
+    function($scope, $modal, $timeout, $rootScope, $window, projectService, mapModes, mapService, dirtyManager, featureService, interactionHandler, mapTools, CircleDrawTool, LayerService, urlResolver, $q,BoxDrawTool,SurfMap) {
         $scope.mapService = mapService;
         $scope.mapTools = mapTools;
 
@@ -13,6 +14,10 @@
 
         (function() {
             $scope.action = {};
+
+            $scope.action.isNewMap = function(){
+                return typeof mapService.getId() === "undefined" ||  mapService.getId() == 0;
+            };
 
             $rootScope.action = $rootScope.action || {};
             $rootScope.action.saveProject = function() {
@@ -217,20 +222,53 @@
                 circle.OnModificationEnd(function(feature, values) {
                     var center = feature.values_.geometry.getCenter();
                     var centerLongLat = ol.proj.transform([center[0], center[1]], 'EPSG:3857', 'EPSG:4326');
-                    
+                    var meterPerDegree = 111325;
                     var params = {
                         version: '1.0.0',
                         request: 'GetFeature',
                         outputFormat: 'JSON',
                         srsName: 'EPSG:3857',
                         typeNames: '',
-                        cql_filter: 'DWithin(the_geom,POINT(' + centerLongLat[0] + ' ' + centerLongLat[1] + '),' + values.radius + ',meters)',
+                        cql_filter: 'DWithin(the_geom,POINT(' + centerLongLat[0] + ' ' + centerLongLat[1] + '),' + values.radius / meterPerDegree + ',meters)',
                     };
                     showFeatures(params);                    
                 });
             };
 
+            function boundingBoxSearch(feature,boundingBox) {
+                var extent=feature.getGeometry().getExtent();
+                var bbox = mapService.getBbox('EPSG:4326',extent);
+                var params = {
+                    version: '1.0.0',
+                    request: 'GetFeature',
+                    outputFormat: 'JSON',
+                    srsName: 'EPSG:3857',
+                    typeNames: '',
+                    bbox: bbox
+                };
+                showFeatures(params);
+            }
+
+            $scope.removeBoxZooming=function () {
+                $scope.mapTools.zoomToExtentTool.removeDrawBox();
+            };
+            var ifSelectFeatureToolActive=false;
+            $scope.toggleSelectFeatureTool=function () {
+                    if(!ifSelectFeatureToolActive){
+                        mapTools.activeLayer.setActiveLayerSelectInteractions();
+                    }else {
+                        mapTools.activeLayer.disableActiveLayerSelectInteractions();
+                    }
+                    ifSelectFeatureToolActive=!ifSelectFeatureToolActive;
+            };
+
+            var box=new BoxDrawTool();
             $scope.action.boundingBoxSearch = function() {
+                // box.Stop();
+                // box.Remove();
+                box.Draw();
+                box.OnBoxModificationEnd(boundingBoxSearch);
+                box.OnBoxDrawEnd(boundingBoxSearch);
                 var bbox = mapService.getBbox('EPSG:4326');
                 var params = {
                     version: '1.0.0',
@@ -238,9 +276,9 @@
                     outputFormat: 'JSON',
                     srsName: 'EPSG:3857',
                     typeNames: '',
-                    bbox: bbox,
+                    bbox: bbox
                 };
-                showFeatures(params);
+                // showFeatures(params);
             };
 
             $scope.action.shareMap = function() {
