@@ -23,7 +23,7 @@
 {% block middle %}
    {{ block.super }}
   {% block slider %}
-      {% if is_slider or request.user.is_authenticated %}
+      {% if is_slider %}
         {% if slider_section.background_color %}
         <section class="gd-slider" style="background:{{ slider_section.background_color }}">
           <div id="carousel-home" class="carousel slide" data-ride="carousel">
@@ -521,7 +521,7 @@
       {% endblock %}
       <!-- Featurd Maps -->
       {% block index_featurdmaps %}
-        {% if is_featured_layers or request.user.is_authenticated %}
+        {% if is_featured_layers  %}
             <div id="gd-featurd-maps">
                 <div class="block-separator" ></div>
                 <div class="container" id="{{ featured_layers_section.slug }}">
@@ -617,7 +617,7 @@
       {% endblock %}
       <!-- Latest News -->
       {% block index_latestnews %}
-        {% if is_latest_news or request.user.is_authenticated %}
+        {% if is_latest_news  %}
             <div id="gd-latestnews">
                 <div class="block-separator"></div>
                 <div class="container">
@@ -693,7 +693,7 @@
       {% endblock %}
       <!-- Feature Highlights -->
       {% block index_featurehighlight %}
-        {% if is_feature_highlights or request.user.is_authenticated %}
+        {% if is_feature_highlights  %}
             {% if feature_highlights_of_geodash_section.background_color %}
             <div id="gd-featurehighlight" style="background:{{ feature_highlights_of_geodash_section.background_color }}">
                 <div class="block-separator"></div>
@@ -881,7 +881,7 @@
       {% endblock %}
       <!-- Inter Probability -->
       {% block index_interprobability %}
-        {% if is_interportability or request.user.is_authenticated %}
+        {% if is_interportability  %}
             {% if is_interportability_section.background_color %}
             <div id="gd-interprobability" style="background:{{ is_interportability_section.background_color }}">
                 <div class="container" id="{{ is_interportability_section.slug }}">
@@ -960,7 +960,7 @@
         <div class="col-md-6" style="padding-right: 0">
           <!-- Make Pretty start -->
           {% block index_makepretty %}
-            {% if is_pretty or request.user.is_authenticated %}
+            {% if is_pretty  %}
                 {% if make_pretty_maps_with_geodash_section.background_color %}
                 <div id="gd-makepretty" style="background:{{ make_pretty_maps_with_geodash_section.background_color }}">
                     <div id="{{ make_pretty_maps_with_geodash_section.slug }}">
@@ -1066,7 +1066,7 @@
           <!-- Make 3d start -->
           <div class="col-md-6" style="padding-left: 0">
           {% block index_make3d %}
-            {% if is_3dmap or request.user.is_authenticated %}
+            {% if is_3dmap  %}
                 {% if view_your_maps_in_3d_section.background_color %}
                 <div id="gd-3dsection" style="background:{{ view_your_maps_in_3d_section.background_color }}">
                     <div id="{{ view_your_maps_in_3d_section.slug }}">
@@ -1145,7 +1145,7 @@
 
       <!-- What GeoDASH offer? -->
       {% block index_geodashoffer %}
-        {% if is_what_geodash_offer or request.user.is_authenticated %}
+        {% if is_what_geodash_offer  %}
         <div id="gd-whatoffer">
             <div class="block-separator"></div>
             <div class="container">
@@ -1331,7 +1331,7 @@
       <!--{% endblock %}-->
       <!-- Share Map -->
       {% block index_sharemap %}
-        {% if is_share_map or request.user.is_authenticated %}
+        {% if is_share_map  %}
             {% if share_your_map_section.background_color %}
             <div id="gd-sharemap" style="background:{{ share_your_map_section.background_color }}">
                 <div class="container" id="{{ share_your_map_section.slug }}">
@@ -1410,7 +1410,7 @@
         {% endif %}
       {% endblock %}
       {% block index_partners %}
-        {% if is_our_partners or request.user.is_authenticated %}
+        {% if is_our_partners  %}
             {% if our_partners_section.background_color %}
             <div id="gd-partners" style="background:{{ our_partners_section.background_color }}">
                 <div class="container" id="{{ our_partners_section.slug }}">
