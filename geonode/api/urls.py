@@ -25,12 +25,12 @@ from .api import TagResource, TopicCategoryResource, ProfileResource, \
         UndockResources, FavoriteUnfavoriteResources, OsmOgrInfo, LayerSourceServer, LayersWithFavoriteAndDoocked, \
     MapsWithFavoriteAndDoocked, GroupsWithFavoriteAndDoocked, DocumentsWithFavoriteAndDoocked, UserNotifications, \
     ViewNotificationTimeSaving, ThesaurusKeywordResource, AccessTokenApi, LayerDownloadCountApi, LayerPermissionPreviewApi, \
- ChangeLayerVersionApi, ResourcePermissionPreviewApi
+ ChangeLayerVersionApi, ResourcePermissionPreviewApi, SetBaseLayerAPI
 
 from .resourcebase_api import LayerResource, MapResource, DocumentResource, \
     ResourceBaseResource, FeaturedResourceBaseResource, LayerResourceWithFavorite, MapResourceWithFavorite, \
     DocumentResourceWithFavorite, GroupsResourceWithFavorite, GroupActivity, WorkSpaceLayerApi, WorkSpaceDocumentApi, \
-    WorkSpaceMapApi, LayerAttributeApi, AttributeApi, LayerAttributeApiPublic, LayerVersionAPI
+    WorkSpaceMapApi, LayerAttributeApi, AttributeApi, LayerAttributeApiPublic, LayerVersionAPI, LayerResourceForBaseLayers
 
 
 
@@ -102,3 +102,5 @@ api.register(LayerAttributeApiPublic())
 api.register(LayerVersionAPI())
 api.register(ChangeLayerVersionApi())
 api.register(ResourcePermissionPreviewApi())
+api.register(SetBaseLayerAPI())
+api.register(LayerResourceForBaseLayers())

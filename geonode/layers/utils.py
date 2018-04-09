@@ -351,6 +351,7 @@ def unzip_file(upload_file, extension='.shp', tempdir=None):
         tempdir = tempfile.mkdtemp()
 
     the_zip = ZipFile(upload_file)
+
     the_zip.extractall(tempdir)
     for item in the_zip.namelist():
         if item.endswith(extension):
@@ -876,3 +877,8 @@ def file_size_with_ext(file_size):
     #     f_size = str(round(file_size / 1073741824.0, 2)) + ' GB'
 
     return file_size
+
+class SafeDict(dict):
+    def __missing__(self, key):
+        return "{" + key + "}"
+

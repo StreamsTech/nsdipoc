@@ -29,6 +29,7 @@ import traceback
 import uuid
 import time
 
+import geopandas
 import requests
 import xmltodict
 import requests
@@ -51,11 +52,13 @@ from geonode.layers.utils import (
     collect_epsg
 )
 import zipfile
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.gis.db import models
 from guardian.shortcuts import get_perms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.urlresolvers import reverse
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.conf import settings
@@ -101,7 +104,7 @@ from geonode.base.models import TopicCategory
 from geonode.utils import default_map_config
 from geonode.utils import GXPLayer
 from geonode.utils import GXPMap
-from geonode.layers.utils import file_upload, is_raster, is_vector
+from geonode.layers.utils import file_upload, is_raster, is_vector, SafeDict
 from geonode.utils import resolve_object, llbbox_to_mercator
 from geonode.people.forms import ProfileForm, PocForm
 from geonode.security.views import _perms_info_json
@@ -120,7 +123,7 @@ from geonode.base.models import KeywordIgnoreListModel
 from geonode.system_settings.models import SystemSettings
 from geonode.system_settings.system_settings_enum import SystemSettingsEnum
 # from geonode.authentication_decorators import login_required as custom_login_required
-from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
 from .serializers import StyleExtensionSerializer
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework import permissions, status
@@ -170,6 +173,7 @@ _PERMISSION_MSG_MODIFY = _("You are not permitted to modify this layer")
 _PERMISSION_MSG_METADATA = _(
     "You are not permitted to modify this layer's metadata")
 _PERMISSION_MSG_VIEW = _("You are not permitted to view this layer")
+_PERMISSION_MSG_CHANGE_STYLE = ("You are not permitted to modify this style")
 
 
 def log_snippet(log_file):
@@ -230,11 +234,10 @@ def layer_upload(request, template='upload/layer_upload.html'):
         }
         return render_to_response(template, RequestContext(request, ctx))
     elif request.method == 'POST':
-
+        out = {'success': False}
         file_extension = request.FILES['base_file'].name.split('.')[1].lower()
         data_dict = dict()
         tmp_dir = ''
-        epsg_code = ''
         if str(file_extension).lower() == 'shp' or zipfile.is_zipfile(request.FILES['base_file']):
             # Check if zip file then, extract into tmp_dir and convert
             if zipfile.is_zipfile(request.FILES['base_file']):
@@ -242,22 +245,19 @@ def layer_upload(request, template='upload/layer_upload.html'):
                 with zipfile.ZipFile(request.FILES['base_file']) as zf:
                     zf.extractall(tmp_dir)
 
-                prj_file_name = ''
                 shp_file_name = ''
                 for file in os.listdir(tmp_dir):
-                    if file.endswith(".prj"):
-                        prj_file_name = file
-
-                    elif file.endswith(".shp"):
+                    if file.endswith(".shp"):
                         shp_file_name = file
 
-                srs = checking_projection(tmp_dir, prj_file_name)
+                world = geopandas.read_file(tmp_dir + '/' + shp_file_name)
+                if 'init' in world.crs:
 
-                # collect epsg code
-                epsg_code = collect_epsg(tmp_dir, prj_file_name)
+                    if world.crs['init'] != 'epsg:4326':
+                        out['warning'] = "Your uploaded layers projection is not in epsg:4326 " \
+                                         "and it will be converted to epsg:2346"
 
-                if epsg_code:
-                    data_dict = reprojection(tmp_dir, shp_file_name)
+                data_dict = reprojection(tmp_dir, shp_file_name)
 
             if str(file_extension) == 'shp':
 
@@ -267,33 +267,21 @@ def layer_upload(request, template='upload/layer_upload.html'):
                 # Upload files
                 upload_files(tmp_dir, request.FILES)
 
-                # collect epsg code
-                epsg_code = collect_epsg(tmp_dir, str(
-                    request.FILES['prj_file'].name))
+                world = geopandas.read_file(tmp_dir + '/' + request.FILES['base_file'].name)
+                if 'init' in world.crs:
 
-                # Checking projection
-                srs = checking_projection(
-                    tmp_dir, str(request.FILES['prj_file'].name))
-
-                # if srs.IsProjected:
-                if epsg_code:
-
-                    if srs.GetAttrValue('projcs'):
-                        if "WGS" not in srs.GetAttrValue('projcs'):
-
-                            data_dict = reprojection(tmp_dir, str(
-                                request.FILES['base_file'].name))
-
-                    # check WGS84 projected
-                    else:
-                        # call projection util function
-                        data_dict = reprojection(tmp_dir, str(
-                            request.FILES['base_file'].name))
+                    if world.crs['init'] != 'epsg:4326':
+                        out['warning'] = "Your uploaded layers projection is not in epsg:4326 " \
+                                         "and it will be converted to epsg:4326"
+                else:
+                    out['warning'] = "Your uploaded layers projection is not in epsg:4326 " \
+                                     "and it will be converted to epsg:4326"
+                data_dict = reprojection(tmp_dir, str(
+                    request.FILES['base_file'].name))
 
         form = NewLayerUploadForm(request.POST, request.FILES)
         tempdir = None
         errormsgs = []
-        out = {'success': False}
         if form.is_valid():
             # if str(file_extension) == 'shp' and srs.IsProjected:
             #     form.cleaned_data['base_file'] = data_dict['base_file']
@@ -308,6 +296,21 @@ def layer_upload(request, template='upload/layer_upload.html'):
             #     if 'sbx_file' in data_dict:
             #         form.cleaned_data['sbx_file'] = data_dict['sbx_file']
             #     """
+
+            if str(file_extension) == 'shp': # and srs.IsProjected:
+                form.cleaned_data['base_file'] = data_dict['base_file']
+                form.cleaned_data['shx_file'] = data_dict['shx_file']
+                form.cleaned_data['dbf_file'] = data_dict['dbf_file']
+                form.cleaned_data['prj_file'] = data_dict['prj_file']
+                if 'xml_file' in data_dict:
+                    form.cleaned_data['xml_file'] = data_dict['xml_file']
+                """
+                if 'sbn_file' in  data_dict:
+                    form.cleaned_data['sbn_file'] = data_dict['sbn_file']
+                if 'sbx_file' in data_dict:
+                    form.cleaned_data['sbx_file'] = data_dict['sbx_file']
+                """
+
 
             title = form.cleaned_data["layer_title"]
             category = form.cleaned_data["category"]
@@ -352,7 +355,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
                     abstract=form.cleaned_data["abstract"],
                     title=form.cleaned_data["layer_title"],
                     metadata_uploaded_preserve=form.cleaned_data["metadata_uploaded_preserve"],
-                    user_data_epsg=epsg_code
+                    # user_data_epsg=epsg_code
                 )
                 file_size, file_type = form.get_type_and_size()
                 f_size = file_size_with_ext(file_size)
@@ -1285,7 +1288,7 @@ def layer_delete(request, layer_pk):
         except:
             return Http404("requested layer does not exists")
         else:
-            if layer.status == 'DRAFT' and (request.user.is_superuser or request.user == layer.owner or request.user in layer.group.get_managers()):
+            if (request.user.is_superuser or request.user == layer.owner or request.user in layer.group.get_managers()):
                 layer.status = "DELETED"
                 layer.save()
 
@@ -1433,7 +1436,7 @@ class LayerStyleListAPIView(ListAPIView):
         return StyleExtension.objects.filter(style__in=styles)
 
 
-class StyleExtensionRetrieveUpdateAPIView(RetrieveUpdateAPIView):
+class StyleExtensionRetrieveUpdateAPIView(RetrieveUpdateDestroyAPIView):
     queryset = StyleExtension.objects.all()
     serializer_class = StyleExtensionSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
@@ -1442,13 +1445,21 @@ class StyleExtensionRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         data = json.loads(request.body)
         # check already style extension created or not
         try:
-            style_extension = StyleExtension.objects.get(pk=pk)
+            style_extension = self.queryset.get(pk=pk)
+            if style_extension.created_by != request.user:
+                layer_obj = resolve_object(request, 
+                                    Layer, 
+                                    dict(typename=style_extension.style.layer_styles.first().typename),
+                                    'layers.change_layer_style',
+                                    _PERMISSION_MSG_CHANGE_STYLE)
             style_extension.json_field = data.get("StyleString", None)
             style_extension.sld_body = data.get('SldStyle', None)
             style_extension.title = data.get('Title', style_extension.title)
             style_extension.style.sld_title = style_extension.title
-        except Exception as ex:
-            raise ex
+        except PermissionDenied as ex:
+            return HttpResponse(ex,status=403,content_type='application/javascript')
+        except ObjectDoesNotExist as ex:
+            return HttpResponse(ex,status=404,content_type='application/javascript')
 
         style_extension.style.save()
         style_extension.save()
@@ -1467,23 +1478,42 @@ class StyleExtensionRetrieveUpdateAPIView(RetrieveUpdateAPIView):
                 ensure_ascii=False),
             status=200,
             content_type='application/javascript')
+    
+    def delete(self, request, pk, **kwargs):
+        try:
+            style_extension = self.queryset.get(pk=pk)
+            if not (style_extension.created_by == request.user or request.user.is_superuser):
+                raise PermissionDenied('You are not authorized to delete this style');
+            style_extension.style.delete()
+
+            full_path = '/gs/rest/styles/{0}.xml'.format(style_extension.style.name)
+            save_sld_geoserver(request_method='DELETE', full_path=full_path, sld_body=style_extension.sld_body)
+        except PermissionDenied as ex:
+            return HttpResponse(ex,status=403,content_type='application/javascript')
+        except ObjectDoesNotExist as ex:
+            return HttpResponse(ex,status=404,content_type='application/javascript')
+        else:
+            return HttpResponse(True, status=200, content_type='application/javascript')
 
 
 class LayerStyleView(View):
     def get(self, request, layername):
-        layer_obj = _resolve_layer(request, layername)
-        layer_style = layer_obj.default_style
-        serializer = StyleExtensionSerializer(layer_style.styleextension)
-        return HttpResponse(
-            json.dumps(
-                serializer.data,
-                ensure_ascii=False),
-            status=200,
-            content_type='application/javascript')
+        try:
+            layer_obj = _resolve_layer(request, layername)
+            serializer = StyleExtensionSerializer(layer_obj.default_style.styleextension)
+        except ObjectDoesNotExist as ex:
+            return HttpResponse(ex,status=404,content_type='application/javascript')
+        else:    
+            return HttpResponse(
+                json.dumps(
+                    serializer.data,
+                    ensure_ascii=False),
+                status=200,
+                content_type='application/javascript')
 
     @custom_login_required
     def put(self, request, layername, **kwargs):
-        layer_obj = _resolve_layer(request, layername)
+        layer_obj = _resolve_layer(request, layername, 'layers.change_layer_style')
         data = json.loads(request.body)
         # check already style extension created or not
         try:
@@ -1513,7 +1543,10 @@ class LayerStyleView(View):
 
     @custom_login_required
     def post(self, request, layername, **kwargs):
-        layer_obj = _resolve_layer(request, layername)
+        layer_obj = _resolve_layer(request, 
+                    layername,
+                    'base.view_resourcebase',
+                    _PERMISSION_MSG_VIEW)
         data = json.loads(request.body)
         json_field = data.get("StyleString", None)
         sld_body = data.get('SldStyle', None)
@@ -1524,7 +1557,8 @@ class LayerStyleView(View):
             json_field=json_field, created_by=request.user, modified_by=request.user)
 
         title = data.get('Title', str(style_extension.uuid))
-        sld_body = sld_body.format(style_name=str(style_extension.uuid))
+        formatter = string.Formatter()
+        sld_body = formatter.vformat(sld_body, (), SafeDict(style_name=str(style_extension.uuid)))
 
         style = Style(name=str(style_extension.uuid),
                       sld_body=sld_body, sld_title=title)

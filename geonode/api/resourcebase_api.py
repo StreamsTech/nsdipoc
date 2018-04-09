@@ -1284,3 +1284,34 @@ class LayerVersionAPI(ModelResource):
         layer_id = request.GET.get('layer_id')
         layer = Layer.objects.get(id=layer_id)
         return LayerVersionModel.objects.filter(layer=layer)
+
+
+class LayerResourceForBaseLayers(ModelResource):
+
+    """Layer API for base layer settings"""
+
+    class Meta:
+        queryset = Layer.objects.distinct().order_by('-date').filter(status='ACTIVE')
+        if settings.RESOURCE_PUBLISHING:
+            queryset = queryset.filter(is_published=True)
+        resource_name = 'layers-list'
+        # excludes = ['csw_anytext', 'metadata_xml', 'csw_wkt_geometry']
+        fields = [
+            'id',
+            'uuid',
+            'title',
+            'date',
+            'owner__username',
+            'thumbnail_url',
+            'detail_url',
+            'resource_type',
+            'is_base_layer',
+
+        ]
+        filtering = {
+            'group': ALL,
+            'featured': ALL
+        }
+    # def get_object_list(self, request):
+    #
+    #     return super(LayerResourceForBaseLayers, self).get_object_list(request).filter(status='ACTIVE')
