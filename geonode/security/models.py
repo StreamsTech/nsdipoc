@@ -201,7 +201,7 @@ class PermissionLevelMixin(object):
                 ]
         }
         """
-
+        
         remove_object_permissions(self)
 
         if 'users' in perm_spec and "AnonymousUser" in perm_spec['users']:
@@ -292,6 +292,8 @@ class PermissionLevelMixin(object):
 
 def set_geofence_all(instance):
     """assign access permissions to all users"""
+    # @TODO: Will be removed after finalizing GeoFence Problem    
+    return None
     resource = instance.get_self_resource()
 
     if hasattr(resource, "layer"):
@@ -351,6 +353,8 @@ def set_geofence_all(instance):
 
 def set_geofence_owner(instance, username, view_perms=False, download_perms=False):
     """assign access permissions to owner user"""
+    # @TODO: Will be removed after finalizing GeoFence Problem    
+    return None
     resource = instance.get_self_resource()
 
     if hasattr(resource, "layer"):
@@ -439,6 +443,8 @@ def set_geofence_owner(instance, username, view_perms=False, download_perms=Fals
 
 def set_geofence_group(instance, groupname, view_perms=False, download_perms=False):
     """assign access permissions to owner group"""
+    # @TODO: Will be removed after finalizing GeoFence Problem    
+    return None
     resource = instance.get_self_resource()
 
     if hasattr(resource, "layer"):
