@@ -255,7 +255,6 @@ class PermissionLevelMixin(object):
         """
         assign all admin permissions to all the managers of the group for this layer
         """
-        import pdb; pdb.set_trace()
 
         if group:
             if self.polymorphic_ctype.name == 'layer':
