@@ -212,6 +212,8 @@ _DEFAULT_STATICFILES_DIRS = [
     os.path.join(PROJECT_ROOT, "static"),
     # os.path.join(PROJECT_ROOT, "front_end/templates/Scripts/"),
     os.path.join(PROJECT_ROOT, "front_end/templates/"),
+    os.path.join(PROJECT_ROOT, "nsdi_frontend/templates/"),
+
 ]
 
 STATICFILES_DIRS = os.getenv('STATICFILES_DIRS', _DEFAULT_STATICFILES_DIRS)
@@ -298,6 +300,7 @@ GEONODE_APPS = (
     #end
 
     'geonode.front_end',
+    'geonode.nsdi_frontend',
 )
 
 GEONODE_CONTRIB_APPS = (
@@ -502,7 +505,7 @@ TEMPLATES = [
     {
         'NAME': 'GeoNode Project Templates',
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(PROJECT_ROOT, "templates"), os.path.join(PROJECT_ROOT, "front_end/templates")],
+        'DIRS': [ os.path.join(PROJECT_ROOT, "nsdi_frontend/templates"), os.path.join(PROJECT_ROOT, "templates"), os.path.join(PROJECT_ROOT, "front_end/templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
