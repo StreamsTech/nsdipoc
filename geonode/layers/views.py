@@ -28,8 +28,6 @@ import sys
 import traceback
 import uuid
 import time
-
-import geopandas
 import requests
 import xmltodict
 import requests
