@@ -7,8 +7,31 @@ function SetMarkerTool(mapService, layerService, SettingsService) {
         var container, content, close, popup;
         this.showPopup = false;
         this.elevationLayerName = "";
-        var isMarkerToolEnabled=false;
-        this.markerToolEvent=undefined;
+        var isMarkerToolEnabled = false;
+        this.markerToolEvent = undefined;
+        var vectorSource = new ol.source.Vector({
+        });
+        var styles={
+            'Point': new ol.style.Style({
+                image: new ol.style.Icon( /** @type {olx.style.IconOptions} */ ({
+                    anchor: [0.5, 48],
+                    anchorXUnits: 'fraction',
+                    anchorYUnits: 'pixels',
+                    opacity: 1,
+                    // size: [120, 120],
+                    src: '/static/geonode/img/marker.png'
+                }))
+            })
+        };
+        var styleFunction = function(feature) {
+            return [styles[feature.getGeometry().getType()]];
+        };
+        var vectorLayer = new ol.layer.Vector({
+            source: vectorSource,
+            style: styleFunction,
+            name : 'pointMarkerVectorLayer'
+        });
+        map.addLayer(vectorLayer);
 
         function createPopup() {
             container = document.getElementById('popup');
@@ -42,44 +65,33 @@ function SetMarkerTool(mapService, layerService, SettingsService) {
         function addMarker(evt) {
             // var latLong = ol.proj.transform(evt.coordinate, 'EPSG:4326','EPSG:3857');
             var latLong = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
-            var iconFeature = new ol.Feature({
-                geometry: new ol.geom.Point(evt.coordinate),
+            var properties={
                 lat: latLong[1].toFixed(6),
-                lon: latLong[0].toFixed(6),
-                coordinate: evt.coordinate,
-                population: 4000,
-                rainfall: 500
-            });
+                lon: latLong[0].toFixed(6)
+            };
+            var iconFeature = new ol.Feature(
+                new ol.geom.Point(evt.coordinate)
+            );
+            // var iconFeature = new ol.Feature({
+            //     geometry: new ol.geom.Point(evt.coordinate),
+            //     lat: latLong[1].toFixed(6),
+            //     lon: latLong[0].toFixed(6),
+            //     coordinate: evt.coordinate
+            // });
 
-            var iconStyle = new ol.style.Style({
-                image: new ol.style.Icon( /** @type {olx.style.IconOptions} */ ({
-                    anchor: [0.5, 48],
-                    anchorXUnits: 'fraction',
-                    anchorYUnits: 'pixels',
-                    opacity: 1,
-                    // size: [120, 120],
-                    src: '/static/geonode/img/marker.png'
-                }))
-            });
-
-            iconFeature.setStyle(iconStyle);
-
-            var vectorSource = new ol.source.Vector({
-                features: [iconFeature]
-            });
-
-            var vectorLayer = new ol.layer.Vector({
-                source: vectorSource
-            });
-
-            map.addLayer(vectorLayer);
+            iconFeature.setProperties(properties);
+            vectorSource.addFeature(iconFeature);
             return iconFeature;
         }
 
-        function showPopup(feature, event) {
+
+        function addElevationData(feature,event) {
+            if(!this.elevationLayerName){
+                //No elevation layer setup in the settings;
+                return;
+            }
             var size = map.getSize();
             var bbox = map.getView().calculateExtent(size);
-
             var urlParams = {
                 bbox: bbox.join(','),
                 width: size[0],
@@ -91,66 +103,93 @@ function SetMarkerTool(mapService, layerService, SettingsService) {
                 x: Math.round(event.pixel[0]),
                 y: Math.round(event.pixel[1])
             };
-            container.style.visibility = 'visible';
+
             layerService.fetchWMSFeatures(urlParams)
-                .then(function(res) {
-                    var lat = feature.get('lat');
-                    var lon = feature.get('lon');
-                    var html = "<div class='pop-up'> " +
-                        "<p>Lat: " + lat + "</p>" +
-                        "<p>Lon: " + lon + "</p>";
+                .then(function (res) {
                     var properties = res.features.length > 0 ? res.features[0].properties : {};
-                    for (var key in properties) {
-                        html += "<p>Elevation: " + res.features["0"].properties[key] + "</p>";
-                    }
-                    html += "</div>";
-                    content.innerHTML = html;
-                }, function(error) {
+                    properties.lat = feature.get('lat');
+                    properties.lon = feature.get('lon');
+                    feature.setProperties(properties);
+                    insertPopupData(feature.getGeometry().getCoordinates(), feature.getProperties());
+                }, function (error) {
 
                 });
-            content.innerHTML = feature.get('name');
-            popup.setPosition(feature.get('coordinate'));
         }
         
+
+        function insertPopupData(coordinate, properties) {
+            var html = "<div class='pop-up'> ";
+            for (var key in properties) {
+                if(key!=='geometry')
+                    html += "<p>"+key+" : " + properties[key] + "</p>";
+            }
+            html += "</div>";
+            content.innerHTML = html;
+            container.style.visibility = 'visible';
+            popup.setPosition(coordinate);
+        }
+
+        function showPopup(feature, event) {
+            var size = map.getSize();
+            var bbox = map.getView().calculateExtent(size);
+            var lat = feature.get('lat');
+            var lon = feature.get('lon');
+            var coordinate = feature.get('coordinate');
+            insertPopupData(feature.getGeometry().getCoordinates(), feature.getProperties());
+        }
+
         function enableSetMarkerTool() {
             createPopup();
-            this.markerToolEvent= mapService.registerEvent('singleclick', function(evt) {
+            this.markerToolEvent = mapService.registerEvent('singleclick', function(evt) {
                 var feature = map.forEachFeatureAtPixel(evt.pixel,
                     function(feature, layer) {
-                        return feature;
+                        if(layer.get('name') === 'pointMarkerVectorLayer') return feature;
                     });
-                if (!feature) {
+                if (!feature && isMarkerToolEnabled) {
                     feature = addMarker(evt);
+                    addElevationData(feature,evt);
                 }
-                showPopup(feature, evt);
+                if(feature) showPopup(feature, evt);
             });
-            isMarkerToolEnabled=true;
+            // isMarkerToolEnabled = true;
         }
+
         function disableSetMarkerTool() {
-            if(this.markerToolEvent){
-                mapService.removeEvent(this.markerToolEvent);
-                isMarkerToolEnabled=false;
-            }
+            // if (this.markerToolEvent) {
+            //     mapService.removeEvent(this.markerToolEvent);
+            //     isMarkerToolEnabled = false;
+            // }
+            isMarkerToolEnabled = false;
         }
-        
+
         this.setMarker = function() {
-            if(!isMarkerToolEnabled) enableSetMarkerTool();
+            if (!isMarkerToolEnabled) isMarkerToolEnabled=true;
             else disableSetMarkerTool();
             return isMarkerToolEnabled;
         };
+        this.clearAllMarkers=function () {
+            if(vectorSource){
+                vectorSource.clear();
+                if(popup) popup.setPosition(undefined);
+            }
+        };
+        this.enableInitially=function () {
+           enableSetMarkerTool();
+        };
 
-        function getSettings(){
+        function getSettings() {
             SettingsService.getSystemSettings()
-            .then(function(res){
-                var elevation = res.find(function(e){
-                    return e.settings_code === 'elevation';
+                .then(function(res) {
+                    var elevation = res.find(function(e) {
+                        return e.settings_code === 'elevation';
+                    });
+                    this.elevationLayerName = elevation && elevation.content_object.typename;
                 });
-                this.elevationLayerName = elevation && elevation.content_object.typename;
-            });
         }
 
-        function init(){
+        function init() {
             getSettings();
+            // enableSetMarkerTool();
         }
 
         (init)();

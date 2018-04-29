@@ -33,6 +33,8 @@
             enableSelectAll: true,
             multiSelect: false,
             enableRowHeaderSelection : true,
+            enableGridMenu: true,
+            exporterCsvFilename: ""+ '.csv',
             onRegisterApi: function(gridApi) {
                 $scope.gridApi = gridApi;
                 gridApi.selection.on.rowSelectionChanged($scope, function(rows) {
@@ -43,7 +45,7 @@
                     });
                     var featureId = features.join(",");
                     if (surfLayer) {
-                        var requestObj = getRequestObjectToGetFeature(featureId, surfLayer.DataId);
+                        var requestObj = getRequestObjectToGetFeature(featureId, surfLayer.LayerId);
                         LayerService.getWFSWithGeom('api/geoserver/', requestObj, false).then(function(response) {
                             attributeGridService.highlightFeature(response);
                             selectedFeatures=$scope.selectedFeatures;
@@ -89,6 +91,8 @@
                 enableSelectAll: true,
                 multiSelect: false,
                 enableRowHeaderSelection : true,
+                enableGridMenu: true,
+                exporterCsvFilename: surfLayer.Name + '.csv',
                 columnDefs: attributeGridService.getColumns($scope.gridData.attributeDefinitions, attributeTypes),
                 onRegisterApi: function(gridApi) {
                     $scope.gridApi = gridApi;
@@ -100,7 +104,7 @@
                         });
                         var featureId = features.join(",");
                         if (surfLayer) {
-                            var requestObj = getRequestObjectToGetFeature(featureId, surfLayer.DataId);
+                            var requestObj = getRequestObjectToGetFeature(featureId, surfLayer.LayerId);
                             LayerService.getWFSWithGeom('api/geoserver/', requestObj, false).then(function(response) {
                                 attributeGridService.highlightFeature(response);
                                 selectedFeatures=$scope.selectedFeatures;
@@ -205,7 +209,7 @@
             var startIndex = currentPageSize * currentPage - currentPageSize;
             var requestObj = {
                 request: 'GetFeature',
-                typeName: surfLayer.DataId,
+                typeName: surfLayer.LayerId,
                 startIndex: startIndex,
                 count: currentPageSize,
                 maxFeatures: currentPageSize,

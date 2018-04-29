@@ -43,13 +43,15 @@ import tempfile
 import logging
 import hashlib
 
+import re
 from osgeo import gdal, osr
 from geonode.layers.utils import (
     reprojection,
     create_tmp_dir,
     upload_files,
     checking_projection,
-    collect_epsg
+    collect_epsg,
+    get_epsg_code
 )
 import zipfile
 from django.core.exceptions import ObjectDoesNotExist
@@ -115,6 +117,8 @@ from geonode.geoserver.helpers import ogc_server_settings
 from geonode import GeoNodeException
 from geonode.layers.models import LayerVersionModel
 from geonode.layers.utils import file_size_with_ext
+from geonode.geoserver.helpers import OGC_Servers_Handler
+from geoserver.catalog import Catalog
 
 from geonode.groups.models import GroupProfile
 from geonode.layers.models import LayerSubmissionActivity, LayerAuditActivity, StyleExtension, Style
@@ -235,9 +239,12 @@ def layer_upload(request, template='upload/layer_upload.html'):
         return render_to_response(template, RequestContext(request, ctx))
     elif request.method == 'POST':
         out = {'success': False}
+        out['warning'] = ''
         file_extension = request.FILES['base_file'].name.split('.')[1].lower()
         data_dict = dict()
         tmp_dir = ''
+        epsg_code = ''
+
         if str(file_extension).lower() == 'shp' or zipfile.is_zipfile(request.FILES['base_file']):
             # Check if zip file then, extract into tmp_dir and convert
             if zipfile.is_zipfile(request.FILES['base_file']):
@@ -249,15 +256,24 @@ def layer_upload(request, template='upload/layer_upload.html'):
                 for file in os.listdir(tmp_dir):
                     if file.endswith(".shp"):
                         shp_file_name = file
+                    if file.endswith(".prj"):
+                        prj_file_name = file
 
-                world = geopandas.read_file(tmp_dir + '/' + shp_file_name)
-                if 'init' in world.crs:
-
-                    if world.crs['init'] != 'epsg:4326':
+                epsg_code = get_epsg_code(tmp_dir + '/' + prj_file_name)
+                if epsg_code:
+                    if epsg_code != '4326':
                         out['warning'] = "Your uploaded layers projection is not in epsg:4326 " \
-                                         "and it will be converted to epsg:2346"
-
-                data_dict = reprojection(tmp_dir, shp_file_name)
+                                         "and it will be converted to epsg:4326"
+                    data_dict = reprojection(tmp_dir, shp_file_name)
+                else:
+                    out['success'] = False
+                    out['errors'] = "Geodash can not detect projection for the uploaded layer" \
+                                    "Please upload layer with known projection"
+                    status_code = 400
+                    return HttpResponse(
+                        json.dumps(out),
+                        content_type='application/json',
+                        status=status_code)
 
             if str(file_extension) == 'shp':
 
@@ -267,17 +283,21 @@ def layer_upload(request, template='upload/layer_upload.html'):
                 # Upload files
                 upload_files(tmp_dir, request.FILES)
 
-                world = geopandas.read_file(tmp_dir + '/' + request.FILES['base_file'].name)
-                if 'init' in world.crs:
-
-                    if world.crs['init'] != 'epsg:4326':
+                epsg_code = get_epsg_code(tmp_dir + '/' + request.FILES['prj_file'].name)
+                if epsg_code:
+                    if epsg_code != '4326':
                         out['warning'] = "Your uploaded layers projection is not in epsg:4326 " \
                                          "and it will be converted to epsg:4326"
+                    data_dict = reprojection(tmp_dir, str(request.FILES['base_file'].name))
                 else:
-                    out['warning'] = "Your uploaded layers projection is not in epsg:4326 " \
-                                     "and it will be converted to epsg:4326"
-                data_dict = reprojection(tmp_dir, str(
-                    request.FILES['base_file'].name))
+                    out['success'] = False
+                    out['errors'] = "Geodash can not detect projection for the uploaded layer" \
+                                    "Please upload layer with known projection"
+                    status_code = 400
+                    return HttpResponse(
+                        json.dumps(out),
+                        content_type='application/json',
+                        status=status_code)
 
         form = NewLayerUploadForm(request.POST, request.FILES)
         tempdir = None
@@ -355,7 +375,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
                     abstract=form.cleaned_data["abstract"],
                     title=form.cleaned_data["layer_title"],
                     metadata_uploaded_preserve=form.cleaned_data["metadata_uploaded_preserve"],
-                    # user_data_epsg=epsg_code
+                    user_data_epsg=epsg_code or 4326
                 )
                 file_size, file_type = form.get_type_and_size()
                 f_size = file_size_with_ext(file_size)
@@ -400,6 +420,12 @@ def layer_upload(request, template='upload/layer_upload.html'):
                 if permissions is not None and len(permissions.keys()) > 0:
                     # permissions = saved_layer.resolvePermission(permissions)
                     saved_layer.set_permissions(permissions)
+
+                #save geometry type for the uploaded layer(point, line, polygone)
+                geometry_type = save_geometry_type(saved_layer)
+                saved_layer.geometry_type = geometry_type
+                saved_layer.save()
+
             finally:
                 # Delete temporary files
 
@@ -648,7 +674,7 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
         srs = osr.SpatialReference(wkt=srstext)
         if srs.IsProjected:
             print srs.GetAttrValue('projcs')
-        user_proj = srs.GetAttrValue('geogcs')
+        user_proj = srs.GetAttrValue('projcs')
 
         context_dict['user_data_proj'] = user_proj
 
@@ -1666,7 +1692,8 @@ class GeoLocationApiView(CreateAPIView):
             except Exception as ex:
                 row += ['', '']
                 failed_count += 1
-            response.append(dict(zip(response_headers, row)))
+            else:
+                response.append(dict(zip(response_headers, row)))
 
         return Response(data=dict(data=response, success=success_count, error=failed_count), status=status.HTTP_200_OK)
 # end
@@ -1950,3 +1977,29 @@ def organizationLayerBackupView(request, template='layers/org_layer_bk.html'):
     }
 
     return render_to_response(template, RequestContext(request, context_dict))
+
+
+def save_geometry_type(layer):
+
+    ogc_server_settings = OGC_Servers_Handler(settings.OGC_SERVER)['default']
+    _user, _password = ogc_server_settings.credentials
+    cat = Catalog(ogc_server_settings.internal_rest, _user, _password)
+    layer = cat.get_layer(layer.name)
+
+    name = ''
+    if layer.resource.resource_type == 'featureType':
+        res = layer.resource
+        res.fetch()
+        ft = res.store.get_resources(res.name)
+        ft.fetch()
+
+        for attr in ft.dom.find("attributes").getchildren():
+            attr_binding = attr.find("binding")
+            if "jts.geom" in attr_binding.text:
+                if "Polygon" in attr_binding.text:
+                    name = "polygon"
+                elif "Line" in attr_binding.text:
+                    name = "line"
+                else:
+                    name = "point"
+    return name

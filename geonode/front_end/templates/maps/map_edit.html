@@ -1,0 +1,155 @@
+{% extends "site_base.html" %} {% load i18n %} {% load base_tags %} {% block title %} {% trans "New Map" %} - {{ block.super }} {% endblock %}  {% block head %}
+{% include 'Templates/_base-headers.html' %}
+<style>
+    .sarsha-spinner-container {
+        background: transparent;
+        color: black;
+        top: unset;
+        bottom: unset;
+    }
+    .sarsha-spinner {
+        position: absolute;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100px;
+        top: calc(100vh - 600px);    
+        color: #fff;
+    }
+</style>
+{% endblock %}
+{% block middle %}
+
+
+
+<div class="surfgis" ng-controller="appController" ng-app="appModule">
+
+   <div class="application-font all-children-application-font"  ng-controller="MapController" ng-click="bodyClicked()" ng-class='{"draft": mapAccessLevel.IsPublic, "not-draft": !mapAccessLevel.IsPublic}'>
+    <div class="row">
+        <sarsha-spinner name="spinner1">
+                    <div class="donot-print ng-scope"> 
+                        <!-- Loading <i class="fa fa-spinner fa-spin"></i>  -->
+                        <img src="{{ STATIC_URL }}geonode/images/loader.gif" width="100"/>
+                    </div>
+        </sarsha-spinner>
+    </div>
+
+       <div class="layout-content">
+           <div class="layout-left donot-print" ng-style="layout.leftStyle">
+            {% include 'maps/_layer-properties.html'%}
+               
+           </div>
+           <div id="mainContent" class="layout-center donot-print" ng-style="layout.centerStyle">
+                {% include 'maps/_map-panel.html'%}
+           </div>
+           
+       </div>
+       <div id="location-search-display-popup" class="surf-popup">
+           <label class="addtolayer">
+                   <button class="btn btn-small"><i class="fa fa-plus"></i> Add to layer</button>
+               </label>
+
+           <label class="address"></label>
+           <label class="latlng"></label>
+       </div>
+   </div>
+   <div id="property-grid-in-overlay" ng-if="enableFeatureIdentification">
+{#        <div class="donot-print" ng-style="layout.rightStyle" >#}
+{#                {% include 'maps/_layer-attributes.html'%}#}
+{#                   #}
+{#               </div>#}
+{#        <property-grid-overlay></property-grid-overlay>#}
+       <div class="property-grid-overlay" style="padding-top: 20px">
+           <a id="attribute-popup-closer" class="ol-route-popup-closer" style="cursor: pointer;top: -1px"></a>
+                   <div class="col-md-12" style="margin-bottom: 8px" ng-if="featureList.length>0">
+                       <button class="btn-sm btn-primary pull-left col-md-3" ng-hide="currentIndex==0" ng-click="getPreviousFeature()">Prev</button>
+                       <div class="text-center col-md-7 text-primary col-md-6" style="padding: 5px">[{currentIndex+1}] of [{featureList.length}]</div>
+                       <button class="btn-sm btn-primary pull-right col-md-3" ng-hide="currentIndex==featureList.length-1" ng-click="getNextFeature()">Next</button>
+                   </div>
+                    <table style="width: 100%;">
+                        <thead>
+                            <tr class="header-row">
+                                <th style="text-align: left"><font color="#FFF"> &nbsp Name</font></th>
+                                <th style="text-align: center"><font color="#FFF">Value</font></th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <div class="property-grid-container" style="max-height: 260px; overflow: auto">
+                        <table class="propertyGridTable" cellspacing="0">
+                            <tbody>
+                                <tr ng-repeat="property in properties" class="propertyGrid-row">
+                                    <td class="propertyGridColumn propertyGridPropertyNameColumn">
+                                        [{property.name}]
+            {#                            <span ng-if="showUnit(property)">({{property.unit}})</span>#}
+                                    </td>
+                                    <td class="propertyGridColumn propertyGridPropertyValueColumn">
+                                        <div class="property-value-div" href-watcher="property.value">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr ng-if="properties.length == 0" class="propertyGrid-row">
+                                    <td class="propertyGridColumn propertyGridPropertyValueColumn" colspan="2" style="text-align: center; padding: 10px">
+                                        <div class="alert">No attribute available</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+        </div>
+
+</div>
+<style>
+        .header-expand-button
+    {
+        display: block;
+    }
+    .layout-content {
+    top: 0;
+}
+.navbar-fixed-top
+{
+    top: 0;
+    transition-property: transform;
+    transition-duration: 0.2s;
+    transition-delay: 0.2s;
+    transform: translate3d(0, -100%, 0);
+}
+.headerSlideOutDown
+{
+    top: 0;
+    transition-property: transform;
+	transition-duration: 0.2s;
+	transition-delay: 0.2s;
+    transform: translate3d(0, 0, 0);
+}
+.headerSlideInUp
+{
+    transition-property: transform;
+    transition-duration: 0.2s;
+    transition-delay: 0.2s;
+    transform: translate3d(0, -100%, 0);
+    top: 0;
+}
+
+    </style>
+
+<script>
+  
+    var navAnCount = 0; 
+    function naVAnimating(){
+        if(navAnCount === 0){
+            // $("#panel-bottom").slideDown();
+            // $('#panel-bottom').css("top", "");
+            document.getElementById('gd-navbar').className = 'navbar navbar-fixed-top headerSlideOutDown'; 
+            navAnCount++;
+        }else{
+            document.getElementById('gd-navbar').className = ' navbar navbar-fixed-top headerSlideInUp ';
+            // $("#panel-bottom").slideUp();
+            // $('#panel-bottom').css("top", "");
+            navAnCount--;
+            }
+    }
+
+</script>
+
+
+   {% endblock %} {% block footer %}{% endblock %}

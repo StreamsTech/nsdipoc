@@ -21,18 +21,28 @@
         width: 100%;
     }
     .sidebar {
-    position: fixed;
-    top: 105px;
-    bottom: 0;
-    left: 0;
-    z-index: 1000;
-    display: block;
-    padding: 20px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    background-color: #f5f5f5;
-    border-right: 1px solid #eee;
-}
+        position: fixed;
+        top: 84px;
+        bottom: 0;
+        left: 0;
+        z-index: 1000;
+        display: block;
+        padding: 20px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        background-color: #384450;
+        border-right: 1px solid #eee;
+    }
+    .sidebar ul li a {
+        color: #fff;
+        border-bottom: 1px solid #495a67;
+    }
+    .sidebar ul li a:hover {
+        background-color: #283139;
+    }
+    .sidebar ul li a i{
+        margin-right: 10px;
+    }
 .nav-sidebar {
     margin-right: -21px;
     margin-bottom: 20px;
@@ -72,11 +82,11 @@ footer
 
 
         <ul class="nav nav-sidebar">
-                <li role="presentation" ><a href="{% url "admin-workspace-layer" %}">{% trans "Layers" %}</a></li>
-                <li role="presentation" class="active"><a href="{% url "admin-workspace-map" %}"> {% trans "Maps" %}</a></li>
-                <li role="presentation"><a href="{% url "admin-workspace-document" %}">{% trans "Documents" %}</a></li>
-                <li role="presentation"><a href="{% url "admin-workspace-user-list" %}" >{% trans "User List" %}</a></li>
-                <li role="presentation"><a href="{% url "create-user" %}" >{% trans "Create User" %}</a></li>
+            <li role="presentation"><a href="{% url "admin-workspace-layer" %}"><i class="fa fa-clone" aria-hidden="true"></i>{% trans "Layers" %}</a></li>
+            <li role="presentation" class="active"><a href="{% url "admin-workspace-map" %}"><i class="fa fa-map" aria-hidden="true"></i>{% trans "Maps" %}</a></li>
+            <li role="presentation"><a href="{% url "admin-workspace-document" %}"><i class="fa fa-file" aria-hidden="true"></i>{% trans "Documents" %}</a></li>
+            <li role="presentation"><a href="{% url "admin-workspace-user-list" %}" ><i class="fa fa-users" aria-hidden="true"></i>{% trans "User List" %}</a></li>
+            <li role="presentation"><a href="{% url "create-user" %}" ><i class="fa fa-plus-circle" aria-hidden="true"></i>{% trans "Create User" %}</a></li>
               </ul>
 
 
@@ -114,6 +124,7 @@ footer
                                                                 <th>Map Title</th>
                                                                 <th>Organization</th>
                                                                 <th>Tried</th>
+                                                                <th>Who Requested</th>
                                                                 <th>Date of Request</th>
                                                                 <th>Approve/Deny Map</th>
                                                                 <!--<th>Denied Map</th>-->
@@ -152,7 +163,7 @@ footer
                                                                 <th>Who Approved</th>
                                                                 <th>Approve Date</th>
                                                                 <th>Map Edit</th>
-                                                                <th>Unapproved Map</th>
+                                                                <th>Unpublish Map</th>
                                                             </tr>
                                                         </thead>
                                                         <!--{% for approved in approved_list %}-->
@@ -426,6 +437,7 @@ $(function () {
                     output+='<td><a href='+ item.detail_url +'>'+ item.title+'</a></td>';
                     output+='<td>'+ item.group +'</td>';
                     output+='<td>'+ item.current_iteration +'</td>';
+                    output+='<td>'+ item.owner +'</td>';
                     output+='<td>'+ item.date_updated +'</td>';
                     output+='<td><a href="'+ item.detail_url +'?user_role=manager" class="btn btn-gd-primary">{% trans "Edit Map" %}</a>';
                     output+='<a href="'+ item.detail_url +'/preview" class="btn btn-gd-primary" style="margin-left:10px">{% trans "Approve/Publish Map" %}</a></td>';

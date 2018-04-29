@@ -98,6 +98,7 @@ class CommonMetaApi:
                  'owner': ALL_WITH_RELATIONS,
                  'date': ALL,
                  'resource_type':ALL,
+                 'geometry_type' :ALL,
 
                  }
     ordering = ['date', 'title', 'popular_count']

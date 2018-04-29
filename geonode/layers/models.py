@@ -125,6 +125,7 @@ class Layer(ResourceBase):
     latest_version = models.IntegerField(blank=True, null=True)
 
     upload_session = models.ForeignKey('UploadSession', blank=True, null=True)
+    geometry_type = models.CharField(max_length=200, null=True, blank=True)
 
     @property
     def is_remote(self):
