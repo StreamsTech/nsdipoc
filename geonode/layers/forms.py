@@ -161,6 +161,7 @@ class LayerUploadForm(forms.Form):
         absolute_base_file = None
         tempdir = tempfile.mkdtemp()
         file = self.cleaned_data['base_file']
+        import pdb; pdb.set_trace()
 
 	#@jahangir091
         filename = file.name
@@ -273,7 +274,7 @@ class LayerUploadForm(forms.Form):
                                 writable.write(c)
                     else:
                         # with open(path, 'wb') as writable:
-                        with open(path, 'wb') as writable:
+                        with open(path, 'r+b') as writable:
                             for c in f.chunks():
                                 writable.write(c)
             absolute_base_file = os.path.join(tempdir,

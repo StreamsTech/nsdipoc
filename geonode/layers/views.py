@@ -246,7 +246,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
         if str(file_extension).lower() == 'shp' or zipfile.is_zipfile(request.FILES['base_file']):
             # Check if zip file then, extract into tmp_dir and convert
             if zipfile.is_zipfile(request.FILES['base_file']):
-                tmp_dir = tempfile.mkdtemp() #create_tmp_dir()
+                tmp_dir = temp_csv_dir = tempfile.mkdtemp() #create_tmp_dir()
                 with zipfile.ZipFile(request.FILES['base_file']) as zf:
                     zf.extractall(tmp_dir)
 
