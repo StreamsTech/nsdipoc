@@ -33,7 +33,6 @@ from .resourcebase_api import LayerResource, MapResource, DocumentResource, \
     WorkSpaceMapApi, LayerAttributeApi, AttributeApi, LayerAttributeApiPublic, LayerVersionAPI, LayerResourceForBaseLayers
 
 
-
 api = Api(api_name='api')
 
 api.register(LayerResource())
@@ -105,3 +104,5 @@ api.register(ResourcePermissionPreviewApi())
 api.register(SetBaseLayerAPI())
 api.register(LayerResourceForBaseLayers())
 api.register(LayerMapDocumentApproveDenyAPI())
+
+
