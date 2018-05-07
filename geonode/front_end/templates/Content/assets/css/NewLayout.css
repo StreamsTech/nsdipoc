@@ -477,20 +477,37 @@ a
 } */
 .map-toolbar {
     background: rgba(255, 255, 255, 0.95);
-    right: 0;
     top: 12px;
-    width: 591px;
-    height: 36px;
+    width: auto;
+    height: 34px;
     position: absolute;
-    right: 119px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.30);
-    border-radius: 4px;
+    right: 150px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.30);
+    border-radius: 0;
+    padding-right: 0;
 }
 .map-toolbar ul li
 {
    float: left;
     position: relative;
 }
+.map-toolbar ul li button
+{
+ width: 35px;
+ height: 34px;
+}
+.map-settings-btn
+{
+    top: 0;
+    right: -35px;
+    padding: 0; 
+}
+.map-settings-btn ul li button
+{
+background-color: #237c62;
+color: #fff;
+}
+
 .layout-center
 {
     top: 5px;
@@ -534,7 +551,7 @@ a
     border-radius: 0 0 8px 8px;
     background: rgba(191,0,45,1);
     background: -moz-radial-gradient(center, ellipse cover, rgba(191,0,45,1) 0%, rgba(143,2,34,1) 44%, rgba(109,0,25,1) 100%);
-    background: -webkit-gradient(radial, center center, 0px, center center, 100%,, color-stop(0%, rgba(191,0,45,1)), color-stop(44%, rgba(143,2,34,1)), color-stop(100%, rgba(109,0,25,1)));
+    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(191,0,45,1)), color-stop(44%, rgba(143,2,34,1)), color-stop(100%, rgba(109,0,25,1)));
     background: -webkit-radial-gradient(center, ellipse cover, rgba(191,0,45,1) 0%, rgba(143,2,34,1) 44%, rgba(109,0,25,1) 100%);
     background: -o-radial-gradient(center, ellipse cover, rgba(191,0,45,1) 0%, rgba(143,2,34,1) 44%, rgba(109,0,25,1) 100%);
     background: -ms-radial-gradient(center, ellipse cover, rgba(191,0,45,1) 0%, rgba(143,2,34,1) 44%, rgba(109,0,25,1) 100%);
@@ -611,7 +628,13 @@ a
 .navbar .nav > li button.svg-ico-button
 
 {
-    padding: 5px 5px 0;
+    padding: 0;
+    height: 34px;
+}
+.navbar .nav > li button svg
+
+{
+   margin-top: 5px;
 }
 .map-toolbar .dropdown-menu
 {
@@ -1059,16 +1082,20 @@ input:focus:invalid:focus, textarea:focus:invalid:focus, select:focus:invalid:fo
 .visulization-legend-container
 {
     position: absolute;
-    bottom: 60px;
-    right: 0px;
+    /*right: 0px;*/
     z-index: 1005;
     background-color: rgb(255, 255, 255);
-    padding: 10px;
+    padding: 2px;
     border-radius: 4px;
+    top: 10%;
+    /*width: 30%;*/
+    overflow: auto;
+    font-size: x-small;
+    height: auto;
 }
 
 .visulization-legend-container td {
-    padding: 5px;
+    padding: 0px;
 }
 
 .modal.fade.image-previewer-dialog {
@@ -1093,3 +1120,27 @@ input:focus:invalid:focus, textarea:focus:invalid:focus, select:focus:invalid:fo
     overflow-y: auto;
     border: 1px solid #ccc;
 }
+
+/*ui grid css*/
+/*.grid2 .ui-grid-cell-contents {*/
+  /*padding: 1px 1px;*/
+/*}*/
+
+/*.grid2 .ui-grid-render-container-body .ui-grid-header-cell,*/
+/*.grid2 .ui-grid-render-container-left .ui-grid-header-cell,*/
+/*.grid2 .ui-grid-row,*/
+/*.grid2 .ui-grid-cell,*/
+/*.grid2 .ui-grid-cell .ui-grid-vertical-bar {*/
+
+  /*font-size: x-small;*/
+  /*line-height: 20px;*/
+  /*height: 15px !important;*/
+/*}*/
+/*.grid2 .ui-grid-render-container-body .ui-grid-header-cell,*/
+/*.grid2 .ui-grid-render-container-left .ui-grid-header-cell,*/
+/*.grid2 .ui-grid-header-cell {*/
+  /*height: 20px !important;*/
+/*}*/
+/*.grid2 .ui-grid-filter-container {*/
+  /*padding: 1px 3px;*/
+/*}*/

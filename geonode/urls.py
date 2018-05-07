@@ -172,6 +172,8 @@ urlpatterns = patterns('',
                        
                        url(r'^api/analytics/', include('geonode.analytics.api.urls')),
                        
+                       url(r'^api/security/', include('geonode.security.api.urls')),
+                       
                        url(r'', include(api.urls)),
 
                        # Analytics

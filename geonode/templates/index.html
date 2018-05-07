@@ -1,0 +1,525 @@
+{% extends "base_for_home.html" %}
+{% load i18n %}
+{% load base_tags %}
+{% load activity_tags social_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+
+
+
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+
+
+
+<!-- Bootstrap core CSS -->
+
+
+
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+<!-- Custom styles for this template -->
+
+
+</head>
+<!-- NAVBAR
+================================================== -->
+<body>
+
+
+{% block index_content %}
+
+
+<!-- Carousel
+    ================================================== -->
+
+<div id="myCarousel" class="carousel slide" data-ride="carousel">
+  <div class="container" style="max-width:1300px">
+    <div class="row">
+      <div class="slideBox01">
+        <div class="caption">
+          <h2 class="text-center"> GEODASH.GOV.BD </h2>
+          <p>AN OPEN SOURCE GEOSPATIAL DATA MANAGEMENT & VISUALIZATION PLATFORM</p>
+        </div>
+        <button type="button" class="btn btn-danger">Learn more</button>
+        <div class="slide-Image"> <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/slide-img-01.png" alt="Slide" width="1092" height="459"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /.carousel -->
+
+<div class="sectionDark" style="padding: 0;">
+  <div class="container" style="max-width:1300px">
+    <!-- Example row of columns -->
+    <div class="row">
+      <div class="col-md-3 count" style="border-left: 0">
+        <div class="pull-left" style="margin-right: 15px;"><img src="{{ STATIC_URL }}geonode/images/new_index_page_images/organization-ico.png" width="79" height="79" alt=""/></div>
+        <div class="pull-left">
+          <h2>{{ group_counter }}</h2>
+          <p> {% trans "Organizations" %}</p>
+        </div>
+      </div>
+      <div class="col-md-3 count">
+        <div class="pull-left" style="margin-right: 15px;"><img src="{{ STATIC_URL }}geonode/images/new_index_page_images/layers-ico.png" width="79" height="79" alt=""/></div>
+        <div class="pull-left">
+          <h2>{{ layer_counter }}</h2>
+          <p> {% trans "Layers" %}</p>
+        </div>
+      </div>
+      <div class="col-md-3 count">
+        <div class="pull-left" style="margin-right: 15px;"><img src="{{ STATIC_URL }}geonode/images/new_index_page_images/maps-ico.png" width="79" height="79" alt=""/></div>
+        <div class="pull-left">
+          <h2>{{ map_counter }}</h2>
+          <p>{% trans "Maps" %}</p>
+        </div>
+      </div>
+      <div class="col-md-3 count" style="border-right: 0">
+        <div class="pull-left" style="margin-right: 15px;"><img src="{{ STATIC_URL }}geonode/images/new_index_page_images/users-ico.png" width="79" height="79" alt=""/></div>
+        <div class="pull-left">
+          <h2>{{ user_counter }}</h2>
+          <p>{% trans "Users" %}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Marketing messaging and featurettes
+    ================================================== -->
+<!-- Wrap the rest of the page in another container to center all the content. -->
+
+<div class="marketing">
+  <div class="sectionLight">
+    <div class="container text-center" style="max-width:1300px">
+      <div class="row feature">
+        <div class="col-md-12 animatedParent">
+          <div class="animated bounceInDown">
+            <h2>How does it work?</h2>
+            <h3 class="text-center"> Just a few quick steps from creating your map to publishing it </h3>
+          </div>
+        </div>
+        <div class="col-md-12 animatedParent"> <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/how-it-work.jpg" alt="How does it work?" class="img-responsive animated bounceInDown"> </div>
+      </div>
+    </div>
+  </div>
+  <div class="sectionDark">
+    <div class="container text-center" style="max-width:1200px">
+      <div class="row">
+        <h2>{% trans "Featured layers" %}</h2>
+        <h3 class="text-center"> Check out some amazing layers uploaded on GeoDASH platform below </h3>
+      </div>
+      <div class="row">
+        <div class="carousel slide media-carousel" style="height: 270px;background: none;padding: 0" id="media">
+          <div class="carousel-inner">
+              {% for featured in featured_layer_list %}
+              {% if forloop.counter0|divisibleby:8 and forloop.counter0 == 0 %}
+                  <div class="item active {{ forloop.counter0 }}">
+              {% endif %}
+              {% if forloop.counter0|divisibleby:8 and forloop.counter0 != 0 and forloop.counter != featured.count %}
+                  </div>
+                  <div class="item {{ forloop.counter0 }} ">
+              {% endif %}
+              <div class="col-md-3">
+                  <div id="box-1" class="box"> <img id="image-1" src="{{ featured.thumbnail_url }}"/> <span class="caption simple-caption">
+                    <h3>{{ featured.title }}<br/>
+                      <span>{{ featured.group }}</span></h3>
+                    <p>{{ featured.abstract }}</p>
+                    </span> </div>
+                </div>
+              {% if forloop.counter == featured_layer_list.count %}
+                  </div>
+              {% endif %}
+        {% endfor %}
+            <!-- <div class="item  active">
+              <div class="row">
+                  {% for featured in featured_layer_list %}
+                  <div class="col-md-3">
+                      <div id="box-1" class="box"> <img id="image-1" src="{{ featured.thumbnail_url }}"/> <span class="caption simple-caption">
+                        <h3>{{ featured.title }}<br/>
+                          <span>{{ featured.group }}</span></h3>
+                        <p>{{ featured.abstract }}</p>
+                        </span> </div>
+                    </div>
+                  {% endfor %}
+
+              </div>
+            </div>
+            <div class="item">
+              <div class="row">
+                <div class="col-md-3">
+                  <div id="box-1" class="box"> <img id="image-1" src="{{ STATIC_URL }}geonode/images/new_index_page_images/map-02.jpg"/> <span class="caption simple-caption">
+                    <h3>Road Network Banani<br/>
+                      <span>Dhaka WASA</span></h3>
+                    <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam</p>
+                    </span> </div>
+                </div>
+                <div class="col-md-3">
+                  <div id="box-1" class="box"> <img id="image-1" src="{{ STATIC_URL }}geonode/images/new_index_page_images/map-03.jpg"/> <span class="caption simple-caption">
+                    <h3>Road Network Banani<br/>
+                      <span>Dhaka WASA</span></h3>
+                    <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam</p>
+                    </span> </div>
+                </div>
+                <div class="col-md-3">
+                  <div id="box-1" class="box"> <img id="image-1" src="{{ STATIC_URL }}geonode/images/new_index_page_images/map-01.jpg"/> <span class="caption simple-caption">
+                    <h3>Road Network Banani<br/>
+                      <span>Dhaka WASA</span></h3>
+                    <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam</p>
+                    </span> </div>
+                </div>
+                <div class="col-md-3">
+                  <div id="box-1" class="box"> <img id="image-1" src="{{ STATIC_URL }}geonode/images/new_index_page_images/map-04.jpg"/> <span class="caption simple-caption">
+                    <h3>Road Network Banani<br/>
+                      <span>Dhaka WASA</span></h3>
+                    <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam</p>
+                    </span> </div>
+                </div>
+              </div>
+            </div> -->
+          </div>
+          <a data-slide="prev" href="#media" class="left carousel-control gallery-carousel-control-left"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></a> <a data-slide="next" href="#media" class="right carousel-control gallery-carousel-control-right"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></a> </div>
+      </div>
+    </div>
+  </div>
+  {% if is_latest_news or request.user.is_authenticated %}
+  <div class="sectionDarkMore">
+    <div class="container" style="max-width:1300px">
+      <div class="row feature">
+        <div class="col-md-12 animatedParent" style="margin-bottom: 30px;">
+          <h2 class="text-center">{% trans "Latest news and updates" %}</h2>
+        </div>
+        <div class="col-md-12">
+          <div class="row">
+            <div class="col-md-7">
+              <div class=" box latest-news">
+                <h2><span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span><a href="{% url "news-list" %}"> {% trans "Latest News" %}</a></h2>
+                <div class="mCustomScrollbar" style="height: 400px;">
+                    {% for news in latest_news_list %}
+                  <div class="news-section">
+                    <div class="row">
+                      <div class="col-md-8">
+                        <h3>{{ news.title }}<br/>
+                          <span>{{ news.date_created }}</span> </h3>
+                      </div>
+                      <div class="col-md-4" style="color: #717171;"> <span class="glyphicon glyphicon-calendar" style="color: #15836d" aria-hidden="true"></span> 06 September, 2016<br/>
+                        <span class="glyphicon glyphicon-time" style="color: #15836d" aria-hidden="true"></span> 9:30 to 12:30 </div>
+                    </div>
+                    <row>
+                        {% if news.description|length >= 300 %}
+                        <p>{{ news.description|truncatechars:300 }}</p>
+                        &nbsp;&nbsp;
+                      </row>
+
+                        <row>
+                            <p> <a href="{% url "news-details" news.id %}" class="btn btn-primary btn-sm"> More </a></p>
+                        </row>
+
+                    {% else %}
+                    <row>
+                        <p>{{ news.description }}</p>
+                      </row>
+                    {% endif %}
+
+                  </div>
+                  {% endfor %}
+
+                </div>
+              </div>
+            </div>
+            <div class="col-md-5">
+              <div class="box recent-activities">
+                <h2>{% trans "Recent Activities" %}</h2>
+                <div class="mCustomScrollbar" style="height: 417px;">
+                    {% for action in action_list %}
+                    {% activity_item action %}
+                {% empty %}
+                    <p>{% trans "No actions yet" %}</p>
+                {% endfor %}
+                  <!-- <div class="activity-list">
+                    <div class="row">
+                      <div class="col-md-3"> <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/map-01.jpg" class="img-responsive" width="148" height="154" alt=""/> </div>
+                      <div class="col-md-9">
+                        <p style="text-align: left"><a href="#">shafiul.parvez uploaded
+                          Bangladesh administrative
+                          Boundary</a> </p>
+                        <span style="color: #717171"><span class="glyphicon glyphicon-time" style="color: #15836d" aria-hidden="true"></span> 17 hours, 15 minutes ago</span> </div>
+                    </div>
+                  </div> -->
+                  <!-- <div class="activity-list">
+                    <div class="row">
+                      <div class="col-md-3"> <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/map-03.jpg" class="img-responsive" width="148" height="154" alt=""/> </div>
+                      <div class="col-md-9">
+                        <p style="text-align: left"><a href="#">shafiul.parvez uploaded
+                          Bangladesh administrative
+                          Boundary</a> </p>
+                        <span style="color: #717171"><span class="glyphicon glyphicon-time" style="color: #15836d" aria-hidden="true"></span> 17 hours, 15 minutes ago</span> </div>
+                    </div>
+                  </div>
+                  <div class="activity-list">
+                    <div class="row">
+                      <div class="col-md-3"> <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/map-02.jpg" class="img-responsive" width="148" height="154" alt=""/> </div>
+                      <div class="col-md-9">
+                        <p style="text-align: left"><a href="#">shafiul.parvez uploaded
+                          Bangladesh administrative
+                          Boundary</a> </p>
+                        <span style="color: #717171"><span class="glyphicon glyphicon-time" style="color: #15836d" aria-hidden="true"></span> 17 hours, 15 minutes ago</span> </div>
+                    </div>
+                  </div>
+                  <div class="activity-list">
+                    <div class="row">
+                      <div class="col-md-3"> <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/map-01.jpg" class="img-responsive" width="148" height="154" alt=""/> </div>
+                      <div class="col-md-9">
+                        <p style="text-align: left"><a href="#">shafiul.parvez uploaded
+                          Bangladesh administrative
+                          Boundary</a> </p>
+                        <span style="color: #717171"><span class="glyphicon glyphicon-time" style="color: #15836d" aria-hidden="true"></span> 17 hours, 15 minutes ago</span> </div>
+                    </div>
+                  </div>
+                  <div class="activity-list">
+                    <div class="row">
+                      <div class="col-md-3"> <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/map-04.jpg" class="img-responsive" width="148" height="154" alt=""/> </div>
+                      <div class="col-md-9">
+                        <p style="text-align: left"><a href="#">shafiul.parvez uploaded
+                          Bangladesh administrative
+                          Boundary</a> </p>
+                        <span style="color: #717171"><span class="glyphicon glyphicon-time" style="color: #15836d" aria-hidden="true"></span> 17 hours, 15 minutes ago</span> </div>
+                    </div>
+                  </div>
+                  <div class="activity-list">
+                    <div class="row">
+                      <div class="col-md-3"> <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/map-02.jpg" class="img-responsive" width="148" height="154" alt=""/> </div>
+                      <div class="col-md-9">
+                        <p style="text-align: left"><a href="#">shafiul.parvez uploaded
+                          Bangladesh administrative
+                          Boundary</a> </p>
+                        <span style="color: #717171"><span class="glyphicon glyphicon-time" style="color: #15836d" aria-hidden="true"></span> 17 hours, 15 minutes ago</span> </div>
+                    </div>
+                  </div> -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  <div class="sectionLight">
+    <div class="container" style="max-width:1300px">
+      <div class="row feature" id="vAlign">
+        <div class="col-md-6 animatedParent">
+          <div class="animated fadeInLeft">
+            <h2>Import your own layers</h2>
+            <p> Layers are the contents of a map. To get started adding layers, sign in to the site, click on upload your layers/data, choose the data format for Vector (Example: .shp, .shx, .dbf, .prj) or Raster (.tiff, .img). Make sure your data projection is WGS 84 or BTM. </p>
+          </div>
+        </div>
+        <div class="col-md-6 animatedParent"> <!--<img src="{{ STATIC_URL }}geonode/images/new_index_page_images/feature-mobile.png" width="500" height="441">-->
+
+          <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/layer-import.png" alt="Import your own layers" class="img-responsive animated fadeInRight"> </div>
+      </div>
+    </div>
+  </div>
+  {% if is_interportability or request.user.is_authenticated %}
+  <div class="sectionColor">
+    <div class="container" style="max-width:1300px">
+      <div class="row feature" id="vAlign">
+        <div class="col-md-6 animatedParent"> <!--<img src="{{ STATIC_URL }}geonode/images/new_index_page_images/feature-mobile.png" width="500" height="441">-->
+
+          {% if is_interportability_section.image1 %}
+           <img src="/uploaded/{{ is_interportability_section.image1 }}" alt="Interoperability" class="img-responsive animated fadeInLeft"> </div>
+          {% else %}
+          <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/interoperability.png" alt="Interoperability" class="img-responsive animated fadeInLeft"> </div>
+        {% endif %}
+          <div class="col-md-6 animatedParent">
+          <div class="animated fadeInRight">
+            <h2>{% trans is_interportability_section.title %}</h2>
+
+            <p>
+              {% if is_interportability_section.description %}
+                {% trans is_interportability_section.description %}
+            {% else %}
+                {% trans "Interportability section" %}
+            {% endif %}
+           </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  <div class="sectionLight">
+    <div class="container" style="max-width:1300px">
+      <div class="row feature" id="vAlign">
+        <div class="col-md-5 animatedParent">
+          <div class="animated fadeInLeft">
+            <h2>Make pretty maps with GeoDASH</h2>
+            <p> To create a new map go to your contributed or existing layers and click the “create map” link.This will take you to the “Map Composer” with a base layer loaded.To add data layers from GeoDASH click on the plus button located upper left side of the screen.This will open a dialog listing all the layers available on the GeoDASH.Select the layers you wish to add, then hit the Add Layers button. </p>
+          </div>
+        </div>
+        <div class="col-md-7 animatedParent"> <!--<img src="{{ STATIC_URL }}geonode/images/new_index_page_images/feature-mobile.png" width="500" height="441">-->
+
+          <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/pretty-maps.png" alt="Make pretty maps with GeoDASH" class="img-responsive animated fadeInRight"> </div>
+      </div>
+    </div>
+  </div>
+  <div class="sectionColor">
+    <div class="container" style="max-width:1300px">
+      <div class="row feature" id="vAlign">
+        <div class="col-md-6 animatedParent"> <!--<img src="{{ STATIC_URL }}geonode/images/new_index_page_images/feature-mobile.png" width="500" height="441">-->
+
+          <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/3d-map.png" alt="View your maps in 3D" class="img-responsive animated fadeInLeft"> </div>
+        <div class="col-md-6 animatedParent">
+          <div class="animated fadeInRight">
+            <h2>View your maps in 3D</h2>
+            <p> To create a new map go to your contributed or existing layers and click the “create map” link.This will take you to the “Map Composer” with a base layer loaded.To add data layers from GeoDASH click on the plus button located upper left side of the screen.This will open a dialog listing all the layers available on the GeoDASH.Select the layers you wish to add, then hit the Add Layers button. </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sectionLight">
+    <div class="container" style="max-width:1300px">
+      <div class="row feature" id="vAlign">
+        <div class="col-md-5 animatedParent">
+          <div class="animated fadeInLeft">
+            <h2>Share your map</h2>
+            <p> Share your map via e-mail, LinkedIn, Twitter, Facebook etc.to maximize data sharing and promote your work.You can also publish and embed your map right away. </p>
+          </div>
+        </div>
+        <div class="col-md-7 animatedParent"> <!--<img src="{{ STATIC_URL }}geonode/images/new_index_page_images/feature-mobile.png" width="500" height="441">-->
+
+          <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/share-map.png" alt="share your map" class="img-responsive animated fadeInRight"> </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- /END THE FEATURETTES -->
+
+  <div class="sectionDark">
+    <div class="container text-center" style="max-width:1300px">
+      <div class="row feature">
+        <div class="col-md-12">
+
+            <h2>What GeoDASH offer</h2>
+
+        </div>
+        <div class="col-md-12" style="margin-top: 30px;">
+          <div class="row">
+            <div class="col-md-6">
+              <ul class="offer-list">
+                <li><a href="#">Standard, facebook, google+ login.</a></li>
+                <li><a href="#">Upload shape formatted polyline, polygon, point layers.</a></li>
+                <li><a href="#">Upload OSM formatted polyline, polygon, point, raster layers.</a></li>
+                <li><a href="#">Upload CSV formatted polyline, polygon, point layers.</a></li>
+                <li><a href="#">Upload TIF formatted layers.</a></li>
+                <li><a href="#">Upload documents.</a></li>
+                <li><a href="#">List/ Grid view of layers, maps and documents.</a></li>
+                <li><a href="#">Dock favorite layers, maps, documents and organizations.</a></li>
+                <li><a href="#">Create map using single/ multiple layers.</a></li>
+                <li><a href="#">Centroids and centers.</a></li>
+              </ul>
+            </div>
+            <div class="col-md-3">
+              <ul class="offer-list">
+                <li><a href="#">Style layers.</a></li>
+                <li><a href="#">Pan maps.</a></li>
+                <li><a href="#">Get FeatureInfo.</a></li>
+                <li><a href="#">Measure length.</a></li>
+                <li><a href="#">Measure Area</a></li>
+                <li><a href="#">Zoom in.</a></li>
+                <li><a href="#">zoom out.</a></li>
+                <li><a href="#">3D map view.</a></li>
+                <li><a href="#">Print map.</a></li>
+                <li><a href="#">Download layer and metadata.</a></li>
+              </ul>
+            </div>
+            <div class="col-md-3">
+              <ul class="offer-list">
+                <li><a href="#">Style layers.</a></li>
+                <li><a href="#">Pan maps.</a></li>
+                <li><a href="#">Get FeatureInfo.</a></li>
+                <li><a href="#">Measure length.</a></li>
+                <li><a href="#">Measure Area</a></li>
+                <li><a href="#">Zoom in.</a></li>
+                <li><a href="#">zoom out.</a></li>
+                <li><a href="#">3D map view.</a></li>
+                <li><a href="#">Print map.</a></li>
+                <li><a href="#">Download layer and metadata.</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sectionLight">
+    <div class="container text-center" style="max-width:1300px">
+      <div class="row feature">
+        <div class="col-md-12 animatedParent">
+          <div class="animated bounceInDown">
+            <h2>Our partners</h2>
+          </div>
+        </div>
+        <div class="col-md-12 animatedParent" style="margin-top: 30px;"> <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/geodash-partners.jpg" alt="" class="img-responsive animated bounceInDown"> </div>
+      </div>
+    </div>
+  </div>
+
+  {% endblock %}
+  <!-- FOOTER -->
+
+</div>
+<!-- /.container -->
+
+
+
+
+
+{% block bottom_static_files %}
+<!-- Bootstrap core JavaScript
+    ================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="{{ STATIC_URL }}geonode/js/new_index_page_js/jquery.js"></script>
+<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="{{ STATIC_URL }}geonode/js/new_index_page_js/ie10-viewport-bug-workaround.js"></script>
+<script src="{{ STATIC_URL }}geonode/js/new_index_page_js/css3-animate-it.js"></script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-117252228-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-117252228-1');
+</script>
+<style>
+	.mCSB_scrollTools .mCSB_draggerRail
+	{
+	background-color: #dcdcdc;
+	}
+	.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar
+	{
+	background-color: #3996e2;
+		border-radius: 0;
+	}
+	.mCSB_scrollTools .mCSB_dragger:hover .mCSB_dragger_bar
+	{
+	background-color: #3996e2;
+	}
+
+  </style>
+{% endblock %}
+</body>
+</html>
+

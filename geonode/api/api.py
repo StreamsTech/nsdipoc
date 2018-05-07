@@ -47,6 +47,7 @@ from django.utils import timezone
 
 from avatar.templatetags.avatar_tags import avatar_url
 from guardian.shortcuts import get_objects_for_user
+from notify.signals import notify
 
 # @jahangir091
 from slugify import slugify
@@ -98,6 +99,10 @@ from geonode.layers.views import backupCurrentVersion, backupAciveLayer
 from geonode.geoserver.helpers import gs_catalog, cascading_delete
 from geonode.layers.utils import unzip_file
 from  geonode.layers.utils import file_size_with_ext
+from geonode.layers.models import LayerSubmissionActivity, LayerAuditActivity
+from geonode.documents.models import DocumentSubmissionActivity, DocumentAuditActivity
+from geonode.maps.models import MapSubmissionActivity, MapAuditActivity
+from geonode.layers.views import save_geometry_type
 
 CONTEXT_LOG_FILE = None
 
@@ -569,7 +574,7 @@ class LayerUpload(TypeFilteredResource):
                         keywords=keywords,
                         status='ACTIVE',
                         overwrite=False,
-                        charset=form.cleaned_data["charset"],
+                        # charset=form.cleaned_data["charset"],
                         abstract=form.cleaned_data["abstract"],
                         title=form.cleaned_data["layer_title"],
                         metadata_uploaded_preserve=form.cleaned_data["metadata_uploaded_preserve"]
@@ -606,9 +611,17 @@ class LayerUpload(TypeFilteredResource):
                     upload_session = saved_layer.upload_session
                     upload_session.processed = True
                     upload_session.save()
-                    permissions = form.cleaned_data["permissions"]
-                    if permissions is not None and len(permissions.keys()) > 0:
-                        saved_layer.set_permissions(permissions)
+
+                    # save geometry type for the uploaded layer(point, line, polygone)
+                    geometry_type = save_geometry_type(saved_layer)
+                    saved_layer.geometry_type = geometry_type
+                    saved_layer.save()
+
+
+                    # permissions = form.cleaned_data["permissions"]
+                    # permissions = str(permissions)
+                    # if permissions is not None and len(permissions.keys()) > 0:
+                    #     saved_layer.set_permissions(permissions)
                 finally:
                     if tempdir is not None:
                         shutil.rmtree(tempdir)
@@ -1335,3 +1348,133 @@ class SetBaseLayerAPI(TypeFilteredResource):
                 out['success'] = False
                 status_code = 400
             return HttpResponse(json.dumps(out), content_type='application/json', status=status_code)
+
+
+
+class LayerMapDocumentApproveDenyAPI(TypeFilteredResource):
+    """
+    This api sets layers as base layer
+    it takes body parameters:
+        'layer_ids'
+    """
+
+    class Meta:
+        resource_name = 'layer-map-documet-approve-deny'
+        list_allowed_methods = ['post']
+
+    def dispatch(self, request_type, request, **kwargs):
+        if request.method == 'POST':
+            out = {'success': False}
+
+            if request.user.is_authenticated():
+                resource_type = json.loads(request.body).get('resource_type')
+                resource_pk = json.loads(request.body).get('resource_pk')
+                action = json.loads(request.body).get('action')
+                resource = False
+                if resource_type == 'layer':
+                    try:
+                        resource = Layer.objects.get(id=resource_pk)
+                    except Layer.DoesNotExist:
+                        out['error'] = 'requested layer does not exists'
+                        out['success'] = False
+                        status_code = 400
+
+                elif resource_type == 'map':
+                    try:
+                        resource = Map.objects.get(id=resource_pk)
+                    except Layer.DoesNotExist:
+                        out['error'] = 'requested map does not exists'
+                        out['success'] = False
+                        status_code = 400
+
+                elif resource_type == 'document':
+                    try:
+                        resource = Document.objects.get(id=resource_pk)
+                    except Layer.DoesNotExist:
+                        out['error'] = 'requested document does not exists'
+                        out['success'] = False
+                        status_code = 400
+
+                if resource:
+                    group = resource.group
+                    if request.user not in group.get_managers():
+                        out['error'] = 'You are not allowed to approve this resource'
+                        out['success'] = False
+                        status_code = 400
+                    else:
+                        if resource_type == 'layer':
+                            resource_submission_activity = LayerSubmissionActivity.objects.get(
+                            layer=resource, group=group, iteration=resource.current_iteration)
+                            resource_audit_activity = LayerAuditActivity(
+                                layer_submission_activity=resource_submission_activity)
+                        elif resource_type == 'map':
+                            resource_submission_activity = MapSubmissionActivity.objects.get(
+                                map=resource, group=group, iteration=resource.current_iteration)
+                            resource_audit_activity = MapAuditActivity(
+                                map_submission_activity=resource_submission_activity)
+                        elif resource_type == 'document':
+                            resource_submission_activity = DocumentSubmissionActivity.objects.get(
+                                document=resource, group=group, iteration=resource.current_iteration)
+                            resource_audit_activity = DocumentAuditActivity(
+                                document_submission_activity=resource_submission_activity)
+
+
+                        comment_body = json.loads(request.body).get('comment')
+                        comment_subject = json.loads(request.body).get('comment_subject')
+                        if action.upper() == 'APPROVED':
+                            resource.status = 'ACTIVE'
+                        elif action.upper() == 'DENIED':
+                            resource.status = 'DENIED'
+                        resource.last_auditor = request.user
+                        resource.save()
+
+                        permissions = _perms_info_json(resource)
+                        perm_dict = json.loads(permissions)
+                        if json.loads(request.body).get('view_permission'):
+                            if not 'AnonymousUser' in perm_dict['users']:
+                                perm_dict['users']['AnonymousUser'] = []
+                                perm_dict['users']['AnonymousUser'].append(
+                                    'view_resourcebase')
+                            else:
+                                if not 'view_resourcebase' in perm_dict['users']['AnonymousUser']:
+                                    perm_dict['users']['AnonymousUser'].append(
+                                        'view_resourcebase')
+
+                        if json.loads(request.body).get('download_permission'):
+                            if not 'AnonymousUser' in perm_dict['users']:
+                                perm_dict['users']['AnonymousUser'] = []
+                                perm_dict['users']['AnonymousUser'].append(
+                                    'download_resourcebase')
+                            else:
+                                if not 'download_resourcebase' in perm_dict['users']['AnonymousUser']:
+                                    perm_dict['users']['AnonymousUser'].append(
+                                        'download_resourcebase')
+
+                        resource.set_permissions(perm_dict)
+
+                        # notify layer owner that someone have approved the layer
+                        if request.user != resource.owner:
+                            recipient = resource.owner
+                            notify.send(request.user, recipient=recipient, actor=request.user,
+                                        target=resource, verb=action + ' your ' + resource_type)
+
+                        resource_submission_activity.is_audited = True
+                        resource_submission_activity.save()
+
+                        resource_audit_activity.comment_subject = comment_subject
+                        resource_audit_activity.comment_body = comment_body
+                        resource_audit_activity.result = resource.status
+                        resource_audit_activity.auditor = request.user
+                        resource_audit_activity.save()
+
+                        out['success'] = 'True'
+                        out['message'] = 'Approved Resource Successfully'
+                        status_code = 200
+
+
+            else:
+                out['error'] = 'Access denied'
+                out['success'] = False
+                status_code = 400
+            return HttpResponse(json.dumps(out), content_type='application/json', status=status_code)
+

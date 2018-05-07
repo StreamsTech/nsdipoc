@@ -1,4 +1,4 @@
-
+from django.db.models import Count
 from django.contrib.contenttypes.models import ContentType
 from geonode.analytics.enum import ContentTypeEnum
 from geonode.analytics.models import MapLoad,Visitor,LayerLoad,PinpointUserActivity, LoadActivity
@@ -164,87 +164,46 @@ class MapListAPIView(AnalyticsMixin, ListAPIView):
 
         results = self.get_analytics(map_load_data, ['object_id','last_modified_date', 'activity_type']) + self.get_analytics(pin_point_data, keys)
 
-        for r in results:
-            if 'object_id' in r:
-                r['map_id'] = r.pop('object_id')
-            try:
-                map_obj = Map.objects.get(id=r['map_id'])
-            except Exception:
-                results.remove(r)
-            else:
-                r.update(dict(name=map_obj.title,
-                        user_organization = map_obj.owner.organization,                        
-                        map_category=map_obj.category.identifier if map_obj.category else None, 
-                        map_organization=map_obj.group.title))
-
-        return Response(data=results, status=status.HTTP_200_OK)
+        return Response(data=self.filter_response(Map, 'map', results), status=status.HTTP_200_OK)
 
 
 class LayerListAPIView(AnalyticsMixin, ListAPIView):
     """
     Will send summary of Layer activity
     """
+    permission_classes = (IsAuthenticated, IsAdminUser,)
+    
     def get_queryset(self):
         content_model = ContentType.objects.get_for_model(Layer)
         return LoadActivity.objects.filter(content_type=content_model).order_by('last_modified')
 
-
     def get(self, request, **kwargs):
         keys = ['layer_id', 'last_modified_date', 'activity_type']
-
         layer_load_data = self.format_data(query=self.get_queryset())
         pin_point_data = self.format_data(model_instance=PinpointUserActivity, filters=dict(layer_id__isnull=False))
 
         results = self.get_analytics(layer_load_data, ['object_id','last_modified_date', 'activity_type']) + self.get_analytics(pin_point_data, keys)
         
-        for r in results:
-            if 'object_id' in r:
-                r['layer_id'] = r.pop('object_id')
-            try:
-                layer = Layer.objects.get(id=r['layer_id'])
-            except Exception:
-                results.remove(r)
-            else:
-                r.update(dict(name=layer.title, 
-                        user_organization = layer.owner.organization,
-                        layer_category=layer.category.identifier if layer.category else None, 
-                        layer_organization=layer.group.title))
-                
-
-        return Response(data=results, status=status.HTTP_200_OK)
+        return Response(data=self.filter_response(Layer, 'layer', results), status=status.HTTP_200_OK)
     
 
 class DocumentListAPIView(AnalyticsMixin, ListAPIView):
     """
     Will send summary of Layer activity
     """
+    permission_classes = (IsAuthenticated, IsAdminUser,)
+    
     def get_queryset(self):
         content_model = ContentType.objects.get_for_model(Document)
-        return LoadActivity.objects.filter(content_type=content_model).order_by('last_modified')
-
+        return LoadActivity.objects.filter(content_type=content_model).order_by('last_modified')        
 
     def get(self, request, **kwargs):
         keys = ['object_id', 'last_modified_date', 'activity_type']
 
         document_load_data = self.format_data(query=self.get_queryset(),extra_field=dict(activity_type='load'))
         
-
         results = self.get_analytics(document_load_data, keys)
-        
-        for r in results:
-            if 'object_id' in r:
-                r['document_id'] = r.pop('object_id')
-            try:
-                document = Document.objects.get(id=r['document_id'])
-            except Exception:
-                results.remove(r)
-            else:
-                r.update(dict(name=document.title, 
-                        user_organization = document.owner.organization,
-                        document_category=document.category.identifier if document.category else None, 
-                        document_organization=document.group.title))
-
-        return Response(data=results, status=status.HTTP_200_OK)
+        return Response(data=self.filter_response(Document, 'document', results), status=status.HTTP_200_OK)
 
 
 class NonGISActivityCreateAPIView(CreateAPIView):
@@ -313,3 +272,35 @@ class GISActivityCreateAPIView(CreateAPIView):
                     )
 
         return Response(status=status.HTTP_201_CREATED)
+
+class SummaryAPIView(ListAPIView):
+    """
+    Send analytics summary
+    """
+    permission_classes = (IsAuthenticated, IsAdminUser,)
+    def _GisActivity(self, filter):
+        try:
+            return PinpointUserActivity.objects.filter(**filter).values('activity_type').annotate(total=Count('activity_type'))
+        except Exception:
+            return []
+
+    def _ActivityByContentModel(self, model):
+        try:
+            content_model = ContentType.objects.get_for_model(model)        
+            return LoadActivity.objects.filter(content_type=content_model).values('activity_type').annotate(total=Count('activity_type'))
+        except Exception:
+            return []
+    
+    def _getAnalytics(self, model, filter):
+        gis = self._GisActivity(filter)
+        no_gis = self._ActivityByContentModel(model)
+
+        response = dict()
+        for k in list(gis)+list(no_gis):
+            response.update({k["activity_type"]:k["total"]})
+        return response
+        
+    def list(self, request):
+        return Response(dict(map=self._getAnalytics(Map, dict(map_id__isnull=False)), 
+                        layer=self._getAnalytics(Layer, dict(layer_id__isnull=False)),
+                        document=self._getAnalytics(Document, dict(document_id__isnull=False))))
