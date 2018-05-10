@@ -12,31 +12,58 @@
 {% endcomment %}
 
 {% block body_outer %}
-    <div class="gd-content">
-        <div class="d-title">
-           
-                {% trans "Member Workspace" %} 
-        
-           
-        </div>
+
+<style>
+        body{
+            background-color: #fff;
+        }
+        .container
+        {
+            width: 100%;
+        }
+
+    .nav-sidebar {
+        margin-right: -21px;
+        margin-bottom: 20px;
+        margin-left: -20px;
+    }
+    footer
+    {
+        z-index: 1008;
+    }
+    .main
+    {
+        background-color: #fff;
+    }
+    .nav-sidebar > .active > a, .nav-sidebar > .active > a:hover, .nav-sidebar > .active > a:focus {
+        color: #fff;
+        background-color: #428bca;
+    }
+    .d-title
+    {
+        padding-bottom: 30px;
+    }
+    </style>
 
 
-        <div class="panel panel-default">
-                <div class="panel-heading globalNavHeading">
-                        <ul class="nav nav-tabs layerNav globalNav">
-                                <li role="presentation" class="active"><a href="{% url "member-workspace-layer" %}">{% trans "Layers" %}</a></li>
-                                <li role="presentation"><a href="{% url "member-workspace-map" %}"> {% trans "Maps" %}</a></li>
-                                <li role="presentation"><a href="{% url "member-workspace-document" %}">{% trans "Documents" %}</a></li>
-                              </ul>
+
+        <div class="row">
+
+
+                <div class="col-sm-3 col-md-2 workspace-sidebar">
+                        <ul class="nav nav-sidebar">
+                                <li role="presentation" class="active"><a href="{% url "member-workspace-layer" %}"><i class="fa fa-clone" aria-hidden="true"></i>{% trans "Layers" %}</a></li>
+                                <li role="presentation"><a href="{% url "member-workspace-map" %}"><i class="fa fa-map" aria-hidden="true"></i>{% trans "Maps" %}</a></li>
+                                <li role="presentation"><a href="{% url "member-workspace-document" %}"><i class="fa fa-file" aria-hidden="true"></i>{% trans "Documents" %}</a></li>
+                                </ul>
                 </div>
-               
-                <div class="panel-body">
-                 
-                        
+
+                <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                        <h1 class="d-title" style="margin: 0"> {% trans "Member Workspace" %}</h1>
+                        <div class="gd-content">
                                 <div class="row">
                                   <div class="col-md-12">
-                                      
-                                      <br>
+
                                   <div>
                                       <div class="alert alert-warning alert-dismissable">
                                           <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
@@ -62,14 +89,14 @@
                                                         <th>Message</th>
                                                     </tr>
                                                 </thead>
-                    
+
                                                     <tbody id="showallMemberDraftlayers">
-                    
+
                                                     </tbody>
                                                     <!--<div id="showallMemberDraftlayerspag"></div>-->
                                                 <!--{% for draft in draft_list %}-->
-                    
-                    
+
+
                                                     <!--<tbody showallMemberDraftlayers>-->
                                                         <!--<tr>-->
                                                             <!--<td>{{ forloop.counter}}</td>-->
@@ -87,7 +114,7 @@
                                                 <!--{% endfor %}-->
                                             </table>
                                             <div id="showallMemberDraftlayerspag">
-                    
+
                                             </div>
                                         </ul>
                                       </article>
@@ -117,7 +144,7 @@
                                                 <!--{% endfor %}-->
                                             </table>
                                             <div id="showallMemberDraftlayerspag_panding">
-                    
+
                                             </div>
                                         </ul>
                                       </article>
@@ -132,7 +159,6 @@
                                                         <th>Who Denied</th>
                                                         <th>Deny Date</th>
                                                         <th>Message</th>
-                                                        <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <!--{% for denied in denied_list %}-->
@@ -151,7 +177,7 @@
                                                 <!--{% endfor %}-->
                                             </table>
                                             <div id="showallMemberDraftlayerspag_denied">
-                    
+
                                             </div>
                                         </ul>
                                       </article>
@@ -163,9 +189,8 @@
                                                         <th>Serial No</th>
                                                         <th>Layer Title</th>
                                                         <th>Organization</th>
-                                                        <th>File Type</th>
-                                                        <th>File Size</th>
-                                                        <th>Downloaded Count</th>
+                                                        <th>Activator</th>
+                                                        <th>Activation Date</th>
                                                         <th>Message</th>
                                                         <th>Layer Edit</th>
                                                     </tr>
@@ -186,22 +211,21 @@
                                                 <!--{% endfor %}-->
                                             </table>
                                             <div id="showallMemberDraftlayerspag_active">
-                    
+
                                             </div>
                                         </ul>
                                       </article>
                                     </div>
                                   </div>
                                 </div>
-                           
+                                </div>
+
 
                 </div>
               </div>
 
 
 
-        
-    </div>
 {% include "layer_templates/_delete_layer.html" %}
 {% endblock %}
 
@@ -270,17 +294,14 @@ $(function () {
                         output+='<td>'+ draft_list_messages_json[item.id]['layer_msg'] +'</td>';
                     }
 
-                    output+='<td><a href="'+ item.detail_url +'/preview" class="btn btn-gd-primary"> {% trans "Continue for Approval" %}</a>'+
-                        '<a href="'+ item.detail_url +'" class="btn btn-gd-primary" style="margin-left:5px"> {% trans "Edit Layer" %}'+'</a> ';
+                    if(draft_list_messages_json[item.id]['mandatory_fields_msg'] == ""){
+                        output+='<td><a href="'+ item.detail_url +'?user_role=member" class="btn btn-gd-primary"> {% trans "Continue for Approval" %}</a></td>';
+                    }
+                    else{
+                        output+='<td><button class="btn btn-gd-primary" id="mandatory-check"> {% trans "Continue for Approval" %}</button></td>';
+                    }
 
-                    // if(draft_list_messages_json[item.id]['mandatory_fields_msg'] == ""){
-                    //     output+='<td><a href="'+ item.detail_url +'?user_role=member" class="btn btn-gd-primary"> {% trans "Continue for Approval" %}</a></td>';
-                    // }
-                    // else{
-                    //     output+='<td><button class="btn btn-gd-primary" id="mandatory-check"> {% trans "Continue for Approval" %}</button></td>';
-                    // }
-
-                    // output+='<td>';
+                    output+='<td>';
                     output+='<button type="button" class="btn btn-gd-primary" onclick="deleteLayer('+ item.id +')" style="color:#fff;">{% trans "Delete Map" %}</button> <br>';
                     output+='</td>';
                     output+='</tr>';
@@ -447,9 +468,8 @@ $(function () {
                     output+='<td>'+ offset +'</td>';
                     output+='<td><a href="'+ item.detail_url +'">'+ item.title+'</a></td>';
                     output+='<td>'+ item.group +'</td>';
-                    output+='<td>'+ item.file_type +'</td>';
-                    output+='<td>'+ item.file_size +'</td>';
-                    output+='<td>'+ item.download_count +'</td>';
+                    output+='<td>'+ item.last_auditor +'</td>';
+                    output+='<td>'+ item.date_updated +'</td>';
 
                     if(denied_list_messages_json[item.id]['layer_msg'] != "Completed"){
                          output+='<td style="color: #EC971F;">'+ denied_list_messages_json[item.id]['layer_msg'] +'</td>';
