@@ -18,13 +18,13 @@
     .hidden {
         display: none;
     }
-
+    
     /* Safari */
     @-webkit-keyframes spin {
       0% { -webkit-transform: rotate(0deg); }
       100% { -webkit-transform: rotate(360deg); }
     }
-
+    
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
@@ -41,12 +41,12 @@
     <!-- <section id="view-selector"></section> -->
     <!-- <section id="bounce-rate"></section> -->
     <!-- <section id="page-views"></section> -->
-
+           
     <div class="row">
         <div class="col-md-3">
                 <div class="panel panel-default analytics-box">
                 <div class="panel-body">
-
+                    
             <div class="round round-info pull-left"><i class="fa fa-map-o" aria-hidden="true"></i></div>
             <div class="pull-left">
             <h3 id="map_load">---</h3>
@@ -56,7 +56,7 @@
             </div>
         </div>
 
-
+        
         <div class="col-md-3">
                 <div class="panel panel-default analytics-box">
                         <div class="panel-body">
@@ -80,7 +80,7 @@
             </div>
             </div>
         </div>
-
+        
         <div class="col-md-3">
                 <div class="panel panel-default analytics-box">
                         <div class="panel-body">
@@ -91,15 +91,15 @@
             </div>
             </div>
         </div>
-
+        
     </div>
 
 </div>
-<div class="row">
+<div class="row">      
     <div class="col-md-3">
             <div class="panel panel-default analytics-box">
             <div class="panel-body">
-
+                
         <div class="round round-info pull-left"><i class="fa fa-map-o" aria-hidden="true"></i></div>
         <div class="pull-left">
         <h3 id="total_pan">---</h3>
@@ -109,7 +109,7 @@
         </div>
     </div>
 
-
+    
     <div class="col-md-3">
             <div class="panel panel-default analytics-box">
                     <div class="panel-body">
@@ -121,7 +121,7 @@
         </div>
         </div>
     </div>
-
+   
 
 
     <div class="col-md-3">
@@ -145,11 +145,11 @@
         </div>
         </div>
     </div>
-
+    
 </div>
 </div>
 <div class="row">
-
+        
         <div class="col-md-3">
                 <div class="panel panel-default analytics-box">
                         <div class="panel-body">
@@ -160,7 +160,7 @@
             </div>
             </div>
         </div>
-
+        
     </div>
 </div>
 
@@ -176,10 +176,10 @@
             <a onclick='showMapData()' id="mapData" class="btn btn-default">Map Data</a>
             <a onclick='showLayerData()' id="layerData" class="btn btn-primary active">Layer Data</a>
             <a onclick='showDocumentData()' id="documentData" class="btn btn-default">Document Data</a>
-        </div>
-        </div>
-
-    </div>
+        </div>  
+        </div>  
+        
+    </div> 
     <div class="row">
         <div class="col-md-12">
             <div class="loader hidden" style="margin: 30px auto" id="analyticsLoader"></div>
@@ -238,7 +238,7 @@ function showTable(url,rows){
                 $("#output").pivotUI(data,{
                   rows:rows,
                   renderers: $.extend(
-                        $.pivotUtilities.renderers,
+                        $.pivotUtilities.renderers, 
                         $.pivotUtilities.c3_renderers,
                         $.pivotUtilities.subtotal_renderers
                       ),
@@ -370,7 +370,7 @@ function showTable(url,rows){
         }
         bounceRate.set(newIds).execute();
         pageViews.set(newIds).execute();
-
+        
     });
     });
 </script>
@@ -385,12 +385,12 @@ function showTable(url,rows){
             'start-date': '30daysAgo',
             'end-date': 'yesterday',
         });
-
+        
         apiQuery.execute(handleCoreReportingResults.bind({
             id: 'bounce-rate',
             key: 'ga:bounceRate',
             units: ''
-
+            
         }));
     }
     function getAvgDuration(){
@@ -403,10 +403,10 @@ function showTable(url,rows){
         });
         apiQuery.execute(handleCoreReportingResults.bind({
             id: 'avg-session-duration',
-            key: 'ga:avgSessionDuration',
+            key: 'ga:avgSessionDuration', 
             units: 'min',
             calculate: function(v){
-                return v / 60;
+                return v / 60; 
             }
         }));
     }
@@ -418,7 +418,7 @@ function showTable(url,rows){
 function handleCoreReportingResults(results) {
   if (!results.error) {
     let value = parseFloat(results.totalsForAllResults[this.key]);
-    $('#' + this.id).html( (typeof this.calculate == 'function'? this.calculate(value): value).toFixed(2) + ' ' + this.units);
+    $('#' + this.id).html( (typeof this.calculate == 'function'? this.calculate(value): value).toFixed(2) + ' ' + this.units); 
   }
 }
     </script>
