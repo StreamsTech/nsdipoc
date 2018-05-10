@@ -30,7 +30,7 @@
     top: 0;
 }
 .navbar-nav > li > a {
-	font-size: 14px;
+	font-size: 13px;
 	padding-top: 8px;
 	padding-bottom: 8px;
 }
@@ -85,6 +85,7 @@
 	border: 1px solid #3896e2;
 	color: #3896e2 !important;
 	margin-left: 10px;
+	background:transparent;
 }
 .dropdown-menu > li > a {
     padding: 9px 20px;
@@ -152,8 +153,8 @@
 @media (max-width: 1300px) {
 
         .navbar-nav > li > a {
-           padding: 8px;
-           font-size: 14px;
+         padding: 8px 5px;
+           font-size: 12px;
         }
         #search_input
         {
@@ -223,4 +224,15 @@
         right: -14px;
         border-radius: 0;
     }
+    .carousel
+    {
+     height:auto !important;
+     background:transparent;
+     }
+     .gd-featurd-maps-content .carousel
+     {
+     height:auto !important;}
+     #carousel-home
+     {
+     height:600px !important;}
      /*End style for header navbar*/
