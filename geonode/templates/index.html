@@ -60,12 +60,12 @@
 <div class="sectionDark sectionCount" style="padding: 0;">
 
     <section class="container" style="max-width:1300px">
-
+        
         <div class="row">
-
+        
         <!-- HTML Chart -->
         <figure class="col-md-3 count chart" data-percent="100" style="border-left:0">
-
+          
           <div class="pull-left count-icon">
           <img class="html" src="{{ STATIC_URL }}geonode/images/new_index_page_images/organization-ico.png" width="79" height="79" alt=""/>
           <svg width="80" height="80">
@@ -79,11 +79,11 @@
           </div>
 
         </figure>
-
+        
         <!-- CSS Chart -->
         <figure class="col-md-3 count chart" data-percent="100">
-
-
+          
+          
             <div class="pull-left count-icon">
           <img class="css" src="{{ STATIC_URL }}geonode/images/new_index_page_images/layers-ico.png" width="79" height="79" alt=""/>
           <svg width="80" height="80">
@@ -96,11 +96,11 @@
             </div>
 
         </figure>
-
-
+        
+        
         <!-- Javascript Chart -->
         <figure class="col-md-3 count chart" data-percent="100">
-
+          
             <div class="pull-left count-icon">
           <img class="javascript" src="{{ STATIC_URL }}geonode/images/new_index_page_images/maps-ico.png" width="79" height="79" alt=""/>
           <svg width="80" height="80">
@@ -113,11 +113,11 @@
   </div>
 
         </figure>
-
+        
         <!-- Node.js Chart -->
         <figure class="col-md-3 count chart" data-percent="100" style="border-right:0 ">
-
-
+          
+          
         <div class="pull-left count-icon">
         <img class="node" src="{{ STATIC_URL }}geonode/images/new_index_page_images/users-ico.png" width="20" height="20" alt=""/>
 
@@ -130,14 +130,14 @@
             <p>{% trans "Users" %}</p>
           </div>
         </figure>
-
+       
       </div>
       </section>
 
 </div>
 
 <!-- Marketing messaging and featurettes
-    ================================================== -->
+    ================================================== --> 
 <!-- Wrap the rest of the page in another container to center all the content. -->
 
 <div class="marketing">
@@ -151,16 +151,16 @@
           </div>
         </div>
         <!-- <div class="col-md-12 animatedParent"> <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/how-it-work.jpg" alt="How does it work?" class="img-responsive animated bounceInDown"> </div> -->
-
-
-      <!-- Vertical timeline start -->
+      
+      
+      <!-- Vertical timeline start -->  
       <section class="cd-timeline js-cd-timeline">
         <div class="cd-timeline__container">
           <div class="cd-timeline__block js-cd-block">
             <div class="cd-timeline__img cd-timeline__img--picture js-cd-img">
              1
             </div> <!-- cd-timeline__img -->
-
+    
             <div class="cd-timeline__content js-cd-content register-timeline-circle">
               <h2>
                 <img class="" src="{{ STATIC_URL }}geonode/images/new_index_page_images/layers-ico.svg" width="50" height="50" alt=""/>
@@ -169,43 +169,43 @@
               <span class="cd-timeline__date">Jan 14</span>
             </div> <!-- cd-timeline__content -->
           </div> <!-- cd-timeline__block -->
-
+    
           <div class="cd-timeline__block js-cd-block">
             <div class="cd-timeline__img cd-timeline__img--movie js-cd-img">
               2
             </div> <!-- cd-timeline__img -->
-
+    
             <div class="cd-timeline__content js-cd-content layers-timeline-circle">
               <h2>
                 <img class="" src="{{ STATIC_URL }}geonode/images/new_index_page_images/layers-ico.svg" width="50" height="50" alt=""/>
               </h2>
-
-
+             
+          
               <span class="cd-timeline__date">Jan 18</span>
             </div> <!-- cd-timeline__content -->
           </div> <!-- cd-timeline__block -->
-
+    
           <div class="cd-timeline__block js-cd-block map-timeline-circle">
             <div class="cd-timeline__img cd-timeline__img--picture js-cd-img">
               3
             </div> <!-- cd-timeline__img -->
-
+    
             <div class="cd-timeline__content js-cd-content">
               <h2>
-                <img class="" src="{{ STATIC_URL }}geonode/images/new_index_page_images/layers-ico.svg" width="50" height="50" alt=""/>
+                <img class="" src="{{ STATIC_URL }}geonode/images/new_index_page_images/layers-ico.svg" width="50" height="50" alt=""/>  
               </h2>
-
-
+              
+             
               <span class="cd-timeline__date">Jan 24</span>
             </div> <!-- cd-timeline__content -->
           </div> <!-- cd-timeline__block -->
-
+    
         </div>
       </section> <!-- cd-timeline -->
-          <!-- Vertical timeline End -->
-
-
-
+          <!-- Vertical timeline End -->  
+      
+      
+      
       </div>
     </div>
   </div>
@@ -248,7 +248,7 @@
                         </span> </div>
                     </div>
                   {% endfor %}
-
+                
               </div>
             </div>
             <div class="item">
@@ -316,20 +316,20 @@
                         <p>{{ news.description|truncatechars:300 }}</p>
                         &nbsp;&nbsp;
                       </row>
-
+                      
                         <row>
                             <p> <a href="{% url "news-details" news.id %}" class="btn btn-primary btn-sm"> More </a></p>
                         </row>
-
+                        
                     {% else %}
                     <row>
                         <p>{{ news.description }}</p>
                       </row>
                     {% endif %}
-
+                      
                   </div>
                   {% endfor %}
-
+                  
                 </div>
               </div>
             </div>
@@ -347,7 +347,7 @@
                       <div class="col-md-3"> <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/map-01.jpg" class="img-responsive" width="148" height="154" alt=""/> </div>
                       <div class="col-md-9">
                         <p style="text-align: left"><a href="#">shafiul.parvez uploaded
-                          Bangladesh administrative
+                          Bangladesh administrative 
                           Boundary</a> </p>
                         <span style="color: #717171"><span class="glyphicon glyphicon-time" style="color: #15836d" aria-hidden="true"></span> 17 hours, 15 minutes ago</span> </div>
                     </div>
@@ -357,7 +357,7 @@
                       <div class="col-md-3"> <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/map-03.jpg" class="img-responsive" width="148" height="154" alt=""/> </div>
                       <div class="col-md-9">
                         <p style="text-align: left"><a href="#">shafiul.parvez uploaded
-                          Bangladesh administrative
+                          Bangladesh administrative 
                           Boundary</a> </p>
                         <span style="color: #717171"><span class="glyphicon glyphicon-time" style="color: #15836d" aria-hidden="true"></span> 17 hours, 15 minutes ago</span> </div>
                     </div>
@@ -367,7 +367,7 @@
                       <div class="col-md-3"> <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/map-02.jpg" class="img-responsive" width="148" height="154" alt=""/> </div>
                       <div class="col-md-9">
                         <p style="text-align: left"><a href="#">shafiul.parvez uploaded
-                          Bangladesh administrative
+                          Bangladesh administrative 
                           Boundary</a> </p>
                         <span style="color: #717171"><span class="glyphicon glyphicon-time" style="color: #15836d" aria-hidden="true"></span> 17 hours, 15 minutes ago</span> </div>
                     </div>
@@ -377,7 +377,7 @@
                       <div class="col-md-3"> <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/map-01.jpg" class="img-responsive" width="148" height="154" alt=""/> </div>
                       <div class="col-md-9">
                         <p style="text-align: left"><a href="#">shafiul.parvez uploaded
-                          Bangladesh administrative
+                          Bangladesh administrative 
                           Boundary</a> </p>
                         <span style="color: #717171"><span class="glyphicon glyphicon-time" style="color: #15836d" aria-hidden="true"></span> 17 hours, 15 minutes ago</span> </div>
                     </div>
@@ -387,7 +387,7 @@
                       <div class="col-md-3"> <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/map-04.jpg" class="img-responsive" width="148" height="154" alt=""/> </div>
                       <div class="col-md-9">
                         <p style="text-align: left"><a href="#">shafiul.parvez uploaded
-                          Bangladesh administrative
+                          Bangladesh administrative 
                           Boundary</a> </p>
                         <span style="color: #717171"><span class="glyphicon glyphicon-time" style="color: #15836d" aria-hidden="true"></span> 17 hours, 15 minutes ago</span> </div>
                     </div>
@@ -397,7 +397,7 @@
                       <div class="col-md-3"> <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/map-02.jpg" class="img-responsive" width="148" height="154" alt=""/> </div>
                       <div class="col-md-9">
                         <p style="text-align: left"><a href="#">shafiul.parvez uploaded
-                          Bangladesh administrative
+                          Bangladesh administrative 
                           Boundary</a> </p>
                         <span style="color: #717171"><span class="glyphicon glyphicon-time" style="color: #15836d" aria-hidden="true"></span> 17 hours, 15 minutes ago</span> </div>
                     </div>
@@ -420,8 +420,8 @@
             <p> Layers are the contents of a map. To get started adding layers, sign in to the site, click on upload your layers/data, choose the data format for Vector (Example: .shp, .shx, .dbf, .prj) or Raster (.tiff, .img). Make sure your data projection is WGS 84 or BTM. </p>
           </div>
         </div>
-        <div class="col-md-6 animatedParent"> <!--<img src="{{ STATIC_URL }}geonode/images/new_index_page_images/feature-mobile.png" width="500" height="441">-->
-
+        <div class="col-md-6 animatedParent"> <!--<img src="{{ STATIC_URL }}geonode/images/new_index_page_images/feature-mobile.png" width="500" height="441">--> 
+          
           <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/layer-import.png" alt="Import your own layers" class="img-responsive animated fadeInRight"> </div>
       </div>
     </div>
@@ -430,8 +430,8 @@
   <div class="sectionColor">
     <div class="container" style="max-width:1300px">
       <div class="row feature" id="vAlign">
-        <div class="col-md-6 animatedParent"> <!--<img src="{{ STATIC_URL }}geonode/images/new_index_page_images/feature-mobile.png" width="500" height="441">-->
-
+        <div class="col-md-6 animatedParent"> <!--<img src="{{ STATIC_URL }}geonode/images/new_index_page_images/feature-mobile.png" width="500" height="441">--> 
+          
           {% if is_interportability_section.image1 %}
            <img src="/uploaded/{{ is_interportability_section.image1 }}" alt="Interoperability" class="img-responsive animated fadeInLeft"> </div>
           {% else %}
@@ -440,8 +440,8 @@
           <div class="col-md-6 animatedParent">
           <div class="animated fadeInRight">
             <h2>{% trans is_interportability_section.title %}</h2>
-
-            <p>
+            
+            <p> 
               {% if is_interportability_section.description %}
                 {% trans is_interportability_section.description %}
             {% else %}
@@ -463,8 +463,8 @@
             <p> To create a new map go to your contributed or existing layers and click the “create map” link.This will take you to the “Map Composer” with a base layer loaded.To add data layers from GeoDASH click on the plus button located upper left side of the screen.This will open a dialog listing all the layers available on the GeoDASH.Select the layers you wish to add, then hit the Add Layers button. </p>
           </div>
         </div>
-        <div class="col-md-7 animatedParent"> <!--<img src="{{ STATIC_URL }}geonode/images/new_index_page_images/feature-mobile.png" width="500" height="441">-->
-
+        <div class="col-md-7 animatedParent"> <!--<img src="{{ STATIC_URL }}geonode/images/new_index_page_images/feature-mobile.png" width="500" height="441">--> 
+          
           <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/pretty-maps.png" alt="Make pretty maps with GeoDASH" class="img-responsive animated fadeInRight"> </div>
       </div>
     </div>
@@ -472,8 +472,8 @@
   <div class="sectionColor">
     <div class="container" style="max-width:1300px">
       <div class="row feature" id="vAlign">
-        <div class="col-md-6 animatedParent"> <!--<img src="{{ STATIC_URL }}geonode/images/new_index_page_images/feature-mobile.png" width="500" height="441">-->
-
+        <div class="col-md-6 animatedParent"> <!--<img src="{{ STATIC_URL }}geonode/images/new_index_page_images/feature-mobile.png" width="500" height="441">--> 
+          
           <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/3d-map.png" alt="View your maps in 3D" class="img-responsive animated fadeInLeft"> </div>
         <div class="col-md-6 animatedParent">
           <div class="animated fadeInRight">
@@ -493,22 +493,22 @@
             <p> Share your map via e-mail, LinkedIn, Twitter, Facebook etc.to maximize data sharing and promote your work.You can also publish and embed your map right away. </p>
           </div>
         </div>
-        <div class="col-md-7 animatedParent"> <!--<img src="{{ STATIC_URL }}geonode/images/new_index_page_images/feature-mobile.png" width="500" height="441">-->
-
+        <div class="col-md-7 animatedParent"> <!--<img src="{{ STATIC_URL }}geonode/images/new_index_page_images/feature-mobile.png" width="500" height="441">--> 
+          
           <img src="{{ STATIC_URL }}geonode/images/new_index_page_images/share-map.png" alt="share your map" class="img-responsive animated fadeInRight"> </div>
       </div>
     </div>
   </div>
-
+  
   <!-- /END THE FEATURETTES -->
-
+  
   <div class="sectionDark">
     <div class="container text-center" style="max-width:1300px">
       <div class="row feature">
         <div class="col-md-12">
-
+          
             <h2>What GeoDASH offer</h2>
-
+         
         </div>
         <div class="col-md-12" style="margin-top: 30px;">
           <div class="row">
@@ -571,26 +571,26 @@
       </div>
     </div>
   </div>
-
+  
   {% endblock %}
   <!-- FOOTER -->
-
+  
 </div>
-<!-- /.container -->
+<!-- /.container --> 
 
 
 
-
+  
 
 {% block bottom_static_files %}
 <!-- Bootstrap core JavaScript
-    ================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="{{ STATIC_URL }}geonode/js/new_index_page_js/jquery.js"></script>
-<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    ================================================== --> 
+<!-- Placed at the end of the document so the pages load faster --> 
+<script src="{{ STATIC_URL }}geonode/js/new_index_page_js/jquery.js"></script> 
+<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script> 
 
-<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-<script src="{{ STATIC_URL }}geonode/js/new_index_page_js/ie10-viewport-bug-workaround.js"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug --> 
+<script src="{{ STATIC_URL }}geonode/js/new_index_page_js/ie10-viewport-bug-workaround.js"></script> 
 <script src="{{ STATIC_URL }}geonode/js/new_index_page_js/css3-animate-it.js"></script>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117252228-1"></script>
@@ -640,8 +640,8 @@
 		for( var i = 0; i < this.blocks.length; i++) {
 			(function(i){
 				if( self.blocks[i].getBoundingClientRect().top > window.innerHeight*self.offset ) {
-					self.images[i].classList.add("cd-is-hidden");
-					self.contents[i].classList.add("cd-is-hidden");
+					self.images[i].classList.add("cd-is-hidden"); 
+					self.contents[i].classList.add("cd-is-hidden"); 
 				}
 			})(i);
 		}
@@ -696,18 +696,18 @@
 <style>
 	.mCSB_scrollTools .mCSB_draggerRail
 	{
-	background-color: #dcdcdc;
+	background-color: #dcdcdc;		
 	}
 	.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar
 	{
-	background-color: #3996e2;
+	background-color: #3996e2;	
 		border-radius: 0;
 	}
 	.mCSB_scrollTools .mCSB_dragger:hover .mCSB_dragger_bar
 	{
-	background-color: #3996e2;
+	background-color: #3996e2;	
 	}
-
+	
   </style>
 {% endblock %}
 </body>

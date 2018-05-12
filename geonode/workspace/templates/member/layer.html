@@ -21,7 +21,7 @@
         {
             width: 100%;
         }
-
+        
     .nav-sidebar {
         margin-right: -21px;
         margin-bottom: 20px;
@@ -45,7 +45,7 @@
     }
     </style>
 
-
+       
 
         <div class="row">
 
@@ -57,13 +57,13 @@
                                 <li role="presentation"><a href="{% url "member-workspace-document" %}"><i class="fa fa-file" aria-hidden="true"></i>{% trans "Documents" %}</a></li>
                                 </ul>
                 </div>
-
+               
                 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                         <h1 class="d-title" style="margin: 0"> {% trans "Member Workspace" %}</h1>
                         <div class="gd-content">
                                 <div class="row">
                                   <div class="col-md-12">
-
+                             
                                   <div>
                                       <div class="alert alert-warning alert-dismissable">
                                           <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
@@ -89,14 +89,14 @@
                                                         <th>Message</th>
                                                     </tr>
                                                 </thead>
-
+                    
                                                     <tbody id="showallMemberDraftlayers">
-
+                    
                                                     </tbody>
                                                     <!--<div id="showallMemberDraftlayerspag"></div>-->
                                                 <!--{% for draft in draft_list %}-->
-
-
+                    
+                    
                                                     <!--<tbody showallMemberDraftlayers>-->
                                                         <!--<tr>-->
                                                             <!--<td>{{ forloop.counter}}</td>-->
@@ -114,7 +114,7 @@
                                                 <!--{% endfor %}-->
                                             </table>
                                             <div id="showallMemberDraftlayerspag">
-
+                    
                                             </div>
                                         </ul>
                                       </article>
@@ -144,7 +144,7 @@
                                                 <!--{% endfor %}-->
                                             </table>
                                             <div id="showallMemberDraftlayerspag_panding">
-
+                    
                                             </div>
                                         </ul>
                                       </article>
@@ -177,7 +177,7 @@
                                                 <!--{% endfor %}-->
                                             </table>
                                             <div id="showallMemberDraftlayerspag_denied">
-
+                    
                                             </div>
                                         </ul>
                                       </article>
@@ -211,7 +211,7 @@
                                                 <!--{% endfor %}-->
                                             </table>
                                             <div id="showallMemberDraftlayerspag_active">
-
+                    
                                             </div>
                                         </ul>
                                       </article>
@@ -219,7 +219,7 @@
                                   </div>
                                 </div>
                                 </div>
-
+                           
 
                 </div>
               </div>
@@ -258,6 +258,7 @@ $(function () {
             else{
                 var url = targeturl;
             }
+            var edit_layer= "{{ FRONT_END_SETTINGS.member_workspace_layer_page.edit_layer }}";
             //var url = "{% url 'api_dispatch_list' api_name='api' resource_name='group_activity' %}?limit="+ Plimit +"&group={{ object.slug }}";
                 $.ajax({
                     cache: true,
@@ -299,6 +300,9 @@ $(function () {
                     }
                     else{
                         output+='<td><button class="btn btn-gd-primary" id="mandatory-check"> {% trans "Continue for Approval" %}</button></td>';
+                    }
+                    if(edit_layer=='True'){
+                        output+='<td><button class="btn btn-gd-primary" id="mandatory-check"> {% trans "Edit Layer" %}</button></td>';
                     }
 
                     output+='<td>';
