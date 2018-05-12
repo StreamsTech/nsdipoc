@@ -150,7 +150,7 @@
 }
 
 /*Start Header navbar media query*/
-@media (max-width: 1300px) {
+@media (max-width: 1400px) {
 
         .navbar-nav > li > a {
          padding: 8px 5px;
