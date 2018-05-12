@@ -122,11 +122,14 @@
 }
 .header-expand-button button
 {
-    border: 1px solid #ccc;
-    background-color: #fff;
-    padding: 0 15px;
-    font-size: 24px;
-    border-top: 0;
+    border: 1px solid #07468b;
+    background-color: #084e9f;
+    color:#fff;
+  padding: 0 8px;
+font-size: 21px;
+border-top: 0;
+height: 25px;
+line-height: 22px;
 }
 .top-site-search .form-control
 {
