@@ -155,9 +155,10 @@
 {% endblock %}
 
 {% block extra_script %}
+
 <script src="{{ STATIC_URL }}geonode/js/workspace/layer/layer.module.js"></script>
 <script src="{{ STATIC_URL }}geonode/js/workspace/layer/layer.service.js"></script>
 <script src="{{ STATIC_URL }}geonode/js/workspace/layer/approve-layer.controller.js"></script>
-<script src="/static/.components//angular-cookies/angular-cookies.js"></script>
+<script src="/static/.components/angular-cookies/angular-cookies.js"></script>
 {{ block.super }}
 {% endblock %}

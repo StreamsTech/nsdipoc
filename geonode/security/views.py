@@ -53,9 +53,7 @@ def _perms_info_json(obj):
 
 def resource_permissions(request, resource_id):
     try:
-        resource = resolve_object(
-            request, ResourceBase, {
-                'id': resource_id}, 'base.change_resourcebase_permissions')
+        resource = ResourceBase.objects.get(id=resource_id)
 
     except PermissionDenied:
         # we are handling this in a non-standard way

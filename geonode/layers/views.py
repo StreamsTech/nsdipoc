@@ -415,8 +415,9 @@ def layer_upload(request, template='upload/layer_upload.html'):
                 upload_session.processed = True
                 upload_session.save()
                 permissions = form.cleaned_data["permissions"]
+                import pdb; pdb.set_trace()
                 if permissions is not None and len(permissions.keys()) > 0:
-                    # permissions = saved_layer.resolvePermission(permissions)
+                    permissions = saved_layer.resolvePermission(permissions)
                     saved_layer.set_permissions(permissions)
 
                 #save geometry type for the uploaded layer(point, line, polygone)
@@ -1385,11 +1386,8 @@ def finding_xlink(dic):
 
 def layer_permission_preview(request, layername, template='layers/layer_attribute_permissions_preview.html'):
 
-    layer = _resolve_layer(
-        request,
-        layername,
-        'base.view_resourcebase',
-        _PERMISSION_MSG_VIEW)
+    # import pdb
+    layer  = Layer.objects.get(name=layername.split(':')[1])
 
     if request.method == 'GET':
         if request.user == layer.owner:

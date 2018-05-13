@@ -1,3 +1,4 @@
+angular.merge=angular.extend;
 (function(){
     angular.module('layerApp').controller('approveLayerController',
     function($scope,layerService,uiGridConstants,$window,$q,$timeout){
