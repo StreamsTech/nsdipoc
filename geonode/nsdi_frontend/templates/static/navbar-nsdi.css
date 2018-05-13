@@ -237,5 +237,7 @@ line-height: 22px;
      height:auto !important;}
      #carousel-home
      {
-     height:600px !important;}
+     height:595px !important;
+    padding: 0;
+    }
      /*End style for header navbar*/
