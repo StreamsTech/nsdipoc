@@ -1135,7 +1135,8 @@ def layer_publish(request, layer_pk):
             working_group_admins = Profile.objects.filter(is_working_group_admin=True)
             # managers = list(group.get_managers())
             managers = list(working_group_admins)
-            notify.send(request.user, recipient_list=managers, actor=request.user,
+            if managers:
+                notify.send(request.user, recipient_list=managers, actor=request.user,
                         verb='pushed a new layer for approval', target=layer)
 
             # set all the permissions for all the managers of the group for this layer
