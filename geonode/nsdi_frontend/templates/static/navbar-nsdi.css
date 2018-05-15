@@ -240,4 +240,23 @@ line-height: 22px;
      height:595px !important;
     padding: 0;
     }
+    .c-menu--slide-left, .c-menu--slide-right, .c-menu--push-left, .c-menu--push-right
+    {
+        -webkit-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+        -moz-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+        box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+    }
+    .c-menu__close .c-menu_gd_close
+    {
+        padding: 0 5px;
+        background-color: #3896e2;
+    }
+    .user-details .grid-container
+    {
+         background-color: #fff;
+    }
+    .c-menu--slide-left .c-menu__item:hover, .c-menu--slide-right .c-menu__item:hover, .c-menu--slide-right .c-menu__item.active, .c-menu--push-left .c-menu__item:hover, .c-menu--push-right .c-menu__item:hover
+    {
+        background-color: #003560;
+    }
      /*End style for header navbar*/
