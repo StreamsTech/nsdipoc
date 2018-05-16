@@ -1218,7 +1218,7 @@ class ResourcePermissionPreviewApi(TypeFilteredResource):
                 # wog_admins = Profile.objects.filter(is_working_group_admin=True)
                 # for wga in wog_admins:
                 #     target_resource.set_managers_permissions(wga)
-                w_group = GroupProfile.objects.ge(slug='working-group')
+                w_group = GroupProfile.objects.get(slug='working-group')
                 resource.set_working_group_permissions(w_group)
 
                 if attributes and target_resource.resource_type == 'layer':

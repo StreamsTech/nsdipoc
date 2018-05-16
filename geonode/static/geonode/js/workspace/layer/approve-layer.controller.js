@@ -90,7 +90,7 @@
                 angular.forEach(selectedAttribute,function(attribute){
                     $scope.gridApi.selection.selectRow(attribute);
                 });
-                
+
               },function(error){
                   console.log(error);
             });
