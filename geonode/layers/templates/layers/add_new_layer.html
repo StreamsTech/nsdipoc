@@ -1,6 +1,7 @@
 {% extends "upload/layer_upload_base.html" %}
 {% load i18n %}
 {% load staticfiles %}
+{% load jsonify %}
 
 {% block title %} {% trans "Replace Layer"  %} - {{ block.super }}  {% endblock %}
 
@@ -37,7 +38,7 @@
           <div class="col-md-6">
               <div class="gd-content-body box-shadow full-pad-30px">
                   <div class="lead">
-                      {% trans "Replace Layer: " %}
+                      {% trans "Layer Name: " %}
                       <a href="{{ layer.get_absolute_url }}">
                           {{ layer.title }}
                       </a>
@@ -117,7 +118,7 @@
               </div>
           </div>
           <div class="col-md-6" ng-app="layerApp"  ng-cloak ng-controller="layerVersionController">
-            <div class="row" ng-init="inIt({{layer.id}})">
+            <div class="row" ng-init="inIt({{layer.id}},{{layer.current_version}})">
                 <table class="table table-striped table-hover">
                     <thead>
                       <tr>
@@ -132,14 +133,14 @@
                         <td>[{layer.date_created | date : 'shortDate'}]</td>
                         <td>
                             <button type="button" class="btn btn-primary btn-sm" 
-                            ng-hide="{{layer.current_version}}==layer.version"
+                            ng-hide="currentVersion==layer.version"
                             ng-disabled="isDisable"
                             ng-click="setVersion(layer)">set version [{layer.version}]</button>
-                            <span ng-show="{{layer.current_version}}==layer.version">
+                            <span ng-show="currentVersion==layer.version">
                                 Current Version
                                 <span class="glyphicon glyphicon-asterisk"></span>
                             </span>
-                            <span ng-if="{{layer.current_version}}!==layer.version" ng-show="postLayerId==layer.id">
+                            <span ng-if="currentVersion!==layer.version" ng-show="postLayerId==layer.id">
                                 <i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
                             </span>
                         </td>

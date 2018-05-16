@@ -12,14 +12,17 @@
         function getAllLayerVersions(layerId){
             layerService.getLayerInformation($scope.layerApprovalUrl+layerId).then(function(response){
                 $scope.layers=response.objects;
+                $scope.isDisable=false;
+                $scope.postLayerId=undefined;
             },function(error){
                 console.log(error);
             });
         }
 
-        $scope.inIt=function(layerId){
+        $scope.inIt=function(layerId,currentVersion){
             getAllLayerVersions(layerId);
             $scope.layer_id=layerId;
+            $scope.currentVersion=currentVersion;
         };
         $scope.setVersion=function(layer){
             var data={
@@ -29,9 +32,8 @@
             $scope.postLayerId=layer.id;
             $scope.isDisable=true;
             layerService.setVersion($scope.versionSettingUrl,data).then(function(response){
-                document.location.href="/layers/";
-                $scope.isDisable=false;
-                $scope.postLayerId=undefined;
+                getAllLayerVersions($scope.layer_id);
+                $scope.currentVersion=layer.version;
             },function(error){
                 document.location.href="/layers/";
             });

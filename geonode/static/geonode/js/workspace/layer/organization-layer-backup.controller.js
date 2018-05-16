@@ -6,13 +6,18 @@
     function($scope,layerService){
         $scope.backupUrl="/layers/organization/layers/backup";
         $scope.showLoader=false;
+        $scope.success=false;
+        $scope.error=false;
         $scope.message="An email has been sent to mail to download the backup files";
         $scope.backupLayer=function () {
             $scope.showLoader=true;
             layerService.backupOrganizationLayers($scope.backupUrl).then(function (response) {
-                console.log(response);
+                $scope.success=true;
+                $scope.showLoader=false;
             },function (error) {
-                console.log(error);
+                $scope.message="Internal Server Error";
+                $scope.error=true;
+                $scope.showLoader=false;
             });
 
         }
