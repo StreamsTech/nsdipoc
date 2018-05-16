@@ -192,7 +192,7 @@ class GroupProfile(models.Model):
         if member:
             member.role = role
             member.save()
-        else:
+        if created:
             user.groups.add(self.group)
 	#end
 
