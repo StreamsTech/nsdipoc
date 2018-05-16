@@ -11,12 +11,34 @@
 {% endcomment %}
 
 {% block body_outer %}
+    <style>
+        .block {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .circle {
+            background: rgba(0, 72, 156, 0.97);
+            border-radius: 200px;
+            color: white;
+            height: 100px;
+            font-weight: bold;
+            width: 100px;
+            display: table;
+            margin: 20px auto;
+        }
+
+        .circle p {
+            vertical-align: middle;
+            display: table-cell;
+        }
+    </style>
     <div class="gd-content">
         <div class="gd-content-heading">
                 <div class="d-title">
-            
-                        {% trans "Admin Workspace" %}     
-                  
+
+                        {% trans "Admin Workspace" %}
+
                 </div>
             <div class="hr"></div>
         </div>
@@ -32,27 +54,26 @@
                   </ul>
                   <br>
                   <div id="viewuserlist"></div>
-                  <div class="row" style="margin-bottom: 10px">
-                    <div class="col-md-4">
-                            
-                    </div>
-                    <div class="col-md-6">
-                            <div class="col-md-2">
-                                    <div class="circle">{{total_layer}} Layers</div>
-                            </div>
-                            <div class="col-md-2">
-                                    <div class="circle">
-                                            {% widthratio total_layer_size 1024 1 %} MB
-                                    </div>
-                            </div>
-                            <div class="col-md-2">
-                                    <div class="circle">1 Archived</div>
-                            </div>
-                    </div>
-                    <div class="col-md-3">
-                            
-                    </div>
+                  <div class="container">
+                      <div class="row">
+                          <div class="col-md-5 block">
+                              <div class="circle pull-right">
+                                  <p>{{total_layer}} Layers</p>
+                              </div>
+                          </div>
+                          <div class="col-md-2 block">
+                              <div class="circle">
+                                  <p>{% widthratio total_layer_size 1024 1 %} MB</p>
+                              </div>
+                          </div>
+                          <div class="col-md-5 block">
+                              <div class="circle pull-left">
+                                  <p>1 Archived</p>
+                              </div>
+                          </div>
+                      </div>
                   </div>
+
                   <div id="viewuserlist_none">
                         <ul class="nav nav-tabs">
                           <li class="active"><a href="#user-approval-request" data-toggle="tab">{% trans "User Approval Request" %}</a></li>
@@ -233,7 +254,7 @@
                                     <!--{% endfor %}-->
                                 </table>
                                 <div id="showallAdminDraftlayerspag_active">
-    
+
                                 </div>
                             </ul>
                           </article>
@@ -266,7 +287,7 @@
                                         <!--{% endfor %}-->
                                     </table>
                                     <div id="showallAdminDraftlayerspag_active">
-        
+
                                     </div>
                                 </ul>
                               </article>
@@ -299,13 +320,13 @@
                                             <!--{% endfor %}-->
                                         </table>
                                         <div id="showallAdminDraftlayerspag_active">
-            
+
                                         </div>
                                     </ul>
                                   </article>
                         </div>
-                  
-                  
+
+
                     </div>
               </div>
             </div>
