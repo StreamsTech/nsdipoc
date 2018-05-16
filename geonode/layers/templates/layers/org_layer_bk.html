@@ -24,11 +24,11 @@
                   <div class="panel-body">
                     <div class="col-md-12" ng-app="layerApp">
                         <div  ng-controller="organizationLayerBackupController">
-                            <div class="alert alert-success">
+                            <div class="alert alert-success" ng-show="success">
                               <strong>Success!</strong> [{message}]
                             </div>
 
-                            <div class="alert alert-info">
+                            <div class="alert alert-info" ng-show="error">
                               <strong>Info!</strong> [{message}]
                             </div>
                                 <h4>
