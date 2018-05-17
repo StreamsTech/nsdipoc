@@ -960,6 +960,7 @@ class WorkSpaceLayerApi(ModelResource):
         if settings.RESOURCE_PUBLISHING:
             queryset = queryset.filter(is_published=True)
         resource_name = 'workspace_layer_api'
+        authorization = GeoNodeAuthorization()
         excludes = ['csw_anytext', 'metadata_xml']
 
     def get_object_list(self, request):
@@ -983,16 +984,16 @@ class WorkSpaceLayerApi(ModelResource):
 
             if user_type == 'admin':
                 if user.is_manager_of_any_group:
-                    groups = GroupProfile.objects.filter(groupmember__user=user, groupmember__role='manager')
+                    # groups = GroupProfile.objects.filter(groupmember__user=user, groupmember__role='manager')
                     if resource_type == 'layer':
                         if resource_state == 'user_approval_request_list':
-                            return Layer.objects.filter(status='PENDING', group__in=groups).order_by('date_updated')
+                            return super(WorkSpaceLayerApi, self).get_object_list(request).filter(status='PENDING').order_by('date_updated')
                         elif resource_state == 'approved_list':
-                            return Layer.objects.filter(status='ACTIVE', group__in=groups).order_by('date_updated')
+                            return super(WorkSpaceLayerApi, self).get_object_list(request).filter(status='ACTIVE').order_by('date_updated')
                         elif resource_state == 'user_draft_list':
-                            return Layer.objects.filter(status='DRAFT', group__in=groups).order_by('date_updated')
+                            return super(WorkSpaceLayerApi, self).get_object_list(request).filter(status='DRAFT').order_by('date_updated')
                         elif resource_state == 'denied_list':
-                            return Layer.objects.filter(status='DENIED', group__in=groups).order_by('date_updated')
+                            return super(WorkSpaceLayerApi, self).get_object_list(request).filter(status='DENIED').order_by('date_updated')
                         else:
                             return nothing
                 else:
@@ -1001,13 +1002,13 @@ class WorkSpaceLayerApi(ModelResource):
             elif user_type == 'member':
                 if resource_type == 'layer':
                     if resource_state == 'draft_list':
-                        return Layer.objects.filter(owner=user, status='DRAFT').order_by('date_updated')
+                        return super(WorkSpaceLayerApi, self).get_object_list(request).filter(owner=user, status='DRAFT').order_by('date_updated')
                     elif resource_state == 'pending_list':
-                        return Layer.objects.filter(owner=user, status='PENDING').order_by('date_updated')
+                        return super(WorkSpaceLayerApi, self).get_object_list(request).filter(owner=user, status='PENDING').order_by('date_updated')
                     elif resource_state == 'denied_list':
-                        return Layer.objects.filter(owner=user, status='DENIED').order_by('date_updated')
+                        return super(WorkSpaceLayerApi, self).get_object_list(request).filter(owner=user, status='DENIED').order_by('date_updated')
                     elif resource_state == 'active_list':
-                        return Layer.objects.filter(owner=user, status='ACTIVE').order_by('date_updated')
+                        return super(WorkSpaceLayerApi, self).get_object_list(request).filter(owner=user, status='ACTIVE').order_by('date_updated')
                     else:
                         return nothing
                 else:
@@ -1049,6 +1050,7 @@ class WorkSpaceDocumentApi(ModelResource):
         if settings.RESOURCE_PUBLISHING:
             queryset = queryset.filter(is_published=True)
         resource_name = 'workspace_document_api'
+        authorization = GeoNodeAuthorization()
 
     def get_object_list(self, request):
         if 'HTTP_AUTHORIZATION' in request.META:
@@ -1071,17 +1073,17 @@ class WorkSpaceDocumentApi(ModelResource):
 
             if user_type == 'admin':
                 if user.is_manager_of_any_group:
-                    groups = GroupProfile.objects.filter(groupmember__user=user, groupmember__role='manager')
+                    # groups = GroupProfile.objects.filter(groupmember__user=user, groupmember__role='manager')
 
                     if resource_type == 'document':
                         if resource_state == 'user_approval_request_list':
-                            return Document.objects.filter(status='PENDING', group__in=groups).order_by('date_updated')
+                            return super(WorkSpaceDocumentApi, self).get_object_list(request).filter(status='PENDING').order_by('date_updated')
                         elif resource_state == 'approved_list':
-                            return Document.objects.filter(status='ACTIVE', group__in=groups).order_by('date_updated')
+                            return super(WorkSpaceDocumentApi, self).get_object_list(request).filter(status='ACTIVE').order_by('date_updated')
                         elif resource_state == 'user_draft_list':
-                            return Document.objects.filter(status='DRAFT', group__in=groups).order_by('date_updated')
+                            return super(WorkSpaceDocumentApi, self).get_object_list(request).filter(status='DRAFT').order_by('date_updated')
                         elif resource_state == 'denied_list':
-                            return Document.objects.filter(status='DENIED', group__in=groups).order_by('date_updated')
+                            return super(WorkSpaceDocumentApi, self).get_object_list(request).filter(status='DENIED').order_by('date_updated')
                         else:
                             return nothing
                     else:
@@ -1094,13 +1096,13 @@ class WorkSpaceDocumentApi(ModelResource):
 
                 if resource_type == 'document':
                     if resource_state == 'draft_list':
-                        return Document.objects.filter(owner=user, status='DRAFT').order_by('date_updated')
+                        return super(WorkSpaceDocumentApi, self).get_object_list(request).filter(owner=user, status='DRAFT').order_by('date_updated')
                     elif resource_state == 'pending_list':
-                        return Document.objects.filter(owner=user, status='PENDING').order_by('date_updated')
+                        return super(WorkSpaceDocumentApi, self).get_object_list(request).filter(owner=user, status='PENDING').order_by('date_updated')
                     elif resource_state == 'denied_list':
-                        return Document.objects.filter(owner=user, status='DENIED').order_by('date_updated')
+                        return super(WorkSpaceDocumentApi, self).get_object_list(request).filter(owner=user, status='DENIED').order_by('date_updated')
                     elif resource_state == 'active_list':
-                        return Document.objects.filter(owner=user, status='ACTIVE').order_by('date_updated')
+                        return super(WorkSpaceDocumentApi, self).get_object_list(request).filter(owner=user, status='ACTIVE').order_by('date_updated')
                     else:
                         return nothing
                 else:
@@ -1142,6 +1144,7 @@ class WorkSpaceMapApi(ModelResource):
         if settings.RESOURCE_PUBLISHING:
             queryset = queryset.filter(is_published=True)
         resource_name = 'workspace_map_api'
+        authorization = GeoNodeAuthorization()
 
     def get_object_list(self, request):
         if 'HTTP_AUTHORIZATION' in request.META:
@@ -1164,16 +1167,16 @@ class WorkSpaceMapApi(ModelResource):
 
             if user_type == 'admin':
                 if user.is_manager_of_any_group:
-                    groups = GroupProfile.objects.filter(groupmember__user=user, groupmember__role='manager')
+                    # groups = GroupProfile.objects.filter(groupmember__user=user, groupmember__role='manager')
                     if resource_type == 'map':
                         if resource_state == 'user_approval_request_list':
-                            return Map.objects.filter(status='PENDING', group__in=groups).order_by('date_updated')
+                            return super(WorkSpaceMapApi, self).get_object_list(request).filter(status='PENDING').order_by('date_updated')
                         elif resource_state == 'approved_list':
-                            return Map.objects.filter(status='ACTIVE', group__in=groups).order_by('date_updated')
+                            return super(WorkSpaceMapApi, self).get_object_list(request).filter(status='ACTIVE').order_by('date_updated')
                         elif resource_state == 'user_draft_list':
-                            return Map.objects.filter(status='DRAFT', group__in=groups).order_by('date_updated')
+                            return super(WorkSpaceMapApi, self).get_object_list(request).filter(status='DRAFT').order_by('date_updated')
                         elif resource_state == 'denied_list':
-                            return Map.objects.filter(status='DENIED', group__in=groups).order_by('date_updated')
+                            return super(WorkSpaceMapApi, self).get_object_list(request).filter(status='DENIED').order_by('date_updated')
                         else:
                             return nothing
                     else:
@@ -1185,13 +1188,13 @@ class WorkSpaceMapApi(ModelResource):
             elif user_type == 'member':
                 if resource_type == 'map':
                     if resource_state == 'draft_list':
-                        return Map.objects.filter(owner=user, status='DRAFT').order_by('date_updated')
+                        return super(WorkSpaceMapApi, self).get_object_list(request).filter(owner=user, status='DRAFT').order_by('date_updated')
                     elif resource_state == 'pending_list':
-                        return Map.objects.filter(owner=user, status='PENDING').order_by('date_updated')
+                        return super(WorkSpaceMapApi, self).get_object_list(request).filter(owner=user, status='PENDING').order_by('date_updated')
                     elif resource_state == 'denied_list':
-                        return Map.objects.filter(owner=user, status='DENIED').order_by('date_updated')
+                        return super(WorkSpaceMapApi, self).get_object_list(request).filter(owner=user, status='DENIED').order_by('date_updated')
                     elif resource_state == 'active_list':
-                        return Map.objects.filter(owner=user, status='ACTIVE').order_by('date_updated')
+                        return super(WorkSpaceMapApi, self).get_object_list(request).filter(owner=user, status='ACTIVE').order_by('date_updated')
                     else:
                         return nothing
                 else:

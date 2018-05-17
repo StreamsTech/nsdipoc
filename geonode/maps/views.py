@@ -552,7 +552,7 @@ def new_map_json(request):
         category_id = int(data['about']['category'])
         # organization_id = int(data['about']['organization'])
         # group = GroupProfile.objects.get(id=organization_id)
-        group = GroupProfile.objects.get(groupmember__user=request.user)
+        group = GroupProfile.objects.get(groupmember__user=request.user).exclude(slug='working-group')[0]
 
 
         map_obj = Map(owner=request.user, zoom=0,
@@ -1112,10 +1112,10 @@ def map_publish(request, map_pk):
             map_submission_activity = MapSubmissionActivity(map=map, group=group, iteration=map.current_iteration)
             map_submission_activity.save()
 
-            # set all the permissions for all the managers of the group for this map
-            # map.set_managers_permissions()
+            # set working group permission for this map
             w_group = GroupProfile.objects.get(slug='working-group')
             map.set_working_group_permissions(w_group)
+
             messages.info(request, 'Pushed map successfully')
             return HttpResponseRedirect(reverse('member-workspace-map'))
     else:
