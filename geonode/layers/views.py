@@ -100,6 +100,7 @@ from geonode.base.forms import CategoryForm, ResourceApproveForm, ResourceDenyFo
 from geonode.layers.models import Layer, Attribute, UploadSession
 from geonode.base.enumerations import CHARSETS
 from geonode.base.models import TopicCategory
+from geonode.layers.tasks import backupOrganizationLayersMetadata
 
 from geonode.utils import default_map_config
 from geonode.utils import GXPLayer
@@ -1836,7 +1837,7 @@ def backupAciveLayer(layer):
     zfile.close()
     r.close()
 
-from geonode.layers.tasks import backupOrganizationLayersMetadata
+
 @login_required
 def backupOrganizationLayers(request):
     out = {}
