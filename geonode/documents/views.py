@@ -227,7 +227,7 @@ class DocumentUploadView(CreateView):
         except TopicCategory.DoesNotExist:
             db_logger.error('Selected category does not exists')
             raise Http404('Selected category does not exists')
-        self.object.group = GroupProfile.objects.get(groupmember__user=self.request.user)
+        self.object.group = GroupProfile.objects.filter(groupmember__user=self.request.user).exclude('working-group')[0]
         self.object.category = category
         #end
 
@@ -640,10 +640,11 @@ def document_publish(request, document_pk):
             managers = list( group.get_managers())
             notify.send(request.user, recipient_list = managers, actor=request.user,
                         verb='pushed a new document for approval', target=document)
-            # set all the permissions for all the managers of the group for this documentt
-            # document.set_managers_permissions()
+
+            # set working group permission for this document
             w_group = GroupProfile.objects.get(slug='working-group')
             document.set_working_group_permissions(w_group)
+
             messages.info(request, 'Pushed document succesfully for approval')
             return HttpResponseRedirect(reverse('member-workspace-document'))
     else:

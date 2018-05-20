@@ -344,7 +344,7 @@ class GroupResource(ModelResource):
         return reverse('group_detail', args=[bundle.obj.slug])
 
     class Meta:
-        queryset = GroupProfile.objects.all()
+        queryset = GroupProfile.objects.all().exclude(slug='working-group')
         resource_name = 'groups'
         allowed_methods = ['get']
         filtering = {
@@ -1136,20 +1136,24 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                 permissions = json.loads(request.body).get('permissions')
                 attributes = json.loads(request.body).get('attributes')
                 status = json.loads(request.body).get('status')
+                #send notification to layer owner that layer
+                #has been approved
                 if request.user.is_working_group_admin:
                     notify.send(request.user, recipient=layer.owner, actor=request.user,
                                 target=layer, verb='approved your layer')
 
                 layer.status = status
                 layer.save()
+
                 if permissions is not None and len(permissions.keys()) > 0:
-                    # permissions = layer.resolvePermission(permissions)
                     layer.set_permissions(permissions)
-                # wog_admins = Profile.objects.filter(is_working_group_admin=True)
-                # for wga in wog_admins:
-                #     layer.set_managers_permissions(wga)
+
                 w_group = GroupProfile.objects.get(slug='working-group')
+
+                #set working group permissions for this layer
                 layer.set_working_group_permissions(w_group)
+                layer.set_managers_permissions()
+
                 layer_attributes = Attribute.objects.filter(layer=layer)
                 for attr in layer_attributes:
                     if attr.id in attributes:
@@ -1213,11 +1217,8 @@ class ResourcePermissionPreviewApi(TypeFilteredResource):
                 target_resource.status = status
                 target_resource.save()
                 if permissions is not None and len(permissions.keys()) > 0:
-                    # permissions = target_resource.resolvePermission(permissions)
                     target_resource.set_permissions(permissions)
-                # wog_admins = Profile.objects.filter(is_working_group_admin=True)
-                # for wga in wog_admins:
-                #     target_resource.set_managers_permissions(wga)
+
                 w_group = GroupProfile.objects.get(slug='working-group')
                 resource.set_working_group_permissions(w_group)
 

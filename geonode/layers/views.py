@@ -100,6 +100,7 @@ from geonode.base.forms import CategoryForm, ResourceApproveForm, ResourceDenyFo
 from geonode.layers.models import Layer, Attribute, UploadSession
 from geonode.base.enumerations import CHARSETS
 from geonode.base.models import TopicCategory
+from geonode.layers.tasks import backupOrganizationLayersMetadata
 
 from geonode.utils import default_map_config
 from geonode.utils import GXPLayer
@@ -335,7 +336,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
             # organization_id = form.cleaned_data["organization"]
             admin_upload = form.cleaned_data["admin_upload"]
             # group = GroupProfile.objects.get(id=organization_id)
-            group = GroupProfile.objects.get(groupmember__user=request.user)
+            group = GroupProfile.objects.filter(groupmember__user=request.user).exclude(slug='working-group')[0]
             # Replace dots in filename - GeoServer REST API upload bug
             # and avoid any other invalid characters.
             # Use the title if possible, otherwise default to the filename
@@ -1139,9 +1140,7 @@ def layer_publish(request, layer_pk):
                 notify.send(request.user, recipient_list=managers, actor=request.user,
                         verb='pushed a new layer for approval', target=layer)
 
-            # set all the permissions for all the managers of the group for this layer
-            # for manager in managers:
-            #     layer.set_managers_permissions(manager)
+            # set working group permissions for this layer
             w_group = GroupProfile.objects.get(slug='working-group')
             layer.set_working_group_permissions(w_group)
 
@@ -1815,7 +1814,6 @@ def backupPreviousVersion(layer):
 
 
 def backupAciveLayer(layer):
-    # import pdb; pdb.set_trace()
     download_link = layer.link_set.get(name='Zipped Shapefile')
     r = requests.get(download_link.url)
     temdir = MEDIA_ROOT + '/' + layer.name + '/' + str(layer.current_version) + '/'
@@ -1839,13 +1837,13 @@ def backupAciveLayer(layer):
     zfile.close()
     r.close()
 
-from geonode.layers.tasks import backupOrganizationLayersMetadata
+
 @login_required
 def backupOrganizationLayers(request):
     out = {}
     out['success'] = False
     if request.user.is_authenticated() and request.user.is_manager_of_any_group:
-        user_organization = GroupProfile.objects.filter(groupmember__user=request.user).first()
+        user_organization = GroupProfile.objects.filter(groupmember__user=request.user).exclude(slug='working-group')[0]
         try:
             host = request.META['HTTP_HOST']
             #used celery for backup layers asynchronously
