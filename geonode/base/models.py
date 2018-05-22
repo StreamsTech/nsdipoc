@@ -1002,7 +1002,7 @@ def do_login(sender, user, request, **kwargs):
             token = u.hex
 
         # Do GeoServer Login
-        url = "%s%s?access_token=%s" % (settings.OGC_SERVER['default']['PUBLIC_LOCATION'],
+        url = "%s%s?access_token=%s" % (settings.OGC_SERVER['default']['LOCATION'],
                                         'ows?service=wms&version=1.3.0&request=GetCapabilities',
                                         token)
 
