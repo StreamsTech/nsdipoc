@@ -224,7 +224,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
     db_logger = logging.getLogger('db')
     if request.method == 'GET':
         mosaics = Layer.objects.filter(is_mosaic=True).order_by('name')
-        organizations = GroupProfile.objects.all()
+        organizations = GroupProfile.objects.all().exclude(slug='working-group')
         user_organization = organizations.filter(groupmember__user=request.user).first()
         ctx = {
             'mosaics': mosaics,
