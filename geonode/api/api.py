@@ -355,6 +355,15 @@ class GroupResource(ModelResource):
         }
         ordering = ['title', 'last_modified']
 
+    def get_object_list(self, request):
+
+        user_groups = request.GET.get('user-groups')
+        if user_groups:
+            return super(GroupResource, self).get_object_list(request).filter(groupmember__user=request.user)
+        else:
+            return super(GroupResource, self).get_object_list(request).all()
+
+
 
 class ProfileResource(TypeFilteredResource):
     """Profile api"""
