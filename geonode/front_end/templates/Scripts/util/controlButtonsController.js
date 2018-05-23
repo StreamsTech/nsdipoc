@@ -475,7 +475,7 @@ appModule.controller("controlButtonsController", ["$scope", "$modal", "$timeout"
                     filter='id in ('+getFeatureIdFromSelectedFeature().join(',')+')';
                 }
                 var meterPerDegree = 111325;
-                var radius = (distance * 1000)/ meterPerDegree;
+                var radius = (distance * 1000);
                 var requestObj = {
                     //service: 'WFS',
                     request: 'GetFeature',
