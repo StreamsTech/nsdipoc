@@ -1388,7 +1388,7 @@ def layer_permission_preview(request, layername, template='layers/layer_attribut
     layer = _resolve_layer(
         request,
         layername,
-        'base.view_resourcebase',
+        'base.change_resourcebase_permissions',
         _PERMISSION_MSG_VIEW)
 
     if request.method == 'GET':
