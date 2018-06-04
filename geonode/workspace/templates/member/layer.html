@@ -78,6 +78,8 @@
                                 </li>
                                 <li><a href="#active" id="active_list_layers" data-toggle="tab">{% trans "Active" %}</a>
                                 </li>
+                                <li><a href="#verified" id="verified_list_layers" data-toggle="tab">{% trans "Verified" %}</a>
+                                </li>
                             </ul>
                             <div class="tab-content">
                                 <article id="draft" class="tab-pane active">
@@ -171,6 +173,24 @@
                                         </div>
                                     </ul>
                                 </article>
+                                <article id="verified" class="tab-pane">
+                                    <ul class="no-style-list">
+                                        <table class="table table-hover" style="background:#ffffff;">
+                                            <thead>
+                                            <tr>
+                                                <th>Verified</th>
+
+                                            </tr>
+                                            </thead>
+                                            <tbody id="allMemberVerifiedlayers_active">
+
+                                            </tbody>
+                                        </table>
+                                        <div id="showallMemberVerifiedlayerspag_active">
+
+                                        </div>
+                                    </ul>
+                                </article>
                             </div>
                         </div>
                     </div>
@@ -253,7 +273,7 @@ $(function () {
 
                     if(draft_list_messages_json[item.id]['mandatory_fields_msg'] == ""){
                         {% if FRONT_END_SETTINGS.attribute_permission %}
-                            output+='<td><a href="'+ item.detail_url +'/preview" class="btn btn-gd-primary"> {% trans "Continue for Approval" %}</a></td>';
+                            output+='<td><a href="'+ item.detail_url +'/preview" class="btn btn-gd-primary"> {% trans "Continue for Verification" %}</a></td>';
                         {% else %}
                             output+='<td><a href="'+ item.detail_url +'?user_role=member" class="btn btn-gd-primary"> {% trans "Continue for Approval" %}</a></td>';
                         {% endif %}

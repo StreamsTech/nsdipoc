@@ -93,9 +93,9 @@
     <div class="row">
 
             <div class="col-sm-3 col-md-2 workspace-sidebar">
-                    
-             
-             
+
+
+
                      <ul class="nav nav-sidebar">
                              <li role="presentation" class="active"><a href="{% url "admin-workspace-layer" %}"><i class="fa fa-clone" aria-hidden="true"></i>{% trans "Layers" %}</a></li>
                              <li role="presentation"><a href="{% url "admin-workspace-map" %}"><i class="fa fa-map" aria-hidden="true"></i>{% trans "Maps" %}</a></li>
@@ -103,8 +103,8 @@
                              <li role="presentation"><a href="{% url "admin-workspace-user-list" %}" ><i class="fa fa-users" aria-hidden="true"></i>{% trans "User List" %}</a></li>
                              <li role="presentation"><a href="{% url "create-user" %}" ><i class="fa fa-plus-circle" aria-hidden="true"></i>{% trans "Create User" %}</a></li>
                            </ul>
-             
-             
+
+
                    </div>
 
 
@@ -112,11 +112,11 @@
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                 <h1 class="d-title" style="margin: 0">{% trans "Admin Workspace" %}</h1>
                 <div class="gd-content">
-                        
+
                                 <div class="row">
                                   <div class="col-md-12">
-                                      
-                                      
+
+
                                       <div id="viewuserlist"></div>
                                       {% if FRONT_END_SETTINGS.attribute_permission %}
                                           <div class="container">
@@ -139,7 +139,7 @@
                                               </div>
                                           </div>
                                       {% endif %}
-                    
+
                                       <div id="viewuserlist_none">
                                             <ul class="nav nav-tabs">
                                               <li class="active"><a href="#user-approval-request" data-toggle="tab">{% trans "User Approval Request" %}</a></li>
@@ -170,7 +170,7 @@
 
                                                 </table>
                                                 <div id="showallAdminDraftlayerspag">
-                    
+
                                                 </div>
                                             </ul>
                                           </article>
@@ -197,7 +197,7 @@
 
                                                 </table>
                                                 <div id="showallAdminDraftlayerspag_panding">
-                    
+
                                                 </div>
                                             </ul>
                                           </article>
@@ -221,11 +221,11 @@
 
                                                 </table>
                                                 <div id="showallAdminDraftlayerspag_denied">
-                    
+
                                                 </div>
                                             </ul>
                                           </article>
-                    
+
                                           <article id="denied-layers" class="tab-pane" style="background:#ffffff;">
                                             <ul class="no-style-list">
                                                     <table class="table table-hover table-striped">
@@ -246,7 +246,7 @@
 
                                                 </table>
                                                 <div id="showallAdminDraftlayerspag_active">
-                    
+
                                                 </div>
                                             </ul>
                                           </article>
@@ -254,11 +254,11 @@
                                       </div>
                                   </div>
                                 </div>
-                         
+
                 </div>
               </div>
 
-        
+
     </div>
 {% include "layer_templates/_delete_layer.html" %}
 {% endblock %}
@@ -512,7 +512,7 @@
                     output+='<td>'+ item.date_updated +'</td>';
                     output+='<td><a href="'+ item.detail_url +'" class="btn btn-gd-primary">{% trans "Edit" %}</a></td>';
                     output+='<td><button type="button" class="btn btn-gd-primary" onclick="deleteLayer('+ item.id +')" style="color:#fff;">{% trans "Delete Layer" %}</button></td>';
-                    output+='<td><a href="'+ item.detail_url +'?user_role=manager" class="btn btn-gd-primary">{% trans "Unapproved" %}</a></td>';                    
+                    output+='<td><a href="'+ item.detail_url +'?user_role=manager" class="btn btn-gd-primary">{% trans "Unapproved" %}</a></td>';
                     output+='</tr>';
                   });
                   outputpag+='<div>';

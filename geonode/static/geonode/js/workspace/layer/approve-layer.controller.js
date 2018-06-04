@@ -7,7 +7,7 @@
         $scope.departments=[];
         $scope.gridApi={};
         $scope.isDisabledButton=false;
-        $scope.layerApprovalUrl="/api/resource-attribute-permission-set/";
+        $scope.layerApprovalUrl="/api/layer-attribute-permission-set/";
         $scope.gridOption = {
             enableRowSelection: true,
             enableSelectAll: true,
