@@ -1124,6 +1124,7 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
     class Meta:
         resource_name = 'layer-attribute-permission-set'
         allowed_methods = ['post']
+        authorization = GeoNodeAuthorization()
 
     def dispatch(self, request_type, request, **kwargs):
         out = {'success': False}
@@ -1135,34 +1136,85 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
           
             out = {'success': False}
             layer_pk = json.loads(request.body).get('layer_pk')
+            permissions = json.loads(request.body).get('permissions')
+            attributes = json.loads(request.body).get('attributes')
+            status = json.loads(request.body).get('status')
+            comment_body = json.loads(request.body).get('comment')
+            comment_subject = json.loads(request.body).get('comment_subject')
             try:
                 layer = Layer.objects.get(id=layer_pk)
             except:
                 out['errors'] = 'No layer found with this layer pk'
                 return HttpResponse(json.dumps(out), content_type='application/json', status=200)
 
-            if request.user.is_working_group_admin or request.user == layer.owner:
-                permissions = json.loads(request.body).get('permissions')
-                attributes = json.loads(request.body).get('attributes')
-                status = json.loads(request.body).get('status')
-                #send notification to layer owner that layer
-                #has been approved
-                if request.user.is_working_group_admin:
-                    notify.send(request.user, recipient=layer.owner, actor=request.user,
-                                target=layer, verb='approved your layer')
-
+            if request.user.is_working_group_admin and status in ["ACTIVE", "DENIED"]:
+                layer_submission_activity = LayerSubmissionActivity.objects.get(
+                    layer=layer, group=layer.group, iteration=layer.current_iteration)
+                layer_audit_activity = LayerAuditActivity(
+                    layer_submission_activity=layer_submission_activity)
                 layer.status = status
+                layer.last_auditor = request.user
                 layer.save()
 
+                verb = ""
+                if status == "ACTIVE":
+                    verb = "approved"
+                elif status == "DENIED":
+                    verb = "denied"
+
+                # notify layer owner that someone have approved the layer
+                notify.send(request.user, recipient=layer.owner, actor=request.user,
+                                target=layer, verb='{0} your layer'.format(verb))
+
+                layer_submission_activity.is_audited = True
+                layer_submission_activity.save()
+
+                layer_audit_activity.comment_subject = comment_subject
+                layer_audit_activity.comment_body = comment_body
+                layer_audit_activity.result = status
+                layer_audit_activity.auditor = request.user
+                layer_audit_activity.save()
+
+            elif request.user in layer.group.get_managers() and status in ["VERIFIED", "DENIED"]:
+                layer_submission_activity = LayerSubmissionActivity.objects.get(
+                    layer=layer, group=layer.group, iteration=layer.current_iteration)
+                layer_audit_activity = LayerAuditActivity(
+                    layer_submission_activity=layer_submission_activity)
+                layer.status = status
+                layer.last_auditor = request.user
+                layer.save()
+
+                # notify layer owner that manager have verified the layer
+                notify.send(request.user, recipient=layer.owner, actor=request.user,
+                            target=layer, verb='verified your layer')
+
+                layer_submission_activity.is_audited = True
+                layer_submission_activity.save()
+
+                layer_audit_activity.comment_subject = comment_subject
+                layer_audit_activity.comment_body = comment_body
+                layer_audit_activity.result = status
+                layer_audit_activity.auditor = request.user
+                layer_audit_activity.save()
+
+            elif request.user ==  layer.owner and status == "PENDING":
+
+                #set layer status
+                layer.status = status
+                #increase iteration
+                layer.current_iteration += 1
+                #save layer
+                layer.save()
+                #create layer submission activity
+                layer_submission_activity = LayerSubmissionActivity(
+                    layer=layer, group=layer.group, iteration=layer.current_iteration)
+                layer_submission_activity.save()
+
+                #set permissions
                 if permissions is not None and len(permissions.keys()) > 0:
                     layer.set_permissions(permissions)
 
-                w_group = GroupProfile.objects.get(slug='working-group')
-
-                #set working group permissions for this layer
-                layer.set_working_group_permissions(w_group)
-                layer.set_managers_permissions()
-
+                #set attribute level prmissions
                 layer_attributes = Attribute.objects.filter(layer=layer)
                 for attr in layer_attributes:
                     if attr.id in attributes:
@@ -1171,11 +1223,17 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                         attr.is_permitted = False
 
                     attr.save()
+
+                #set manager permissions for this layer
+                layer.set_managers_permissions(manager=layer.group.get_managers().first())
+
+                # notify organization admin about the new published layer
+                notify.send(request.user, recipient=layer.group.get_managers().first(), actor=request.user,
+                                verb='pushed a new layer for verification', target=layer)
                 out['success'] = True
 
-
             else:
-                out['errors'] = 'You dont have permission to update permissions'
+                out['errors'] = 'You dont have permission to perform this action'
         else:
             out['errors'] = 'Only post method is permitted'
         return HttpResponse(json.dumps(out), content_type='application/json', status=200)
@@ -1185,6 +1243,7 @@ class ResourcePermissionPreviewApi(TypeFilteredResource):
     class Meta:
         resource_name = 'resource-attribute-permission-set'
         allowed_methods = ['post']
+        authorization = GeoNodeAuthorization()
 
     def dispatch(self, request_type, request, **kwargs):
         out = {'success': False}

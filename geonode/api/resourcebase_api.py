@@ -994,6 +994,9 @@ class WorkSpaceLayerApi(ModelResource):
                             return super(WorkSpaceLayerApi, self).get_object_list(request).filter(status='DRAFT').order_by('date_updated')
                         elif resource_state == 'denied_list':
                             return super(WorkSpaceLayerApi, self).get_object_list(request).filter(status='DENIED').order_by('date_updated')
+                        elif resource_state == 'verified_list':
+                            return super(WorkSpaceLayerApi, self).get_object_list(request).filter(
+                                status='VERIFIED').order_by('date_updated')
                         else:
                             return nothing
                 else:
