@@ -1178,15 +1178,32 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
             elif request.user in layer.group.get_managers() and status in ["VERIFIED", "DENIED"]:
                 layer_submission_activity = LayerSubmissionActivity.objects.get(
                     layer=layer, group=layer.group, iteration=layer.current_iteration)
+
+                #create a new audit activity
                 layer_audit_activity = LayerAuditActivity(
                     layer_submission_activity=layer_submission_activity)
+
+                #set layer status
                 layer.status = status
                 layer.last_auditor = request.user
                 layer.save()
 
-                # notify layer owner that manager have verified the layer
-                notify.send(request.user, recipient=layer.owner, actor=request.user,
-                            target=layer, verb='verified your layer')
+                # set permissions
+                if permissions is not None and len(permissions.keys()) > 0:
+                    layer.set_permissions(permissions)
+
+                # set attribute level prmissions
+                layer_attributes = Attribute.objects.filter(layer=layer)
+                for attr in layer_attributes:
+                    if attr.id in attributes:
+                        attr.is_permitted = True
+                    else:
+                        attr.is_permitted = False
+
+                    attr.save()
+
+                # set working group admins permissions for this layer
+                layer.set_working_group_permissions(group=layer.group)
 
                 layer_submission_activity.is_audited = True
                 layer_submission_activity.save()
@@ -1196,6 +1213,18 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                 layer_audit_activity.result = status
                 layer_audit_activity.auditor = request.user
                 layer_audit_activity.save()
+
+                # notify layer owner that manager have verified the layer
+                notify.send(request.user, recipient=layer.owner, actor=request.user,
+                            target=layer, verb='{0} your layer'.format(status))
+
+                #if the layer is verified, the inform working group
+                #admins to approve this layer
+                if status == "VERIFIED":
+                    working_group_admins = Profile.objects.filter(is_working_group_admin=True)
+                    notify.send(request.user, recipient_list=working_group_admins, actor=request.user,
+                                target=layer, verb='pushed a new layer for approval')
+
 
             elif request.user ==  layer.owner and status == "PENDING":
 
