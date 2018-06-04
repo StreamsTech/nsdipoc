@@ -1392,12 +1392,13 @@ def layer_permission_preview(request, layername, template='layers/layer_attribut
         _PERMISSION_MSG_VIEW)
 
     if request.method == 'GET':
-        if request.user == layer.owner:
-            if layer.status == 'DRAFT':
-                pass
-        elif request.user.is_working_group_admin:
-            if layer.status == 'PENDING':
-                pass
+        user_state = None
+        if request.user == layer.owner and layer.status == 'DRAFT':
+            user_state = "user"
+        elif request.user in layer.get_managers() and layer.status == "PENDING":
+            user_state = "manager"
+        elif request.user.is_working_group_admin and layer.status == "VERIFIED":
+            user_state = "admin"
         else:
             return HttpResponse(
                 loader.render_to_string(
@@ -1408,6 +1409,7 @@ def layer_permission_preview(request, layername, template='layers/layer_attribut
         ctx = {
             'layer': layer,
             'organizations': GroupProfile.objects.all(),
+            'user_state': user_state
 
 
         }
