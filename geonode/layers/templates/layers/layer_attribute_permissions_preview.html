@@ -23,7 +23,7 @@
               <div class="col-md-12">
                   <div class="panel-body">
                     <div class="row" ng-app="layerApp" ng-cloak>
-                        <div ng-controller="approveLayerController" ng-init="inIt({{layer.id}},'{{request.user.is_working_group_admin}}')">
+                        <div ng-controller="approveLayerController" ng-init="inIt({{layer.id}},'{{request.user.is_working_group_admin}}')" ng-class="'{{ user_state }}'=='admin' ? 'disabled':'enabled'">
                             <div class="col-md-5">
                                     <form class="form-horizontal" name="layer-approval-from">
                                             <div class="form-group">
@@ -124,24 +124,57 @@
                             </div>
                             <div class="col-md-12">
                                 <div class="col-md-4 pull-right">
-                                    <button type="button" 
-                                    ng-if="!userRole"
-                                    ng-disabled="isDisabledButton"
-                                    class="btn btn-primary pull-right"
-                                     ng-click="approveLayer()">Submit For Verification
-                                     <span ng-show="isDisabledButton">
-                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
-                                    </span>
-                                    </button>
-                                    <button type="button"
-                                    ng-if="userRole"
-                                    ng-disabled="isDisabledButton"
-                                    class="btn btn-primary pull-right" 
-                                    ng-click="publishLayer()">Publish
-                                    <span ng-show="isDisabledButton">
-                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
-                                    </span>
-                                    </button>
+                                    {% if  user_state == 'user' %}
+                                            <button type="button"
+                                                    ng-disabled="isDisabledButton"
+                                                    class="btn btn-primary pull-right"
+                                                    ng-click="submitforVerify()">
+                                                        Submit For Verification
+                                                        <span ng-show="isDisabledButton">
+                                                            <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+                                                        </span>
+                                            </button>
+                                        {% elif user_state == 'manager' %}
+                                            <button type="button" style="margin-left: 10px"
+                                                    ng-disabled="isDisabledButton"
+                                                    class="btn btn-primary pull-right"
+                                                    ng-click="verifyLayer()">
+                                                    Deny
+                                                    <span ng-show="isDisabledButton">
+                                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+                                                     </span>
+                                            </button>
+                                            <button type="button"
+                                                    ng-disabled="isDisabledButton"
+                                                    class="btn btn-primary pull-right"
+                                                    ng-click="verifyLayer()">
+                                                    Verify
+                                                    <span ng-show="isDisabledButton">
+                                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+                                                     </span>
+                                            </button>
+                                        {% elif user_state == 'admin'%}
+                                            <button type="button" style="margin-left: 10px"
+                                                    ng-disabled="isDisabledButton"
+                                                    class="btn btn-primary pull-right"
+                                                    ng-click="verifyLayer()">
+                                                    Deny
+                                                    <span ng-show="isDisabledButton">
+                                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+                                                     </span>
+                                            </button>
+                                            <button type="button"
+                                                    ng-disabled="isDisabledButton"
+                                                    class="btn btn-primary pull-right enabled"
+                                                    ng-click="approveLayer()">
+                                                            Approve
+                                                        <span ng-show="isDisabledButton">
+                                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+                                                    </span>
+                                            </button>
+                                    {% endif %}
+
+
                                     
                                 </div>
                             </div>
@@ -155,6 +188,7 @@
 {% endblock %}
 
 {% block extra_script %}
+<script src="{{ STATIC_URL }}Scripts/lib/ui-bootstrap-tpls-0.9.0.min.js"></script>
 <script src="{{ STATIC_URL }}geonode/js/workspace/layer/layer.module.js"></script>
 <script src="{{ STATIC_URL }}geonode/js/workspace/layer/layer.service.js"></script>
 <script src="{{ STATIC_URL }}geonode/js/workspace/layer/approve-layer.controller.js"></script>

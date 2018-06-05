@@ -36,7 +36,7 @@
             var permissionAttributes=
           ['view_resourcebase', 'download_resourcebase'];
             var data={};
-            data.resource_pk =$scope.layer_id;
+            data.layer_pk =$scope.layer_id;
             var permittedOrganizations=_.map(_.filter($scope.departments,function(department){
                 return department.IsChecked;
                 }),"slug");
@@ -61,17 +61,23 @@
         }
 
 
-        $scope.approveLayer=function(){
+        $scope.submitforVerify=function(){
             var data=getPostLayerDataInformation();
             data.status="PENDING";
             postLayerData($scope.layerApprovalUrl,data);
         };
 
-        $scope.publishLayer=function(){
+        $scope.verifyLayer=function(){
+            var data=getPostLayerDataInformation();
+            data.status="VERIFIED";
+            postLayerData($scope.layerApprovalUrl,data);
+        };
+        $scope.approveLayer=function () {
             var data=getPostLayerDataInformation();
             data.status="ACTIVE";
             postLayerData($scope.layerApprovalUrl,data);
         };
+
         angular.isUndefinedOrNull = function(val) {
             return angular.isUndefined(val) || val === null ;
         };
@@ -102,7 +108,8 @@
                      }));
                     var permissions  = Object.keys(JSON.parse(resolutions.permissions.permissions).groups);
                     angular.forEach(permissions,function(permission){
-                        $scope.departments[permission].IsChecked=true;
+                        if($scope.departments[permission])
+                            $scope.departments[permission].IsChecked=true;
                     });
                 });
         }
@@ -112,5 +119,11 @@
             $scope.layer_id=layerId;
             $scope.userRole= (userRole == 'True' || userRole=='true');
         };
+        $scope.poniterDisable = {
+            'pointer-events' : 'none'
+        };
+        $scope.poniterEnable = {
+            'pointer-events' : 'all'
+        }
     });
 })();

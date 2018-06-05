@@ -142,10 +142,14 @@
 
                                       <div id="viewuserlist_none">
                                             <ul class="nav nav-tabs">
-                                              <li class="active"><a href="#user-approval-request" data-toggle="tab">{% trans "User Approval Request" %}</a></li>
+                                              <li class="active"><a href="#user-approval-request" data-toggle="tab">{% trans "User Verification Request" %}</a></li>
+                                              <li><a href="#user-verification-request" data-toggle="tab" id="user_verification_request">{% trans "User Approval Request" %}</a></li>
                                               <li><a href="#approved" id="Approved_list_layers_admin" data-toggle="tab">{% trans "Approved" %}</a></li>
                                               <li><a href="#user-drafts" id="Admin_userdraft" data-toggle="tab">{% trans "User Drafts" %}</a></li>
                                               <li><a href="#denied-layers" id="Admin_dined_list" data-toggle="tab">{% trans "Denied Layers" %}</a></li>
+                                                <li><a href="#verified-layers" id="admin_verified_list"
+                                                       data-toggle="tab">{% trans "Verified" %}</a>
+                                                </li>
                                             </ul>
                                         <div class="tab-content">
                                           <article id="user-approval-request" class="tab-pane active">
@@ -174,6 +178,34 @@
                                                 </div>
                                             </ul>
                                           </article>
+
+                                            <article id="user-verification-request" class="tab-pane">
+                                                <ul class="no-style-list">
+                                                    <table class="table table-hover" style="background:#ffffff;">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Serial No</th>
+                                                            <th>Layer Title</th>
+                                                            <th>Organization</th>
+                                                            <th>Tried</th>
+                                                            <th>Who Requested</th>
+                                                            <th>Date of Request</th>
+                                                            <th>Approve/Deny Layer</th>
+                                                            <!--<th>Denied Layer</th>-->
+                                                        </tr>
+                                                        </thead>
+
+                                                        <tbody id="showallAdminVerificationRequestlayers">
+
+                                                        </tbody>
+
+                                                    </table>
+                                                    <div id="showallAdminVerificationRequestlayerspag">
+
+                                                    </div>
+                                                </ul>
+                                            </article>
+
                                           <article id="approved" class="tab-pane">
                                             <ul class="no-style-list">
                                                     <table class="table table-hover table-striped">
@@ -250,6 +282,32 @@
                                                 </div>
                                             </ul>
                                           </article>
+
+                                            <article id="verified-layers" class="tab-pane" style="background:#ffffff;">
+                                                <ul class="no-style-list">
+                                                    <table class="table table-hover table-striped">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Serial No</th>
+                                                            <th>Layer Title</th>
+                                                            <th>Organization</th>
+                                                            <th>Who Requested</th>
+                                                            <th>Who Verfied</th>
+                                                            <th>Verified Date</th>
+                                                        </tr>
+                                                        </thead>
+
+                                                        <tbody id="allAdminVerified_layers">
+
+                                                        </tbody>
+
+                                                    </table>
+                                                    <div id="showallAdminVerifiedlayerspag_active">
+
+                                                    </div>
+                                                </ul>
+                                            </article>
+
                                         </div>
                                       </div>
                                   </div>
@@ -391,7 +449,7 @@
         function showAdminDraftLayer(targeturl){
             var limit = 25;
             if(targeturl== undefined){
-                var url = "{% url 'api_dispatch_list' api_name='api' resource_name='workspace_layer_api' %}?limit="+ limit +"&resource_state=user_approval_request_list&user_type=admin";
+                var url = "{% url 'api_dispatch_list' api_name='api' resource_name='workspace_layer_api' %}?limit="+ limit +"&resource_state=user_verification_request_list&user_type=admin";
             }
             else{
                 var url = targeturl;
@@ -428,7 +486,7 @@
                     output+='<td>'+ item.owner +'</td>';
                     output+='<td>'+ item.date_updated +'</td>';
                       {% if FRONT_END_SETTINGS.attribute_permission %}
-                          output+='<td><a href="'+ item.detail_url +'/preview" class="btn btn-gd-primary">{% trans "Continue to Approve/Deny" %}</a></td>';
+                          output+='<td><a href="'+ item.detail_url +'/preview" class="btn btn-gd-primary">{% trans "Continue to Verify/Deny" %}</a></td>';
                       {% else %}
                           output+='<td><a href="'+ item.detail_url +'?user_role=manager" class="btn btn-gd-primary">{% trans "Continue to Approve/Deny" %}</a></td>';
                       {% endif %}
@@ -469,6 +527,95 @@
             showAdminDraftLayer();
         });
  </script>
+
+
+    <script type="text/javascript" language="JavaScript">
+        function showAdminVerifiedLayer(targeturl) {
+            var limit = 25;
+            if (targeturl == undefined) {
+                var url = "{% url 'api_dispatch_list' api_name='api' resource_name='workspace_layer_api' %}?limit=" + limit + "&resource_state=user_approval_request_list&user_type=admin";
+            }
+            else {
+                var url = targeturl;
+            }
+            //var url = "{% url 'api_dispatch_list' api_name='api' resource_name='group_activity' %}?limit="+ Plimit +"&group={{ object.slug }}";
+            $.ajax({
+                cache: true,
+                type: 'GET',
+                url: url,
+                data: {},
+                dataType: "json",
+                success: function (jsondata) {
+                    console.log("success");
+                    //console.log(JSON.stringify(jsondata));
+                    var data = eval(jsondata.objects);
+                    var meta = eval(jsondata.meta);
+                    var t_count = meta.total_count;
+                    var t_limit = meta.limit;
+                    var t_offset = meta.offset;
+                    var t_next = meta.next;
+                    var t_previous = meta.previous;
+                    //alert(t_offset);
+                    var output = '';
+                    var outputpag = '';
+                    var offset = meta.offset;
+                    $.each(data, function (i, item) {
+                        offset = offset + 1;
+                        output += '<tr>';
+
+                        output += '<td>' + offset + '</td>';
+                        output += '<td><a href=' + item.detail_url + '>' + item.title + '</a></td>';
+                        output += '<td>' + item.group + '</td>';
+                        output += '<td>' + item.current_iteration + '</td>';
+                        output += '<td>' + item.owner + '</td>';
+                        output += '<td>' + item.date_updated + '</td>';
+                        {% if FRONT_END_SETTINGS.attribute_permission %}
+                            output += '<td><a href="' + item.detail_url + '/preview" class="btn btn-gd-primary">{% trans "Continue to Approve/Deny" %}</a></td>';
+                        {% else %}
+                            output += '<td><a href="' + item.detail_url + '?user_role=manager" class="btn btn-gd-primary">{% trans "Continue to Approve/Deny" %}</a></td>';
+                        {% endif %}
+
+                        output += '</tr>';
+                    });
+                    outputpag += '<div>';
+                    outputpag += '<nav>';
+                    outputpag += '<ul class="pagination pull-left">';
+                    var nexturl = meta.next;
+                    //alert(t_count);
+                    var previousurl = meta.previous;
+                    if (previousurl) {
+                        outputpag += '<li><a href="javascript:;" id="previousManagerVerifiedlayers"><strong><i class="fa fa-angle-left"> <span>Previous</span></i></strong></a></li>';
+                    }
+                    if (nexturl) {
+                        outputpag += '<li><a href="javascript:;" id="nextManagerVerifiedlayers"><strong><span>Next</span> <i class="fa fa-angle-right"></i></strong></a></li>';
+                    }
+                    outputpag += '</ul>';
+                    outputpag += '</nav>';
+                    outputpag += '</div>';
+                    $("#showallAdminVerificationRequestlayers").html(output);
+                    $("#showallAdminVerificationRequestlayerspag").html(outputpag);
+                    $("#nextManagerVerifiedlayers").click(function () {
+                        showAdminDraftLayer(nexturl)
+                    });
+                    $("#previousManagerVerifiedlayers").click(function () {
+                        showAdminDraftLayer(previousurl)
+                    });
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console.log("error");
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $("#user_verification_request").click(function () {
+                showAdminVerifiedLayer();
+            });
+        });
+    </script>
+
+
+
 <script type="text/javascript" language="JavaScript">
         function showAdminDatalayers_pending(targeturl){
             var limit = 25;
@@ -712,6 +859,87 @@
                 });
          });
  </script>
+
+<script type="text/javascript" language="JavaScript">
+        function showAdminDatalayers_verified(targeturl) {
+            var limit = 25;
+            if (targeturl == undefined) {
+                var url = "{% url 'api_dispatch_list' api_name='api' resource_name='workspace_layer_api' %}?limit=" + limit + "&resource_state=verified_list&user_type=admin";
+            }
+            else {
+                var url = targeturl;
+            }
+            //var url = "{% url 'api_dispatch_list' api_name='api' resource_name='group_activity' %}?limit="+ Plimit +"&group={{ object.slug }}";
+            $.ajax({
+                cache: true,
+                type: 'GET',
+                url: url,
+                data: {},
+                dataType: "json",
+                success: function (jsondata) {
+                    console.log("success");
+                    console.log(JSON.stringify(jsondata));
+                    var data = eval(jsondata.objects);
+                    var meta = eval(jsondata.meta);
+                    var t_count = meta.total_count;
+                    var t_limit = meta.limit;
+                    var t_offset = meta.offset;
+                    var t_next = meta.next;
+                    var t_previous = meta.previous;
+                    //alert(t_offset);
+                    var output = '';
+                    var outputpag = '';
+                    var i = 1;
+                    var offset = meta.offset;
+                    $.each(data, function (i, item) {
+                        offset = offset + 1;
+                        output += '<tr>';
+                        output += '<td>' + offset + '</td>';
+                        output += '<td><a href="' + item.detail_url + '">' + item.title + '</a></td>';
+                        output += '<td>' + item.group + '</td>';
+                        output += '<td>' + item.owner + '</td>';
+                        output += '<td>' + item.last_auditor + '</td>';
+                        output += '<td>' + item.date_updated + '</td>';
+                        output += '</tr>';
+                    });
+                    outputpag += '<div>';
+                    outputpag += '<nav>';
+                    outputpag += '<ul class="pagination pull-left">';
+                    var nexturl = meta.next;
+                    //alert(t_count);
+                    var previousurl = meta.previous;
+                    if (previousurl) {
+                        outputpag += '<li><a href="javascript:;" id="previousAdminVerifiedlayers_active"><strong><i class="fa fa-angle-left"> <span>Previous</span></i></strong></a></li>';
+                    }
+                    if (nexturl) {
+                        outputpag += '<li><a href="javascript:;" id="nextAdminVerifiedlayers_active"><strong><span>Next</span> <i class="fa fa-angle-right"></i></strong></a></li>';
+                    }
+                    outputpag += '</ul>';
+                    outputpag += '</nav>';
+                    outputpag += '</div>';
+                    $("#allAdminVerified_layers").html(output);
+                    $("#showallAdminVerifiedlayerspag_active").html(outputpag);
+                    $("#nextAdminVerifiedlayers_active").click(function () {
+                        showAdminDatalayers_verified(nexturl)
+                    });
+                    $("#previousAdminVerifiedlayers_active").click(function () {
+                        showAdminDatalayers_verified(previousurl)
+                    });
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console.log("error");
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $("#admin_verified_list").click(function () {
+                showAdminDatalayers_verified();
+            });
+        });
+</script>
+
+
 {% endblock %}
 
 

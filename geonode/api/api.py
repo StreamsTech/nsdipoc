@@ -1133,7 +1133,6 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
             return HttpResponse(json.dumps(out), content_type='application/json', status=200)
 
         if request.method == 'POST':
-          
             out = {'success': False}
             layer_pk = json.loads(request.body).get('layer_pk')
             permissions = json.loads(request.body).get('permissions')
@@ -1169,8 +1168,8 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                 layer_submission_activity.is_audited = True
                 layer_submission_activity.save()
 
-                layer_audit_activity.comment_subject = comment_subject
-                layer_audit_activity.comment_body = comment_body
+                layer_audit_activity.comment_subject = comment_subject or "Great work"
+                layer_audit_activity.comment_body = comment_body or "Layer verified"
                 layer_audit_activity.result = status
                 layer_audit_activity.auditor = request.user
                 layer_audit_activity.save()
@@ -1208,9 +1207,14 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                 layer_submission_activity.is_audited = True
                 layer_submission_activity.save()
 
-                layer_audit_activity.comment_subject = comment_subject
-                layer_audit_activity.comment_body = comment_body
-                layer_audit_activity.result = status
+                layer_audit_activity.comment_subject = comment_subject or "Great work"
+                layer_audit_activity.comment_body = comment_body or "Layer verified"
+
+                if status == "VERIFIED":
+                    layer_audit_activity.result = 'APPROVED'
+                if status == "DENIED":
+                    layer_audit_activity.result = 'DECLINED'
+
                 layer_audit_activity.auditor = request.user
                 layer_audit_activity.save()
 
@@ -1222,7 +1226,7 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                 #admins to approve this layer
                 if status == "VERIFIED":
                     working_group_admins = Profile.objects.filter(is_working_group_admin=True)
-                    notify.send(request.user, recipient_list=working_group_admins, actor=request.user,
+                    notify.send(request.user, recipient_list=list(working_group_admins), actor=request.user,
                                 target=layer, verb='pushed a new layer for approval')
 
 

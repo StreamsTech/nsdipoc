@@ -981,12 +981,13 @@ class WorkSpaceLayerApi(ModelResource):
             resource_state = request.GET.get('resource_state')
             resource_type = 'layer'
             user = request.user
+            group = GroupProfile.objects.filter(groupmember__user=request.user).exclude(slug='working-group')[0]
 
             if user_type == 'admin':
                 if user.is_manager_of_any_group:
                     # groups = GroupProfile.objects.filter(groupmember__user=user, groupmember__role='manager')
                     if resource_type == 'layer':
-                        if resource_state == 'user_approval_request_list':
+                        if resource_state == 'user_verification_request_list':
                             return super(WorkSpaceLayerApi, self).get_object_list(request).filter(status='PENDING').order_by('date_updated')
                         elif resource_state == 'approved_list':
                             return super(WorkSpaceLayerApi, self).get_object_list(request).filter(status='ACTIVE').order_by('date_updated')
@@ -994,9 +995,12 @@ class WorkSpaceLayerApi(ModelResource):
                             return super(WorkSpaceLayerApi, self).get_object_list(request).filter(status='DRAFT').order_by('date_updated')
                         elif resource_state == 'denied_list':
                             return super(WorkSpaceLayerApi, self).get_object_list(request).filter(status='DENIED').order_by('date_updated')
-                        elif resource_state == 'verified_list':
+                        elif resource_state == 'user_approval_request_list':
                             return super(WorkSpaceLayerApi, self).get_object_list(request).filter(
                                 status='VERIFIED').order_by('date_updated')
+                        elif resource_state == 'verified_list':
+                            return super(WorkSpaceLayerApi, self).get_object_list(request).filter(
+                                status='VERIFIED', group=group).order_by('date_updated')
                         else:
                             return nothing
                 else:
@@ -1012,6 +1016,10 @@ class WorkSpaceLayerApi(ModelResource):
                         return super(WorkSpaceLayerApi, self).get_object_list(request).filter(owner=user, status='DENIED').order_by('date_updated')
                     elif resource_state == 'active_list':
                         return super(WorkSpaceLayerApi, self).get_object_list(request).filter(owner=user, status='ACTIVE').order_by('date_updated')
+                    elif resource_state == 'verified_list':
+                        return super(WorkSpaceLayerApi, self).get_object_list(request).filter(
+                            status='VERIFIED', group=group).order_by('date_updated')
+
                     else:
                         return nothing
                 else:
