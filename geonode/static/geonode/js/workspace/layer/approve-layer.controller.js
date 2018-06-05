@@ -1,6 +1,25 @@
 (function(){
+    angular.module('layerApp').controller('denyLayerController',
+    function($scope,$modalInstance){
+        $scope.deny={
+            subject: undefined,
+            comment: undefined,
+        };
+        $scope.ok=function () {
+            if($scope.deny.subject && $scope.deny.comment){
+                $modalInstance.close($scope.deny);
+            }
+        };
+
+        $scope.cancel=function () {
+            $modalInstance.dismiss('cancel');
+        }
+    });
+})();
+
+(function(){
     angular.module('layerApp').controller('approveLayerController',
-    function($scope,layerService,uiGridConstants,$window,$q,$timeout){
+    function($scope,layerService,uiGridConstants,$window,$q,$timeout,$modal){
         $scope.layer={};
         $scope.layer_id="";
         $scope.isAdmin=false;
@@ -119,11 +138,19 @@
             $scope.layer_id=layerId;
             $scope.userRole= (userRole == 'True' || userRole=='true');
         };
-        $scope.poniterDisable = {
-            'pointer-events' : 'none'
-        };
-        $scope.poniterEnable = {
-            'pointer-events' : 'all'
+        $scope.openDenyModal=function () {
+            $modal.open({
+                templateUrl: 'denyModalContent.html',
+                backdrop: 'static',
+                keyboard: false,
+                controller: 'denyLayerController'
+            }).result.then(function(result) {
+                var data = getPostLayerDataInformation();
+                data.status = "DENIED";
+                data.comment = result.comment;
+                data.comment_subject= result.subject;
+                postLayerData($scope.layerApprovalUrl, data);
+            });
         }
     });
 })();
