@@ -1202,7 +1202,8 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                     attr.save()
 
                 # set working group admins permissions for this layer
-                layer.set_working_group_permissions(group=layer.group)
+                w_group = GroupProfile.objects.get(slug='working-group')
+                layer.set_working_group_permissions(group=w_group)
 
                 layer_submission_activity.is_audited = True
                 layer_submission_activity.save()
