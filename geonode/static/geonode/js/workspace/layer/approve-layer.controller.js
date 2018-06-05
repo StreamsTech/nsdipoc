@@ -3,7 +3,7 @@
     function($scope,$modalInstance){
         $scope.deny={
             subject: undefined,
-            comment: undefined,
+            comment: undefined
         };
         $scope.ok=function () {
             if($scope.deny.subject && $scope.deny.comment){
@@ -26,6 +26,7 @@
         $scope.departments=[];
         $scope.gridApi={};
         $scope.isDisabledButton=false;
+        $scope.denyLoader=false;
         $scope.layerApprovalUrl="/api/layer-attribute-permission-set/";
         $scope.gridOption = {
             enableRowSelection: true,
@@ -69,10 +70,10 @@
         }
 
         function postLayerData(url,data){
-            $scope.isDisabledButton=true;
             layerService.submitLayerInformation(url,data).then(function(response){
                 document.location.href="/layers/";
                 $scope.isDisabledButton=false;
+                $scope.denyLoader=false;
             },function(error){
                 $scope.isDisabledButton=false;
                 console.log(error);
@@ -83,17 +84,20 @@
         $scope.submitforVerify=function(){
             var data=getPostLayerDataInformation();
             data.status="PENDING";
+            $scope.isDisabledButton=true;
             postLayerData($scope.layerApprovalUrl,data);
         };
 
         $scope.verifyLayer=function(){
             var data=getPostLayerDataInformation();
             data.status="VERIFIED";
+            $scope.isDisabledButton=true;
             postLayerData($scope.layerApprovalUrl,data);
         };
         $scope.approveLayer=function () {
             var data=getPostLayerDataInformation();
             data.status="ACTIVE";
+            $scope.isDisabledButton=true;
             postLayerData($scope.layerApprovalUrl,data);
         };
 
@@ -149,6 +153,7 @@
                 data.status = "DENIED";
                 data.comment = result.comment;
                 data.comment_subject= result.subject;
+                $scope.denyLoader=true;
                 postLayerData($scope.layerApprovalUrl, data);
             });
         }

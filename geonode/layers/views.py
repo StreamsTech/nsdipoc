@@ -1393,7 +1393,7 @@ def layer_permission_preview(request, layername, template='layers/layer_attribut
 
     if request.method == 'GET':
         user_state = None
-        if request.user == layer.owner and layer.status == 'DRAFT':
+        if request.user == layer.owner and (layer.status == 'DRAFT' or layer.status == 'DENIED'):
             user_state = "user"
         elif request.user in layer.group.get_managers() and layer.status == "PENDING":
             user_state = "manager"
@@ -1409,9 +1409,8 @@ def layer_permission_preview(request, layername, template='layers/layer_attribut
         ctx = {
             'layer': layer,
             'organizations': GroupProfile.objects.all(),
-            'user_state': user_state
-
-
+            'user_state': user_state,
+            "denied_comments": LayerAuditActivity.objects.filter(layer_submission_activity__layer=layer)
         }
         return render_to_response(template, RequestContext(request, ctx))
 

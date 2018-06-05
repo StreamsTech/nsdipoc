@@ -1201,9 +1201,7 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
 
                     attr.save()
 
-                # set working group admins permissions for this layer
-                w_group = GroupProfile.objects.get(slug='working-group')
-                layer.set_working_group_permissions(group=w_group)
+
 
                 layer_submission_activity.is_audited = True
                 layer_submission_activity.save()
@@ -1212,6 +1210,9 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                 layer_audit_activity.comment_body = comment_body or "Layer verified"
 
                 if status == "VERIFIED":
+                    # set working group admins permissions for this layer
+                    w_group = GroupProfile.objects.get(slug='working-group')
+                    layer.set_working_group_permissions(group=w_group)
                     layer_audit_activity.result = 'APPROVED'
                 if status == "DENIED":
                     layer_audit_activity.result = 'DECLINED'
