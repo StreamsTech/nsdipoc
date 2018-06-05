@@ -552,7 +552,7 @@ def new_map_json(request):
         category_id = int(data['about']['category'])
         # organization_id = int(data['about']['organization'])
         # group = GroupProfile.objects.get(id=organization_id)
-        group = GroupProfile.objects.get(groupmember__user=request.user).exclude(slug='working-group')[0]
+        group = GroupProfile.objects.filter(groupmember__user=request.user).exclude(slug='working-group')[0]
 
 
         map_obj = Map(owner=request.user, zoom=0,
@@ -1408,18 +1408,42 @@ class MapLayerRetrieveUpdateAPIView(RetrieveUpdateAPIView):
 
 def map_permission_preview(request, mapid, template='maps/map_attribute_permissions_preview.html'):
 
-    try:
-        map = Map.objects.get(id=mapid)
-    except Map.DoesNotExist:
-        raise Http404('requested map does not exist')
+    # try:
+    #     map = Map.objects.get(id=mapid)
+    # except Map.DoesNotExist:
+    #     raise Http404('requested map does not exist')
+    #
+    # if request.method == 'GET':
+    #     if request.user == map.owner:
+    #         if map.status == 'DRAFT':
+    #             pass
+    #     elif request.user.is_working_group_admin:
+    #         if map.status == 'PENDING':
+    #             pass
+    #     else:
+    #         return HttpResponse(
+    #             loader.render_to_string(
+    #                 '401.html', RequestContext(
+    #                     request, {
+    #                         'error_message': _("You dont have permission to edit this map.")})), status=401)
+    #
+    #     ctx = {
+    #         'map': map,
+    #         'organizations': GroupProfile.objects.all(),
+    #
+    #
+    #     }
+    #     return render_to_response(template, RequestContext(request, ctx))
+    map = _resolve_map(request, mapid, 'base.view_resourcebase', _PERMISSION_MSG_VIEW)
 
     if request.method == 'GET':
-        if request.user == map.owner:
-            if map.status == 'DRAFT':
-                pass
-        elif request.user.is_working_group_admin:
-            if map.status == 'PENDING':
-                pass
+        user_state = None
+        if request.user == map.owner and map.status == 'DRAFT':
+            user_state = "user"
+        elif request.user in map.group.get_managers() and map.status == "PENDING":
+            user_state = "manager"
+        elif request.user.is_working_group_admin and map.status == "VERIFIED":
+            user_state = "admin"
         else:
             return HttpResponse(
                 loader.render_to_string(
@@ -1430,7 +1454,7 @@ def map_permission_preview(request, mapid, template='maps/map_attribute_permissi
         ctx = {
             'map': map,
             'organizations': GroupProfile.objects.all(),
-
+            'user_state': user_state
 
         }
         return render_to_response(template, RequestContext(request, ctx))
