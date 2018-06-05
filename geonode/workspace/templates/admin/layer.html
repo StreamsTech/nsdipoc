@@ -143,7 +143,9 @@
                                       <div id="viewuserlist_none">
                                             <ul class="nav nav-tabs">
                                               <li class="active"><a href="#user-approval-request" data-toggle="tab">{% trans "User Verification Request" %}</a></li>
-                                              <li><a href="#user-verification-request" data-toggle="tab" id="user_verification_request">{% trans "User Approval Request" %}</a></li>
+                                                {% if request.user.is_working_group_admin %}
+                                                    <li><a href="#user-verification-request" data-toggle="tab" id="user_verification_request">{% trans "User Approval Request" %}</a></li>
+                                                {% endif %}
                                               <li><a href="#approved" id="Approved_list_layers_admin" data-toggle="tab">{% trans "Approved" %}</a></li>
                                               <li><a href="#user-drafts" id="Admin_userdraft" data-toggle="tab">{% trans "User Drafts" %}</a></li>
                                               <li><a href="#denied-layers" id="Admin_dined_list" data-toggle="tab">{% trans "Denied Layers" %}</a></li>
@@ -178,33 +180,35 @@
                                                 </div>
                                             </ul>
                                           </article>
+                                            {% if  request.user.is_working_group_admin %}
+                                                <article id="user-verification-request" class="tab-pane">
+                                                    <ul class="no-style-list">
+                                                        <table class="table table-hover" style="background:#ffffff;">
+                                                            <thead>
+                                                            <tr>
+                                                                <th>Serial No</th>
+                                                                <th>Layer Title</th>
+                                                                <th>Organization</th>
+                                                                <th>Tried</th>
+                                                                <th>Who Requested</th>
+                                                                <th>Date of Request</th>
+                                                                <th>Approve/Deny Layer</th>
+                                                                <!--<th>Denied Layer</th>-->
+                                                            </tr>
+                                                            </thead>
 
-                                            <article id="user-verification-request" class="tab-pane">
-                                                <ul class="no-style-list">
-                                                    <table class="table table-hover" style="background:#ffffff;">
-                                                        <thead>
-                                                        <tr>
-                                                            <th>Serial No</th>
-                                                            <th>Layer Title</th>
-                                                            <th>Organization</th>
-                                                            <th>Tried</th>
-                                                            <th>Who Requested</th>
-                                                            <th>Date of Request</th>
-                                                            <th>Approve/Deny Layer</th>
-                                                            <!--<th>Denied Layer</th>-->
-                                                        </tr>
-                                                        </thead>
+                                                            <tbody id="showallAdminVerificationRequestlayers">
 
-                                                        <tbody id="showallAdminVerificationRequestlayers">
+                                                            </tbody>
 
-                                                        </tbody>
+                                                        </table>
+                                                        <div id="showallAdminVerificationRequestlayerspag">
 
-                                                    </table>
-                                                    <div id="showallAdminVerificationRequestlayerspag">
+                                                        </div>
+                                                    </ul>
+                                                </article>
+                                            {% endif %}
 
-                                                    </div>
-                                                </ul>
-                                            </article>
 
                                           <article id="approved" class="tab-pane">
                                             <ul class="no-style-list">
@@ -607,11 +611,13 @@
             });
         }
 
-        $(document).ready(function () {
-            $("#user_verification_request").click(function () {
-                showAdminVerifiedLayer();
+        {% if  request.user.is_working_group_admin %}
+            $(document).ready(function () {
+                $("#user_verification_request").click(function () {
+                    showAdminVerifiedLayer();
+                });
             });
-        });
+        {% endif %}
     </script>
 
 
