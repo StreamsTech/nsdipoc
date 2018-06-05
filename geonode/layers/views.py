@@ -1410,7 +1410,7 @@ def layer_permission_preview(request, layername, template='layers/layer_attribut
             'layer': layer,
             'organizations': GroupProfile.objects.all(),
             'user_state': user_state,
-            "denied_comments": LayerAuditActivity.objects.filter(layer_submission_activity__layer=layer)
+            "denied_comments": LayerAuditActivity.objects.filter(layer_submission_activity__layer=layer).order_by('-date_updated')
         }
         return render_to_response(template, RequestContext(request, ctx))
 
