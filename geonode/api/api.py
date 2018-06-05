@@ -1274,6 +1274,160 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
         return HttpResponse(json.dumps(out), content_type='application/json', status=200)
 
 
+class MapPermissionPreviewApi(TypeFilteredResource):
+
+    class Meta:
+        resource_name = 'map-attribute-permission-set'
+        allowed_methods = ['post']
+        authorization = GeoNodeAuthorization()
+
+    def dispatch(self, request_type, request, **kwargs):
+        out = {'success': False}
+        if not request.user.is_authenticated():
+            out['errors'] = 'User is not authenticated'
+            return HttpResponse(json.dumps(out), content_type='application/json', status=200)
+
+        if request.method == 'POST':
+            out = {'success': False}
+            map_pk = json.loads(request.body).get('map_pk')
+            permissions = json.loads(request.body).get('permissions')
+            attributes = json.loads(request.body).get('attributes')
+            status = json.loads(request.body).get('status')
+            comment_body = json.loads(request.body).get('comment')
+            comment_subject = json.loads(request.body).get('comment_subject')
+            try:
+                map = Map.objects.get(id=map_pk)
+            except:
+                out['errors'] = 'No map found with this map pk'
+                return HttpResponse(json.dumps(out), content_type='application/json', status=200)
+
+            if request.user.is_working_group_admin and status in ["ACTIVE", "DENIED"]:
+                map_submission_activity = MapSubmissionActivity.objects.get(
+                    map=map, group=map.group, iteration=map.current_iteration)
+                map_audit_activity = MapAuditActivity(
+                    map_submission_activity=map_submission_activity)
+                map.status = status
+                map.last_auditor = request.user
+                map.save()
+
+                verb = ""
+                if status == "ACTIVE":
+                    verb = "approved"
+                elif status == "DENIED":
+                    verb = "denied"
+
+                # notify map owner that someone have approved the map
+                notify.send(request.user, recipient=map.owner, actor=request.user,
+                                target=map, verb='{0} your map'.format(verb))
+
+                map_submission_activity.is_audited = True
+                map_submission_activity.save()
+
+                map_audit_activity.comment_subject = comment_subject or "Great work"
+                map_audit_activity.comment_body = comment_body or "Map verified"
+                map_audit_activity.result = status
+                map_audit_activity.auditor = request.user
+                map_audit_activity.save()
+
+            elif request.user in map.group.get_managers() and status in ["VERIFIED", "DENIED"]:
+                map_submission_activity = MapSubmissionActivity.objects.get(
+                    map=map, group=map.group, iteration=map.current_iteration)
+
+                #create a new audit activity
+                map_audit_activity = MapAuditActivity(
+                    map_submission_activity=map_submission_activity)
+
+                #set map status
+                map.status = status
+                map.last_auditor = request.user
+                map.save()
+
+                # set permissions
+                if permissions is not None and len(permissions.keys()) > 0:
+                    map.set_permissions(permissions)
+
+                # set attribute level prmissions
+                # map_attributes = Attribute.objects.filter(map=map)
+                # for attr in map_attributes:
+                #     if attr.id in attributes:
+                #         attr.is_permitted = True
+                #     else:
+                #         attr.is_permitted = False
+                #
+                #     attr.save()
+
+                # set working group admins permissions for this map
+                map.set_working_group_permissions(group=map.group)
+
+                map_submission_activity.is_audited = True
+                map_submission_activity.save()
+
+                map_audit_activity.comment_subject = comment_subject or "Great work"
+                map_audit_activity.comment_body = comment_body or "Map verified"
+
+                if status == "VERIFIED":
+                    map_audit_activity.result = 'APPROVED'
+                if status == "DENIED":
+                    map_audit_activity.result = 'DECLINED'
+
+                map_audit_activity.auditor = request.user
+                map_audit_activity.save()
+
+                # notify map owner that manager have verified the map
+                notify.send(request.user, recipient=map.owner, actor=request.user,
+                            target=map, verb='{0} your map'.format(status))
+
+                #if the map is verified, the inform working group
+                #admins to approve this map
+                if status == "VERIFIED":
+                    working_group_admins = Profile.objects.filter(is_working_group_admin=True)
+                    notify.send(request.user, recipient_list=list(working_group_admins), actor=request.user,
+                                target=map, verb='pushed a new map for approval')
+
+
+            elif request.user ==  map.owner and status == "PENDING":
+
+                #set map status
+                map.status = status
+                #increase iteration
+                map.current_iteration += 1
+                #save map
+                map.save()
+                #create map submission activity
+                map_submission_activity = MapSubmissionActivity(
+                    map=map, group=map.group, iteration=map.current_iteration)
+                map_submission_activity.save()
+
+                #set permissions
+                if permissions is not None and len(permissions.keys()) > 0:
+                    map.set_permissions(permissions)
+
+                #set attribute level prmissions
+                map_attributes = Attribute.objects.filter(map=map)
+                for attr in map_attributes:
+                    if attr.id in attributes:
+                        attr.is_permitted = True
+                    else:
+                        attr.is_permitted = False
+
+                    attr.save()
+
+                #set manager permissions for this map
+                map.set_managers_permissions(manager=map.group.get_managers().first())
+
+                # notify organization admin about the new published map
+                notify.send(request.user, recipient=map.group.get_managers().first(), actor=request.user,
+                                verb='pushed a new map for verification', target=map)
+                out['success'] = True
+
+            else:
+                out['errors'] = 'You dont have permission to perform this action'
+        else:
+            out['errors'] = 'Only post method is permitted'
+        return HttpResponse(json.dumps(out), content_type='application/json', status=200)
+
+
+
 class ResourcePermissionPreviewApi(TypeFilteredResource):
     class Meta:
         resource_name = 'resource-attribute-permission-set'
