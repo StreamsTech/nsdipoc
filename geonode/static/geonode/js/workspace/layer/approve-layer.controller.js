@@ -76,6 +76,7 @@
                 $scope.denyLoader=false;
             },function(error){
                 $scope.isDisabledButton=false;
+                $scope.denyLoader=false;
                 console.log(error);
             });
         }
