@@ -1019,6 +1019,7 @@ class WorkSpaceLayerApi(ModelResource):
                     elif resource_state == 'verified_list':
                         return super(WorkSpaceLayerApi, self).get_object_list(request).filter(
                             status='VERIFIED',owner=user).order_by('date_updated')
+
                     else:
                         return nothing
                 else:
