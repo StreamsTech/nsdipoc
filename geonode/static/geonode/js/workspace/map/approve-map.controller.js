@@ -1,9 +1,29 @@
 (function(){
+    angular.module('mapPermissionApp').controller('denyMapController',
+    function($scope,$modalInstance){
+        $scope.deny={
+            subject: undefined,
+            comment: undefined
+        };
+        $scope.ok=function () {
+            if($scope.deny.subject && $scope.deny.comment){
+                $modalInstance.close($scope.deny);
+            }
+        };
+
+        $scope.cancel=function () {
+            $modalInstance.dismiss('cancel');
+        }
+    });
+})();
+(function(){
     angular.module('mapPermissionApp').controller('approveMapController',
-    function($scope,mapPermissionService,uiGridConstants,$window,$q,$timeout){
+    function($scope,mapPermissionService,$modal){
         $scope.mapId="";
         $scope.isAdmin=false;
         $scope.departments=[];
+        $scope.denyLoader=false;
+        $scope.isDisabledButton = false;
         $scope.layerApprovalUrl="/api/resource-attribute-permission-set/";
 
         function getPostLayerDataInformation(){
@@ -39,18 +59,26 @@
         }
 
 
-        $scope.approveLayer=function(){
+        $scope.submitforVerify=function(){
             var data=getPostLayerDataInformation();
             data.status="PENDING";
+            $scope.isDisabledButton=true;
             postLayerData($scope.layerApprovalUrl,data);
         };
 
-        $scope.publishLayer=function(){
+        $scope.verifyLayer=function(){
             var data=getPostLayerDataInformation();
-            data.status="ACTIVE";
-            console.log(data);
+            data.status="VERIFIED";
+            $scope.isDisabledButton=true;
             postLayerData($scope.layerApprovalUrl,data);
         };
+        $scope.approveLayer=function () {
+            var data=getPostLayerDataInformation();
+            data.status="ACTIVE";
+            $scope.isDisabledButton=true;
+            postLayerData($scope.layerApprovalUrl,data);
+        };
+
         angular.isUndefinedOrNull = function(val) {
             return angular.isUndefined(val) || val === null ;
         };
@@ -69,5 +97,20 @@
             $scope.mapId=mapId;
             $scope.userRole= (userRole == 'True' || userRole=='true');
         };
+        $scope.openDenyModal=function () {
+            $modal.open({
+                templateUrl: 'denyModalContent.html',
+                backdrop: 'static',
+                keyboard: false,
+                controller: 'denyMapController'
+            }).result.then(function(result) {
+                var data = getPostLayerDataInformation();
+                data.status = "DENIED";
+                data.comment = result.comment;
+                data.comment_subject= result.subject;
+                $scope.denyLoader=true;
+                postLayerData($scope.layerApprovalUrl, data);
+            });
+        }
     });
 })();
