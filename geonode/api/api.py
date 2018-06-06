@@ -1253,19 +1253,6 @@ class MapPermissionPreviewApi(TypeFilteredResource):
                 if permissions is not None and len(permissions.keys()) > 0:
                     map.set_permissions(permissions)
 
-                # set attribute level prmissions
-                # map_attributes = Attribute.objects.filter(map=map)
-                # for attr in map_attributes:
-                #     if attr.id in attributes:
-                #         attr.is_permitted = True
-                #     else:
-                #         attr.is_permitted = False
-                #
-                #     attr.save()
-
-                # set working group admins permissions for this map
-                map.set_working_group_permissions(group=map.group)
-
                 map_submission_activity.is_audited = True
                 map_submission_activity.save()
 
@@ -1273,6 +1260,9 @@ class MapPermissionPreviewApi(TypeFilteredResource):
                 map_audit_activity.comment_body = comment_body or "Map verified"
 
                 if status == "VERIFIED":
+                    # set working group admins permissions for this map
+                    w_group = GroupProfile.objects.get(slug='working-group')
+                    map.set_working_group_permissions(group=w_group)
                     map_audit_activity.result = 'APPROVED'
                 if status == "DENIED":
                     map_audit_activity.result = 'DECLINED'
@@ -1309,18 +1299,8 @@ class MapPermissionPreviewApi(TypeFilteredResource):
                 if permissions is not None and len(permissions.keys()) > 0:
                     map.set_permissions(permissions)
 
-                #set attribute level prmissions
-                map_attributes = Attribute.objects.filter(map=map)
-                for attr in map_attributes:
-                    if attr.id in attributes:
-                        attr.is_permitted = True
-                    else:
-                        attr.is_permitted = False
-
-                    attr.save()
-
                 #set manager permissions for this map
-                map.set_managers_permissions(manager=map.group.get_managers().first())
+                    map.set_managers_permissions(manager=map.group.get_managers().first())
 
                 # notify organization admin about the new published map
                 notify.send(request.user, recipient=map.group.get_managers().first(), actor=request.user,
@@ -1333,6 +1313,138 @@ class MapPermissionPreviewApi(TypeFilteredResource):
             out['errors'] = 'Only post method is permitted'
         return HttpResponse(json.dumps(out), content_type='application/json', status=200)
 
+
+class DocumentPermissionPreviewApi(TypeFilteredResource):
+
+    class Meta:
+        resource_name = 'document-attribute-permission-set'
+        allowed_methods = ['post']
+        authorization = GeoNodeAuthorization()
+
+    def dispatch(self, request_type, request, **kwargs):
+        out = {'success': False}
+        if not request.user.is_authenticated():
+            out['errors'] = 'User is not authenticated'
+            return HttpResponse(json.dumps(out), content_type='application/json', status=200)
+
+        if request.method == 'POST':
+            out = {'success': False}
+            document_pk = json.loads(request.body).get('document_pk')
+            permissions = json.loads(request.body).get('permissions')
+            attributes = json.loads(request.body).get('attributes')
+            status = json.loads(request.body).get('status')
+            comment_body = json.loads(request.body).get('comment')
+            comment_subject = json.loads(request.body).get('comment_subject')
+            try:
+                document = Document.objects.get(id=document_pk)
+            except:
+                out['errors'] = 'No document found with this document pk'
+                return HttpResponse(json.dumps(out), content_type='application/json', status=200)
+
+            if request.user.is_working_group_admin and status in ["ACTIVE", "DENIED"]:
+                document_submission_activity = DocumentSubmissionActivity.objects.get(
+                    document=document, group=document.group, iteration=document.current_iteration)
+                document_audit_activity = DocumentAuditActivity(
+                    document_submission_activity=document_submission_activity)
+                document.status = status
+                document.last_auditor = request.user
+                document.save()
+
+                verb = ""
+                if status == "ACTIVE":
+                    verb = "approved"
+                elif status == "DENIED":
+                    verb = "denied"
+
+                # notify document owner that someone have approved the document
+                notify.send(request.user, recipient=document.owner, actor=request.user,
+                                target=document, verb='{0} your document'.format(verb))
+
+                document_submission_activity.is_audited = True
+                document_submission_activity.save()
+
+                document_audit_activity.comment_subject = comment_subject or "Great work"
+                document_audit_activity.comment_body = comment_body or "Document verified"
+                document_audit_activity.result = status
+                document_audit_activity.auditor = request.user
+                document_audit_activity.save()
+
+            elif request.user in document.group.get_managers() and status in ["VERIFIED", "DENIED"]:
+                document_submission_activity = DocumentSubmissionActivity.objects.get(
+                    document=document, group=document.group, iteration=document.current_iteration)
+
+                #create a new audit activity
+                document_audit_activity = DocumentAuditActivity(
+                    document_submission_activity=document_submission_activity)
+
+                #set document status
+                document.status = status
+                document.last_auditor = request.user
+                document.save()
+
+                # set permissions
+                if permissions is not None and len(permissions.keys()) > 0:
+                    document.set_permissions(permissions)
+
+                document_submission_activity.is_audited = True
+                document_submission_activity.save()
+
+                document_audit_activity.comment_subject = comment_subject or "Great work"
+                document_audit_activity.comment_body = comment_body or "Document verified"
+
+                if status == "VERIFIED":
+                    # set working group admins permissions for this document
+                    w_group = GroupProfile.objects.get(slug='working-group')
+                    document.set_working_group_permissions(group=w_group)
+                    document_audit_activity.result = 'APPROVED'
+                if status == "DENIED":
+                    document_audit_activity.result = 'DECLINED'
+
+                document_audit_activity.auditor = request.user
+                document_audit_activity.save()
+
+                # notify document owner that manager have verified the document
+                notify.send(request.user, recipient=document.owner, actor=request.user,
+                            target=document, verb='{0} your document'.format(status))
+
+                #if the document is verified, the inform working group
+                #admins to approve this document
+                if status == "VERIFIED":
+                    working_group_admins = Profile.objects.filter(is_working_group_admin=True)
+                    notify.send(request.user, recipient_list=list(working_group_admins), actor=request.user,
+                                target=document, verb='pushed a new document for approval')
+
+
+            elif request.user ==  document.owner and status == "PENDING":
+
+                #set document status
+                document.status = status
+                #increase iteration
+                document.current_iteration += 1
+                #save document
+                document.save()
+                #create document submission activity
+                document_submission_activity = DocumentSubmissionActivity(
+                    document=document, group=document.group, iteration=document.current_iteration)
+                document_submission_activity.save()
+
+                #set permissions
+                if permissions is not None and len(permissions.keys()) > 0:
+                    document.set_permissions(permissions)
+
+                #set manager permissions for this document
+                    document.set_managers_permissions(manager=document.group.get_managers().first())
+
+                # notify organization admin about the new published document
+                notify.send(request.user, recipient=document.group.get_managers().first(), actor=request.user,
+                                verb='pushed a new document for verification', target=document)
+                out['success'] = True
+
+            else:
+                out['errors'] = 'You dont have permission to perform this action'
+        else:
+            out['errors'] = 'Only post method is permitted'
+        return HttpResponse(json.dumps(out), content_type='application/json', status=200)
 
 
 class ResourcePermissionPreviewApi(TypeFilteredResource):

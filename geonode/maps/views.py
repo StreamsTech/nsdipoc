@@ -1438,7 +1438,7 @@ def map_permission_preview(request, mapid, template='maps/map_attribute_permissi
 
     if request.method == 'GET':
         user_state = None
-        if request.user == map.owner and map.status == 'DRAFT':
+        if request.user == map.owner and (map.status == 'DRAFT' or map.status == 'DENIED'):
             user_state = "user"
         elif request.user in map.group.get_managers() and map.status == "PENDING":
             user_state = "manager"
@@ -1454,7 +1454,7 @@ def map_permission_preview(request, mapid, template='maps/map_attribute_permissi
         ctx = {
             'map': map,
             'organizations': GroupProfile.objects.all(),
-            'user_state': user_state
-
+            'user_state': user_state,
+            "denied_comments": MapAuditActivity.objects.filter(map_submission_activity__map=map).order_by('-date_updated')
         }
         return render_to_response(template, RequestContext(request, ctx))
