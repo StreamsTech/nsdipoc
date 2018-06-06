@@ -1,13 +1,33 @@
 (function(){
+    angular.module('layerApp').controller('denyLayerController',
+    function($scope,$modalInstance){
+        $scope.deny={
+            subject: undefined,
+            comment: undefined
+        };
+        $scope.ok=function () {
+            if($scope.deny.subject && $scope.deny.comment){
+                $modalInstance.close($scope.deny);
+            }
+        };
+
+        $scope.cancel=function () {
+            $modalInstance.dismiss('cancel');
+        }
+    });
+})();
+
+(function(){
     angular.module('layerApp').controller('approveLayerController',
-    function($scope,layerService,uiGridConstants,$window,$q,$timeout){
+    function($scope,layerService,uiGridConstants,$window,$q,$timeout,$modal){
         $scope.layer={};
         $scope.layer_id="";
         $scope.isAdmin=false;
         $scope.departments=[];
         $scope.gridApi={};
         $scope.isDisabledButton=false;
-        $scope.layerApprovalUrl="/api/resource-attribute-permission-set/";
+        $scope.denyLoader=false;
+        $scope.layerApprovalUrl="/api/layer-attribute-permission-set/";
         $scope.gridOption = {
             enableRowSelection: true,
             enableSelectAll: true,
@@ -36,7 +56,7 @@
             var permissionAttributes=
           ['view_resourcebase', 'download_resourcebase'];
             var data={};
-            data.resource_pk =$scope.layer_id;
+            data.layer_pk =$scope.layer_id;
             var permittedOrganizations=_.map(_.filter($scope.departments,function(department){
                 return department.IsChecked;
                 }),"slug");
@@ -50,28 +70,38 @@
         }
 
         function postLayerData(url,data){
-            $scope.isDisabledButton=true;
             layerService.submitLayerInformation(url,data).then(function(response){
                 document.location.href="/layers/";
                 $scope.isDisabledButton=false;
+                $scope.denyLoader=false;
             },function(error){
                 $scope.isDisabledButton=false;
+                $scope.denyLoader=false;
                 console.log(error);
             });
         }
 
 
-        $scope.approveLayer=function(){
+        $scope.submitforVerify=function(){
             var data=getPostLayerDataInformation();
             data.status="PENDING";
+            $scope.isDisabledButton=true;
             postLayerData($scope.layerApprovalUrl,data);
         };
 
-        $scope.publishLayer=function(){
+        $scope.verifyLayer=function(){
             var data=getPostLayerDataInformation();
-            data.status="ACTIVE";
+            data.status="VERIFIED";
+            $scope.isDisabledButton=true;
             postLayerData($scope.layerApprovalUrl,data);
         };
+        $scope.approveLayer=function () {
+            var data=getPostLayerDataInformation();
+            data.status="ACTIVE";
+            $scope.isDisabledButton=true;
+            postLayerData($scope.layerApprovalUrl,data);
+        };
+
         angular.isUndefinedOrNull = function(val) {
             return angular.isUndefined(val) || val === null ;
         };
@@ -102,7 +132,8 @@
                      }));
                     var permissions  = Object.keys(JSON.parse(resolutions.permissions.permissions).groups);
                     angular.forEach(permissions,function(permission){
-                        $scope.departments[permission].IsChecked=true;
+                        if($scope.departments[permission])
+                            $scope.departments[permission].IsChecked=true;
                     });
                 });
         }
@@ -112,5 +143,20 @@
             $scope.layer_id=layerId;
             $scope.userRole= (userRole == 'True' || userRole=='true');
         };
+        $scope.openDenyModal=function () {
+            $modal.open({
+                templateUrl: 'denyModalContent.html',
+                backdrop: 'static',
+                keyboard: false,
+                controller: 'denyLayerController'
+            }).result.then(function(result) {
+                var data = getPostLayerDataInformation();
+                data.status = "DENIED";
+                data.comment = result.comment;
+                data.comment_subject= result.subject;
+                $scope.denyLoader=true;
+                postLayerData($scope.layerApprovalUrl, data);
+            });
+        }
     });
 })();

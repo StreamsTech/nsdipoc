@@ -3904,3 +3904,13 @@ footer {
     right: 0;
     top: 0;
 }
+
+.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+
+}
+
+.enabled {
+    pointer-events: all;
+}
