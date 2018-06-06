@@ -1204,16 +1204,16 @@ class WorkSpaceMapApi(ModelResource):
                     if resource_type == 'map':
                         if resource_state == 'user_verification_request_list':
                             return super(WorkSpaceMapApi, self).get_object_list(request).filter(
-                                status='PENDING').order_by('date_updated')
+                                status='PENDING', group=group).order_by('date_updated')
                         elif resource_state == 'approved_list':
                             return super(WorkSpaceMapApi, self).get_object_list(request).filter(
-                                status='ACTIVE').order_by('date_updated')
+                                status='ACTIVE', group=group).order_by('date_updated')
                         elif resource_state == 'user_draft_list':
                             return super(WorkSpaceMapApi, self).get_object_list(request).filter(
-                                status='DRAFT').order_by('date_updated')
+                                status='DRAFT', group=group).order_by('date_updated')
                         elif resource_state == 'denied_list':
                             return super(WorkSpaceMapApi, self).get_object_list(request).filter(
-                                status='DENIED').order_by('date_updated')
+                                status='DENIED', group=group).order_by('date_updated')
                         elif resource_state == 'user_approval_request_list':
                             return super(WorkSpaceMapApi, self).get_object_list(request).filter(
                                 status='VERIFIED').order_by('date_updated')
