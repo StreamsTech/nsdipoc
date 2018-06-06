@@ -811,12 +811,13 @@ def document_permission_preview(request, docid, template='documents/document_att
         raise Http404('requested document does not exists')
 
     if request.method == 'GET':
-        if request.user == document.owner:
-            if document.status == 'DRAFT':
-                pass
-        elif request.user.is_working_group_admin:
-            if document.status == 'PENDING':
-                pass
+        user_state = None
+        if request.user == document.owner and (document.status == 'DRAFT' or document.status == 'DENIED'):
+            user_state = "user"
+        elif request.user in document.group.get_managers() and document.status == "PENDING":
+            user_state = "manager"
+        elif request.user.is_working_group_admin and document.status == "VERIFIED":
+            user_state = "admin"
         else:
             return HttpResponse(
                 loader.render_to_string(
@@ -827,7 +828,7 @@ def document_permission_preview(request, docid, template='documents/document_att
         ctx = {
             'document': document,
             'organizations': GroupProfile.objects.all(),
-
-
+            'user_state': user_state,
+            "denied_comments": DocumentAuditActivity.objects.filter(document_submission_activity__document=document).order_by('-date_updated')
         }
         return render_to_response(template, RequestContext(request, ctx))
