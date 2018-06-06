@@ -460,24 +460,24 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
         'base.view_resourcebase',
         _PERMISSION_MSG_VIEW)
 
-    user = request.user
-    edit_permit = False
-    if layer.owner == user and layer.status in ['DRAFT', 'ACTIVE', 'DENIED']:
-        edit_permit = True
-    elif user in layer.group.get_managers() and layer.status in ['PENDING', 'ACTIVE', 'DENIED']:
-        edit_permit = True
-
-    if not edit_permit and layer.status == 'ACTIVE':
-        edit_permit = True
-
-    # if the edit request is not valid then just return from here
-    if not edit_permit:
-        return HttpResponse(
-            loader.render_to_string(
-                '401.html', RequestContext(
-                    request, {
-                        'error_message': _("You dont have permission to edit this layer.")})), status=401)
-        # return  HttpResponse('You dont have permission to edit this layer')
+    # user = request.user
+    # edit_permit = False
+    # if layer.owner == user and layer.status in ['DRAFT', 'ACTIVE', 'DENIED']:
+    #     edit_permit = True
+    # elif user in layer.group.get_managers() and layer.status in ['PENDING', 'ACTIVE', 'DENIED']:
+    #     edit_permit = True
+    #
+    # if not edit_permit and layer.status == 'ACTIVE':
+    #     edit_permit = True
+    #
+    # # if the edit request is not valid then just return from here
+    # if not edit_permit:
+    #     return HttpResponse(
+    #         loader.render_to_string(
+    #             '401.html', RequestContext(
+    #                 request, {
+    #                     'error_message': _("You dont have permission to edit this layer.")})), status=401)
+    #     # return  HttpResponse('You dont have permission to edit this layer')
 
     # assert False, str(layer_bbox)
     config = layer.attribute_config()
@@ -1392,12 +1392,13 @@ def layer_permission_preview(request, layername, template='layers/layer_attribut
         _PERMISSION_MSG_VIEW)
 
     if request.method == 'GET':
-        if request.user == layer.owner:
-            if layer.status == 'DRAFT':
-                pass
-        elif request.user.is_working_group_admin:
-            if layer.status == 'PENDING':
-                pass
+        user_state = None
+        if request.user == layer.owner and (layer.status == 'DRAFT' or layer.status == 'DENIED'):
+            user_state = "user"
+        elif request.user in layer.group.get_managers() and layer.status == "PENDING":
+            user_state = "manager"
+        elif request.user.is_working_group_admin and layer.status == "VERIFIED":
+            user_state = "admin"
         else:
             return HttpResponse(
                 loader.render_to_string(
@@ -1408,8 +1409,8 @@ def layer_permission_preview(request, layername, template='layers/layer_attribut
         ctx = {
             'layer': layer,
             'organizations': GroupProfile.objects.all(),
-
-
+            'user_state': user_state,
+            "denied_comments": LayerAuditActivity.objects.filter(layer_submission_activity__layer=layer).order_by('-date_updated')
         }
         return render_to_response(template, RequestContext(request, ctx))
 

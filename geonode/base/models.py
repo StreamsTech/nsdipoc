@@ -545,7 +545,7 @@ class ResourceBase(PolymorphicModel, PermissionLevelMixin, ItemBase):
     status = models.CharField(max_length=10, choices=[
         ("DRAFT", _("Draft")),
         ("PENDING", _("Pending")),
-        ("VERIFICATION", _("Verification")),
+        ("VERIFIED", _("Verified")),
         ("ACTIVE", _("Active")),
         ("INACTIVE", _("Inactive")),
         ("DENIED", _("Denied")),

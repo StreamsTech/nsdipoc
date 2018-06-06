@@ -13,9 +13,7 @@
 {% block body_outer %}
     <div class="gd-content">
         <div class="gd-content-heading">
-            <div class="d-title small-content">
-                {% trans "Approve Map" %}
-            </div>
+            <h1 class="d-title" style="margin: 0"> {% trans "Approve Map" %}</h1>
             <div class="hr"></div>
         </div>
         <div class="gd-content-body gd-history transparent top-bottom-margin-20px">
@@ -87,10 +85,9 @@
                                           </form>
     
                             </div>
-
-                            <div class="col-md-12">
-                                <div class="col-md-4">
-                                    <p>user state: {{ user_state }}</p>
+                            <div class="clearfix"></div>
+                            <div class="row">
+                                <div class="col-md-5">
                                     {% if  user_state == 'user' %}
                                             <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#_deny_comments">{% trans "Comments" %}</button>
                                             <button type="button"
@@ -142,25 +139,25 @@
                                                     </span>
                                             </button>
                                     {% endif %}
-
-                                    <button type="button"
-                                            ng-if="!userRole"
-                                            ng-disabled="isDisabledButton"
-                                            class="btn btn-primary pull-right"
-                                            ng-click="approveLayer()">Submit For Approval
-                                        <span ng-show="isDisabledButton">
-                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
-                                    </span>
-                                    </button>
-                                    <button type="button"
-                                            ng-if="userRole"
-                                            ng-disabled="isDisabledButton"
-                                            class="btn btn-primary pull-right"
-                                            ng-click="publishLayer()">Publish
-                                            <span ng-show="isDisabledButton">
-                                                <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
-                                            </span>
-                                    </button>
+{##}
+{#                                    <button type="button"#}
+{#                                            ng-if="!userRole"#}
+{#                                            ng-disabled="isDisabledButton"#}
+{#                                            class="btn btn-primary pull-right"#}
+{#                                            ng-click="approveLayer()">Submit For Approval#}
+{#                                        <span ng-show="isDisabledButton">#}
+{#                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>#}
+{#                                    </span>#}
+{#                                    </button>#}
+{#                                    <button type="button"#}
+{#                                            ng-if="userRole"#}
+{#                                            ng-disabled="isDisabledButton"#}
+{#                                            class="btn btn-primary pull-right"#}
+{#                                            ng-click="publishLayer()">Publish#}
+{#                                            <span ng-show="isDisabledButton">#}
+{#                                                <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>#}
+{#                                            </span>#}
+{#                                    </button>#}
                                 </div>
                             </div>
                         </div>

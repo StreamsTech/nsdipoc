@@ -48,12 +48,14 @@
         }
 
         function postLayerData(url,data){
-            $scope.isDisabledButton=true;
             mapPermissionService.submitMapInformation(url,data).then(function(response){
                 document.location.href="/maps/";
                 $scope.isDisabledButton=false;
+                $scope.denyLoader = false;
+                $scope.de
             },function(error){
                 $scope.isDisabledButton=false;
+                $scope.denyLoader = false;
                 console.log(error);
             });
         }
