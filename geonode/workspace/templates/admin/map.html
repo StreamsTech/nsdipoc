@@ -266,12 +266,12 @@ footer
                                                             </tr>
                                                             </thead>
 
-                                                            <tbody id="allAdminVerified_layers">
+                                                            <tbody id="allAdminVerified_maps">
 
                                                             </tbody>
 
                                                         </table>
-                                                        <div id="showallAdminVerifiedlayerspag_active">
+                                                        <div id="showallAdminVerifiedmapspag">
 
                                                         </div>
                                                     </ul>
@@ -819,5 +819,84 @@ $(function () {
                 });
          });
  </script>
+
+    <script type="text/javascript" language="JavaScript">
+        function showAdminDataMaps_verified(targeturl) {
+            var limit = 25;
+            if (targeturl == undefined) {
+                var url = "{% url 'api_dispatch_list' api_name='api' resource_name='workspace_map_api' %}?limit=" + limit + "&resource_state=verified_list&user_type=admin";
+            }
+            else {
+                var url = targeturl;
+            }
+            //var url = "{% url 'api_dispatch_list' api_name='api' resource_name='group_activity' %}?limit="+ Plimit +"&group={{ object.slug }}";
+            $.ajax({
+                cache: true,
+                type: 'GET',
+                url: url,
+                data: {},
+                dataType: "json",
+                success: function (jsondata) {
+                    console.log("success");
+                    console.log(JSON.stringify(jsondata));
+                    var data = eval(jsondata.objects);
+                    var meta = eval(jsondata.meta);
+                    var t_count = meta.total_count;
+                    var t_limit = meta.limit;
+                    var t_offset = meta.offset;
+                    var t_next = meta.next;
+                    var t_previous = meta.previous;
+                    //alert(t_offset);
+                    var output = '';
+                    var outputpag = '';
+                    var i = 1;
+                    var offset = meta.offset;
+                    $.each(data, function (i, item) {
+                        offset = offset + 1;
+                        output += '<tr>';
+                        output += '<td>' + offset + '</td>';
+                        output += '<td><a href="' + item.detail_url + '">' + item.title + '</a></td>';
+                        output += '<td>' + item.group + '</td>';
+                        output += '<td>' + item.owner + '</td>';
+                        output += '<td>' + item.last_auditor + '</td>';
+                        output += '<td>' + item.date_updated + '</td>';
+                        output += '</tr>';
+                    });
+                    outputpag += '<div>';
+                    outputpag += '<nav>';
+                    outputpag += '<ul class="pagination pull-left">';
+                    var nexturl = meta.next;
+                    //alert(t_count);
+                    var previousurl = meta.previous;
+                    if (previousurl) {
+                        outputpag += '<li><a href="javascript:;" id="previousAdminDraftMaps_active"><strong><i class="fa fa-angle-left"> <span>Previous</span></i></strong></a></li>';
+                    }
+                    if (nexturl) {
+                        outputpag += '<li><a href="javascript:;" id="nextAdminDraftMaps_active"><strong><span>Next</span> <i class="fa fa-angle-right"></i></strong></a></li>';
+                    }
+                    outputpag += '</ul>';
+                    outputpag += '</nav>';
+                    outputpag += '</div>';
+                    $("#allAdminVerified_maps").html(output);
+                    $("#showallAdminVerifiedmapspag").html(outputpag);
+                    $("#nextAdminDraftMaps_active").click(function () {
+                        showAdminDataMaps_verified(nexturl)
+                    });
+                    $("#previousAdminDraftMaps_active").click(function () {
+                        showAdminDataMaps_verified(previousurl)
+                    });
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console.log("error");
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $("#admin_verified_list").click(function () {
+                showAdminDataMaps_verified();
+            });
+        });
+    </script>
 
 {% endblock %}

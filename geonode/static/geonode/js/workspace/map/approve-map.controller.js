@@ -18,7 +18,7 @@
 })();
 (function(){
     angular.module('mapPermissionApp').controller('approveMapController',
-    function($scope,mapPermissionService,$modal){
+    function($scope,mapPermissionService,$modal,$q){
         $scope.mapId="";
         $scope.isAdmin=false;
         $scope.departments=[];
@@ -52,7 +52,6 @@
                 document.location.href="/maps/";
                 $scope.isDisabledButton=false;
                 $scope.denyLoader = false;
-                $scope.de
             },function(error){
                 $scope.isDisabledButton=false;
                 $scope.denyLoader = false;
@@ -85,18 +84,26 @@
             return angular.isUndefined(val) || val === null ;
         };
         function getLayerInformation(layerId){
-           mapPermissionService.getOrganizations('/api/groups')
-                    .then(function(response){
-                    var departments= response.objects;
-                    $scope.departments= _.object(_.map(departments, function(item) {
+            $q.all({
+                department: mapPermissionService.getOrganizations('/api/groups'),
+                permissions: mapPermissionService.getMapPermissions('/security/permissions/' + layerId)
+            })
+                .then(function (resolutions) {
+                    var departments = resolutions.department.objects;
+                    $scope.departments = _.object(_.map(departments, function (item) {
                         return [item.slug, item];
-                     }));
+                    }));
+                    var permissions = Object.keys(JSON.parse(resolutions.permissions.permissions).groups);
+                    angular.forEach(permissions, function (permission) {
+                        if ($scope.departments[permission])
+                            $scope.departments[permission].IsChecked = true;
+                    });
                 });
         }
 
         $scope.inIt=function(mapId,userRole){
-            getLayerInformation('');
             $scope.mapId=mapId;
+            getLayerInformation(mapId);
             $scope.userRole= (userRole == 'True' || userRole=='true');
         };
         $scope.openDenyModal=function () {

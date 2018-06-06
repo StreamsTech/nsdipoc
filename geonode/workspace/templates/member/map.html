@@ -403,7 +403,7 @@ $(function () {
                     output+='<td>'+ item.group +'</td>';
                     output+='<td>'+ item.last_auditor +'</td>';
                     output+='<td>'+ item.date_updated +'</td>';
-                    output+='<td><a href="'+ item.detail_url +'?user_role=member" class="btn btn-gd-primary"> {% trans "Edit and Push Again" %}</a></td>';
+                    output+='<td><a href="'+ item.detail_url +'/preview" class="btn btn-gd-primary"> {% trans "Edit and Push Again" %}</a></td>';
                     output+='</tr>';
                   });
                   outputpag+='<div>';
@@ -447,7 +447,7 @@ $(function () {
         function showLimitDatamaps_verified(targeturl){
             var limit = 25;
             if(targeturl== undefined){
-                var url = "{% url 'api_dispatch_list' api_name='api' resource_name='workspace_map_api' %}?limit="+ limit +"&resource_state=denied_list&user_type=member";
+                var url = "{% url 'api_dispatch_list' api_name='api' resource_name='workspace_map_api' %}?limit="+ limit +"&resource_state=verified_list&user_type=member";
             }
             else{
                 var url = targeturl;
@@ -482,7 +482,6 @@ $(function () {
                     output+='<td>'+ item.group +'</td>';
                     output+='<td>'+ item.last_auditor +'</td>';
                     output+='<td>'+ item.date_updated +'</td>';
-                    output+='<td><a href="'+ item.detail_url +'?user_role=member" class="btn btn-gd-primary"> {% trans "Edit and Push Again" %}</a></td>';
                     output+='</tr>';
                   });
                   outputpag+='<div>';
