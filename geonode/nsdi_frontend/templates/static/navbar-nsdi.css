@@ -262,4 +262,12 @@ line-height: 22px;
     {
         background-color: #003560;
     }
+    .gd-slider-title
+    {
+display: none;
+    }
+    .gd-slider-msg
+    {
+        display: none;
+    }
      /*End style for header navbar*/
