@@ -73,16 +73,20 @@
                                       <div id="viewuserlist"></div>
                                       <div id="viewuserlist_none">
                                         <ul class="nav nav-tabs">
-                                          <li class="active"><a href="#user-approval-request" data-toggle="tab">{% trans "User Approval Request" %}</a></li>
+                                          <li class="active"><a href="#user-approval-request" data-toggle="tab">{% trans "User Verification Request" %}</a></li>
+                                          {% if request.user.is_working_group_admin %}
+                                              <li><a href="#user-verification-request" data-toggle="tab" id="user_verification_request">{% trans "User Approval Request" %}</a></li>
+                                          {% endif %}
                                           <li><a href="#approved" id="Approved_list_docs_admin" data-toggle="tab">{% trans "Approved" %}</a></li>
                                           <li><a href="#user-drafts" id="Admin_userdraft_docs" data-toggle="tab">{% trans "User Drafts" %}</a></li>
                                           <li><a href="#denied-documents" id="Admin_dined_docslist" data-toggle="tab">{% trans "Denied Documents" %}</a></li>
+                                          <li><a href="#verified-documents" id="admin_verified_doclist" data-toggle="tab">{% trans "Verified" %}</a></li>
                                         </ul>
                                         <div class="tab-content">
-                                          <article id="user-approval-request" class="tab-pane active">
-                                            <ul class="no-style-list">
+                                            <article id="user-approval-request" class="tab-pane active">
+                                                <ul class="no-style-list">
                                                     <table class="table table-hover table-striped">
-                                                    <thead>
+                                                        <thead>
                                                         <tr>
                                                             <th>Serial No</th>
                                                             <th>Document Title</th>
@@ -92,22 +96,50 @@
                                                             <th>Date of Request</th>
                                                             <th>Approve/Deny Document</th>
                                                         </tr>
-                                                    </thead>
+                                                        </thead>
 
                                                         <tbody id="showallAdminDraftdocs">
 
                                                         </tbody>
 
-                                                </table>
-                                                <div id="showallAdminDraftdocspag">
-                    
-                                                </div>
-                                            </ul>
-                                          </article>
-                                          <article id="approved" class="tab-pane">
-                                            <ul class="no-style-list">
+                                                    </table>
+                                                    <div id="showallAdminDraftdocspag">
+
+                                                    </div>
+                                                </ul>
+                                            </article>
+                                            {% if  request.user.is_working_group_admin %}
+                                                <article id="user-verification-request" class="tab-pane">
+                                                    <ul class="no-style-list">
+                                                        <table class="table table-hover" style="background:#ffffff;">
+                                                            <thead>
+                                                            <tr>
+                                                                <th>Serial No</th>
+                                                                <th>Document Title</th>
+                                                                <th>Organization</th>
+                                                                <th>Tried</th>
+                                                                <th>Who Requested</th>
+                                                                <th>Date of Request</th>
+                                                                <th>Approve/Deny Layer</th>
+                                                                <!--<th>Denied Layer</th>-->
+                                                            </tr>
+                                                            </thead>
+
+                                                            <tbody id="showallAdminVerificationRequestDocuments">
+
+                                                            </tbody>
+
+                                                        </table>
+                                                        <div id="showallAdminVerificationRequestDocumentspag">
+
+                                                        </div>
+                                                    </ul>
+                                                </article>
+                                            {% endif %}
+                                            <article id="approved" class="tab-pane">
+                                                <ul class="no-style-list">
                                                     <table class="table table-hover table-striped">
-                                                    <thead>
+                                                        <thead>
                                                         <tr>
                                                             <th>Serial No</th>
                                                             <th>Document Title</th>
@@ -117,22 +149,22 @@
                                                             <th>Approve Date</th>
                                                             <th>Document Edit</th>
                                                         </tr>
-                                                    </thead>
+                                                        </thead>
 
                                                         <tbody id="allAdminDraftDocs_pen">
 
                                                         </tbody>
 
-                                                </table>
-                                                <div id="showallAdminDraftDocspag_panding">
-                    
-                                                </div>
-                                            </ul>
-                                          </article>
-                                          <article id="user-drafts" class="tab-pane">
-                                            <ul class="no-style-list">
+                                                    </table>
+                                                    <div id="showallAdminDraftDocspag_panding">
+
+                                                    </div>
+                                                </ul>
+                                            </article>
+                                            <article id="user-drafts" class="tab-pane">
+                                                <ul class="no-style-list">
                                                     <table class="table table-hover table-striped">
-                                                    <thead>
+                                                        <thead>
                                                         <tr>
                                                             <th>Serial No</th>
                                                             <th>Document Title</th>
@@ -141,23 +173,23 @@
                                                             <th>Document Creation Date</th>
                                                             <th>Document Delete</th>
                                                         </tr>
-                                                    </thead>
+                                                        </thead>
 
                                                         <tbody id="allAdminDraftdocs_denied">
 
                                                         </tbody>
 
-                                                </table>
-                                                <div id="showallAdminDraftdocspag_denied">
-                    
-                                                </div>
-                                            </ul>
-                                          </article>
-                    
-                                          <article id="denied-documents" class="tab-pane">
-                                            <ul class="no-style-list">
+                                                    </table>
+                                                    <div id="showallAdminDraftdocspag_denied">
+
+                                                    </div>
+                                                </ul>
+                                            </article>
+
+                                            <article id="denied-documents" class="tab-pane">
+                                                <ul class="no-style-list">
                                                     <table class="table table-hover table-striped">
-                                                    <thead>
+                                                        <thead>
                                                         <tr>
                                                             <th>Serial No</th>
                                                             <th>Document Title</th>
@@ -166,18 +198,42 @@
                                                             <th>Who Denied</th>
                                                             <th>Denied Date</th>
                                                         </tr>
-                                                    </thead>
+                                                        </thead>
 
                                                         <tbody id="allAdminDraftDocs_active">
 
                                                         </tbody>
 
-                                                </table>
-                                                <div id="showallAdminDraftDocspag_active">
-                    
-                                                </div>
-                                            </ul>
-                                          </article>
+                                                    </table>
+                                                    <div id="showallAdminDraftDocspag_active">
+
+                                                    </div>
+                                                </ul>
+                                            </article>
+                                            <article id="verified-documents" class="tab-pane" style="background:#ffffff;">
+                                                <ul class="no-style-list">
+                                                    <table class="table table-hover table-striped">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Serial No</th>
+                                                            <th>Document Title</th>
+                                                            <th>Organization</th>
+                                                            <th>Who Requested</th>
+                                                            <th>Who Verified</th>
+                                                            <th>Verified Date</th>
+                                                        </tr>
+                                                        </thead>
+
+                                                        <tbody id="allAdminVerified_documents">
+
+                                                        </tbody>
+
+                                                    </table>
+                                                    <div id="showallAdminVerifiedpag_documents">
+
+                                                    </div>
+                                                </ul>
+                                            </article>
                                         </div>
                                       </div>
                                   </div>
@@ -324,7 +380,7 @@ $(function () {
         function showAdminDraftDocs(targeturl){
             var limit = 25;
             if(targeturl== undefined){
-                var url = "{% url 'api_dispatch_list' api_name='api' resource_name='workspace_document_api' %}?limit="+ limit +"&resource_state=user_approval_request_list&user_type=admin";
+                var url = "{% url 'api_dispatch_list' api_name='api' resource_name='workspace_document_api' %}?limit="+ limit +"&resource_state=user_verification_request_list&user_type=admin";
             }
             else{
                 var url = targeturl;
@@ -359,7 +415,7 @@ $(function () {
                     output+='<td>'+ item.current_iteration +'</td>';
                     output+='<td>'+ item.date_updated +'</td>';
                     output+='<td>'+ item.owner +'</td>';
-                    output+='<td><a href="'+ item.detail_url +'?user_role=manager" class="btn btn-gd-primary">{% trans "Continue to Approve/Deny" %}</a></td>';
+                    output+='<td><a href="'+ item.detail_url +'/preview" class="btn btn-gd-primary">{% trans "Continue to Verify/Deny" %}</a></td>';
                     output+='</tr>';
                   });
                   outputpag+='<div>';
@@ -396,6 +452,89 @@ $(function () {
             showAdminDraftDocs();
         });
  </script>
+
+<script type="text/javascript" language="JavaScript">
+        function showAdminApprovalRequestDocs(targeturl){
+            var limit = 25;
+            if(targeturl== undefined){
+                var url = "{% url 'api_dispatch_list' api_name='api' resource_name='workspace_document_api' %}?limit="+ limit +"&resource_state=user_approval_request_list&user_type=admin";
+            }
+            else{
+                var url = targeturl;
+            }
+            //var url = "{% url 'api_dispatch_list' api_name='api' resource_name='group_activity' %}?limit="+ Plimit +"&group={{ object.slug }}";
+                $.ajax({
+                    cache: true,
+                    type: 'GET',
+                    url: url,
+                    data: {},
+                    dataType: "json",
+                    success: function(jsondata) {
+                        console.log("success");
+                        //console.log(JSON.stringify(jsondata));
+                    var data = eval(jsondata.objects);
+                    var meta = eval(jsondata.meta);
+                    var t_count = meta.total_count;
+                    var t_limit = meta.limit;
+                    var t_offset = meta.offset;
+                    var t_next = meta.next;
+                    var t_previous = meta.previous;
+                        //alert(t_offset);
+                    var output='';
+                    var outputpag='';
+                  var offset = meta.offset;
+                  $.each(data, function(i, item) {
+                    offset = offset + 1;
+                    output+='<tr>';
+                    output+='<td>'+ offset +'</td>';
+                    output+='<td><a href='+ item.detail_url +'>'+ item.title+'</a></td>';
+                    output+='<td>'+ item.group +'</td>';
+                    output+='<td>'+ item.current_iteration +'</td>';
+                    output+='<td>'+ item.date_updated +'</td>';
+                    output+='<td>'+ item.owner +'</td>';
+                    output+='<td><a href="'+ item.detail_url +'/preview" class="btn btn-gd-primary">{% trans "Continue to Verify/Deny" %}</a></td>';
+                    output+='</tr>';
+                  });
+                  outputpag+='<div>';
+                  outputpag+='<nav>';
+                  outputpag+='<ul class="pagination pull-left">';
+                  var nexturl = meta.next;
+                  //alert(t_count);
+                  var previousurl = meta.previous;
+                  if(previousurl){
+                  outputpag+='<li><a href="javascript:;" id="previousAdminVerifyRequestdocs"><strong><i class="fa fa-angle-left"> <span>Previous</span></i></strong></a></li>';
+                  }
+                  if(nexturl){
+                  outputpag+='<li><a href="javascript:;" id="nextAdminVerifyRequestdocs"><strong><span>Next</span> <i class="fa fa-angle-right"></i></strong></a></li>';
+                    }
+                  outputpag+='</ul>';
+                  outputpag+='</nav>';
+                  outputpag+='</div>';
+                   $("#showallAdminVerificationRequestDocuments").html(output);
+                   $("#showallAdminVerificationRequestDocumentspag").html(outputpag);
+                   $("#nextAdminVerifyRequestdocs").click(function(){
+                        showAdminApprovalRequestDocs(nexturl)
+                   });
+                   $("#previousAdminVerifyRequestdocs").click(function(){
+                        showAdminApprovalRequestDocs(previousurl)
+                   });
+                    },
+                    error: function(xhr, ajaxOptions, thrownError) {
+                        console.log("error");
+                    }
+                });
+        }
+
+        {% if  request.user.is_working_group_admin %}
+            $(document).ready(function () {
+                $("#user_verification_request").click(function () {
+                    showAdminApprovalRequestDocs();
+                });
+            });
+        {% endif %}
+ </script>
+
+
 <script type="text/javascript" language="JavaScript">
         function showAdminDataDocs_Approve(targeturl){
             var limit = 25;
@@ -629,6 +768,86 @@ $(function () {
         $(document).ready(function(){
             $("#Admin_dined_docslist").click(function(){
                 showAdminDataDocs_denied();
+                });
+         });
+ </script>
+
+
+<script type="text/javascript" language="JavaScript">
+        function showAdminDataDocs_Verified(targeturl){
+            var limit = 25;
+            if(targeturl== undefined){
+                var url = "{% url 'api_dispatch_list' api_name='api' resource_name='workspace_document_api' %}?limit="+ limit +"&resource_state=verified_list&user_type=admin";
+            }
+            else{
+                var url = targeturl;
+            }
+            //var url = "{% url 'api_dispatch_list' api_name='api' resource_name='group_activity' %}?limit="+ Plimit +"&group={{ object.slug }}";
+                $.ajax({
+                    cache: true,
+                    type: 'GET',
+                    url: url,
+                    data: {},
+                    dataType: "json",
+                    success: function(jsondata) {
+                        console.log("success");
+                        console.log(JSON.stringify(jsondata));
+                    var data = eval(jsondata.objects);
+                    var meta = eval(jsondata.meta);
+                    var t_count = meta.total_count;
+                    var t_limit = meta.limit;
+                    var t_offset = meta.offset;
+                    var t_next = meta.next;
+                    var t_previous = meta.previous;
+                        //alert(t_offset);
+                    var output='';
+                    var outputpag='';
+                    var i =1;
+                    var offset = meta.offset;
+                  $.each(data, function(i, item) {
+                    offset = offset + 1;
+                    output+='<tr>';
+                    output+='<td>'+ offset +'</td>';
+                    output+='<td><a href="'+ item.detail_url +'">'+ item.title+'</a></td>';
+                    output+='<td>'+ item.group +'</td>';
+                    output+='<td>'+ item.owner +'</td>';
+                    output+='<td>'+ item.last_auditor +'</td>';
+                    output+='<td>'+ item.date_updated +'</td>';
+                    output+='</tr>';
+                  });
+                  outputpag+='<div>';
+                  outputpag+='<nav>';
+                  outputpag+='<ul class="pagination pull-left">';
+                  var nexturl = meta.next;
+                  //alert(t_count);
+                  var previousurl = meta.previous;
+                  if(previousurl){
+                  outputpag+='<li><a href="javascript:;" id="previousAdminDraftDocs_verified"><strong><i class="fa fa-angle-left"> <span>Previous</span></i></strong></a></li>';
+                  }
+                  if(nexturl){
+                  outputpag+='<li><a href="javascript:;" id="nextAdminDraftDocs_verified"><strong><span>Next</span> <i class="fa fa-angle-right"></i></strong></a></li>';
+                    }
+                  outputpag+='</ul>';
+                  outputpag+='</nav>';
+                  outputpag+='</div>';
+                   $("#allAdminVerified_documents").html(output);
+                   $("#showallAdminVerifiedpag_documents").html(outputpag);
+                   $("#nextAdminDraftDocs_verified").click(function(){
+                        showAdminDataDocs_Verified(nexturl)
+                   });
+                   $("#previousAdminDraftDocs_verified").click(function(){
+                        showAdminDataDocs_Verified(previousurl)
+                   });
+                    },
+                    error: function(xhr, ajaxOptions, thrownError) {
+                        console.log("error");
+                    }
+                });
+        }
+
+        $(document).ready(function(){
+            $("#admin_verified_doclist").click(function(){
+                showAdminDataDocs_Verified();
                 });
          });
  </script>

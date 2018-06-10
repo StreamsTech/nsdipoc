@@ -109,10 +109,16 @@ footer
                                           <div id="viewuserlist"></div>
                                           <div id="viewuserlist_none">
                                             <ul class="nav nav-tabs">
-                                              <li class="active"><a href="#user-approval-request" data-toggle="tab">{% trans "User Approval Request" %}</a></li>
+                                              <li class="active"><a href="#user-approval-request" data-toggle="tab">{% trans "User Verification Request" %}</a></li>
+                                                {% if request.user.is_working_group_admin %}
+                                                    <li><a href="#user-verification-request" data-toggle="tab" id="user_verification_request">{% trans "User Approval Request" %}</a></li>
+                                                {% endif %}
                                               <li><a href="#approved" id="Approved_list_layers_admin" data-toggle="tab">{% trans "Approved" %}</a></li>
                                               <li><a href="#user-drafts" id="Admin_userdraft_maps" data-toggle="tab">{% trans "User Drafts" %}</a></li>
                                               <li><a href="#denied-maps" id="Admin_dined_mapslist" data-toggle="tab">{% trans "Denied Maps" %}</a></li>
+                                                <li><a href="#verified-maps" id="admin_verified_list"
+                                                       data-toggle="tab">{% trans "Verified" %}</a>
+                                                </li>
                                             </ul>
                                             <div class="tab-content">
                                               <article id="user-approval-request" class="tab-pane active">
@@ -141,9 +147,38 @@ footer
                                                     </div>
                                                 </ul>
                                               </article>
-                                              <article id="approved" class="tab-pane">
-                                                <ul class="no-style-list">
-                                                    <table class="table table-hover table-striped">
+                                                {% if  request.user.is_working_group_admin %}
+                                                    <article id="user-verification-request" class="tab-pane">
+                                                        <ul class="no-style-list">
+                                                            <table class="table table-hover"
+                                                                   style="background:#ffffff;">
+                                                                <thead>
+                                                                <tr>
+                                                                    <th>Serial No</th>
+                                                                    <th>Map Title</th>
+                                                                    <th>Organization</th>
+                                                                    <th>Tried</th>
+                                                                    <th>Who Requested</th>
+                                                                    <th>Date of Request</th>
+                                                                    <th>Approve/Deny Map</th>
+                                                                    <!--<th>Denied Layer</th>-->
+                                                                </tr>
+                                                                </thead>
+
+                                                                <tbody id="showallAdminVerificationRequestMaps">
+
+                                                                </tbody>
+
+                                                            </table>
+                                                            <div id="showallAdminVerificationRequestMapspag">
+
+                                                            </div>
+                                                        </ul>
+                                                    </article>
+                                                {% endif %}
+                                                <article id="approved" class="tab-pane">
+                                                    <ul class="no-style-list">
+                                                        <table class="table table-hover table-striped">
                                                         <thead>
                                                             <tr>
                                                                 <th>Serial No</th>
@@ -216,6 +251,31 @@ footer
                                                     </div>
                                                 </ul>
                                               </article>
+                                                <article id="verified-maps" class="tab-pane"
+                                                         style="background:#ffffff;">
+                                                    <ul class="no-style-list">
+                                                        <table class="table table-hover table-striped">
+                                                            <thead>
+                                                            <tr>
+                                                                <th>Serial No</th>
+                                                                <th>Map Title</th>
+                                                                <th>Organization</th>
+                                                                <th>Who Requested</th>
+                                                                <th>Who Verfied</th>
+                                                                <th>Verified Date</th>
+                                                            </tr>
+                                                            </thead>
+
+                                                            <tbody id="allAdminVerified_maps">
+
+                                                            </tbody>
+
+                                                        </table>
+                                                        <div id="showallAdminVerifiedmapspag">
+
+                                                        </div>
+                                                    </ul>
+                                                </article>
                                             </div>
                                           </div>
                                       </div>
@@ -363,7 +423,7 @@ $(function () {
         function showAdminDraftMap(targeturl){
             var limit = 25;
             if(targeturl== undefined){
-                var url = "{% url 'api_dispatch_list' api_name='api' resource_name='workspace_map_api' %}?limit="+ limit +"&resource_state=user_approval_request_list&user_type=admin";
+                var url = "{% url 'api_dispatch_list' api_name='api' resource_name='workspace_map_api' %}?limit="+ limit +"&resource_state=user_verification_request_list&user_type=admin";
             }
             else{
                 var url = targeturl;
@@ -399,7 +459,7 @@ $(function () {
                     output+='<td>'+ item.owner +'</td>';
                     output+='<td>'+ item.date_updated +'</td>';
                     output+='<td><a href="'+ item.detail_url +'?user_role=manager" class="btn btn-gd-primary">{% trans "Edit Map" %}</a>';
-                    output+='<a href="'+ item.detail_url +'/preview" class="btn btn-gd-primary" style="margin-left:10px">{% trans "Approve/Publish Map" %}</a></td>';
+                    output+='<a href="'+ item.detail_url +'/preview" class="btn btn-gd-primary" style="margin-left:10px">{% trans "Continue to Verify/Deny Map" %}</a></td>';
                     output+='</tr>';
                   });
                   outputpag+='<div>';
@@ -436,6 +496,92 @@ $(function () {
             showAdminDraftMap();
         });
  </script>
+
+    <script type="text/javascript" language="JavaScript">
+        function showAdminApprovedRequest(targeturl) {
+            var limit = 25;
+            if (targeturl == undefined) {
+                var url = "{% url 'api_dispatch_list' api_name='api' resource_name='workspace_map_api' %}?limit=" + limit + "&resource_state=user_approval_request_list&user_type=admin";
+            }
+            else {
+                var url = targeturl;
+            }
+            //var url = "{% url 'api_dispatch_list' api_name='api' resource_name='group_activity' %}?limit="+ Plimit +"&group={{ object.slug }}";
+            $.ajax({
+                cache: true,
+                type: 'GET',
+                url: url,
+                data: {},
+                dataType: "json",
+                success: function (jsondata) {
+                    console.log("success");
+                    //console.log(JSON.stringify(jsondata));
+                    var data = eval(jsondata.objects);
+                    var meta = eval(jsondata.meta);
+                    var t_count = meta.total_count;
+                    var t_limit = meta.limit;
+                    var t_offset = meta.offset;
+                    var t_next = meta.next;
+                    var t_previous = meta.previous;
+                    //alert(t_offset);
+                    var output = '';
+                    var outputpag = '';
+                    var offset = meta.offset;
+                    $.each(data, function (i, item) {
+                        offset = offset + 1;
+                        output += '<tr>';
+                        output += '<td>' + offset + '</td>';
+                        output += '<td><a href=' + item.detail_url + '>' + item.title + '</a></td>';
+                        output += '<td>' + item.group + '</td>';
+                        output += '<td>' + item.current_iteration + '</td>';
+                        output += '<td>' + item.owner + '</td>';
+                        output += '<td>' + item.date_updated + '</td>';
+                        output += '<td><a href="' + item.detail_url + '?user_role=manager" class="btn btn-gd-primary">{% trans "Edit Map" %}</a>';
+                        output += '<a href="' + item.detail_url + '/preview" class="btn btn-gd-primary" style="margin-left:10px">{% trans "Approve/Publish Map" %}</a></td>';
+                        output += '</tr>';
+                    });
+                    outputpag += '<div>';
+                    outputpag += '<nav>';
+                    outputpag += '<ul class="pagination pull-left">';
+                    var nexturl = meta.next;
+                    //alert(t_count);
+                    var previousurl = meta.previous;
+                    if (previousurl) {
+                        outputpag += '<li><a href="javascript:;" id="previousAdminApproveRequestmaps"><strong><i class="fa fa-angle-left"> <span>Previous</span></i></strong></a></li>';
+                    }
+                    if (nexturl) {
+                        outputpag += '<li><a href="javascript:;" id="nextAdminApproveRequestmaps"><strong><span>Next</span> <i class="fa fa-angle-right"></i></strong></a></li>';
+                    }
+                    outputpag += '</ul>';
+                    outputpag += '</nav>';
+                    outputpag += '</div>';
+                    $("#showallAdminVerificationRequestMaps").html(output);
+                    $("#showallAdminVerificationRequestMapspag").html(outputpag);
+                    $("#nextAdminApproveRequestmaps").click(function () {
+                        showAdminApprovedRequest(nexturl)
+                    });
+                    $("#previousAdminApproveRequestmaps").click(function () {
+                        showAdminApprovedRequest(previousurl)
+                    });
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console.log("error");
+                }
+            });
+        }
+
+       {% if  request.user.is_working_group_admin %}
+            $(document).ready(function () {
+                $("#user_verification_request").click(function () {
+                    showAdminApprovedRequest();
+                });
+            });
+        {% endif %}
+    </script>
+
+
+
+
 <script type="text/javascript" language="JavaScript">
         function showAdminDataMaps_Approve(targeturl){
             var limit = 25;
@@ -673,5 +819,84 @@ $(function () {
                 });
          });
  </script>
+
+    <script type="text/javascript" language="JavaScript">
+        function showAdminDataMaps_verified(targeturl) {
+            var limit = 25;
+            if (targeturl == undefined) {
+                var url = "{% url 'api_dispatch_list' api_name='api' resource_name='workspace_map_api' %}?limit=" + limit + "&resource_state=verified_list&user_type=admin";
+            }
+            else {
+                var url = targeturl;
+            }
+            //var url = "{% url 'api_dispatch_list' api_name='api' resource_name='group_activity' %}?limit="+ Plimit +"&group={{ object.slug }}";
+            $.ajax({
+                cache: true,
+                type: 'GET',
+                url: url,
+                data: {},
+                dataType: "json",
+                success: function (jsondata) {
+                    console.log("success");
+                    console.log(JSON.stringify(jsondata));
+                    var data = eval(jsondata.objects);
+                    var meta = eval(jsondata.meta);
+                    var t_count = meta.total_count;
+                    var t_limit = meta.limit;
+                    var t_offset = meta.offset;
+                    var t_next = meta.next;
+                    var t_previous = meta.previous;
+                    //alert(t_offset);
+                    var output = '';
+                    var outputpag = '';
+                    var i = 1;
+                    var offset = meta.offset;
+                    $.each(data, function (i, item) {
+                        offset = offset + 1;
+                        output += '<tr>';
+                        output += '<td>' + offset + '</td>';
+                        output += '<td><a href="' + item.detail_url + '">' + item.title + '</a></td>';
+                        output += '<td>' + item.group + '</td>';
+                        output += '<td>' + item.owner + '</td>';
+                        output += '<td>' + item.last_auditor + '</td>';
+                        output += '<td>' + item.date_updated + '</td>';
+                        output += '</tr>';
+                    });
+                    outputpag += '<div>';
+                    outputpag += '<nav>';
+                    outputpag += '<ul class="pagination pull-left">';
+                    var nexturl = meta.next;
+                    //alert(t_count);
+                    var previousurl = meta.previous;
+                    if (previousurl) {
+                        outputpag += '<li><a href="javascript:;" id="previousAdminDraftMaps_active"><strong><i class="fa fa-angle-left"> <span>Previous</span></i></strong></a></li>';
+                    }
+                    if (nexturl) {
+                        outputpag += '<li><a href="javascript:;" id="nextAdminDraftMaps_active"><strong><span>Next</span> <i class="fa fa-angle-right"></i></strong></a></li>';
+                    }
+                    outputpag += '</ul>';
+                    outputpag += '</nav>';
+                    outputpag += '</div>';
+                    $("#allAdminVerified_maps").html(output);
+                    $("#showallAdminVerifiedmapspag").html(outputpag);
+                    $("#nextAdminDraftMaps_active").click(function () {
+                        showAdminDataMaps_verified(nexturl)
+                    });
+                    $("#previousAdminDraftMaps_active").click(function () {
+                        showAdminDataMaps_verified(previousurl)
+                    });
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console.log("error");
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $("#admin_verified_list").click(function () {
+                showAdminDataMaps_verified();
+            });
+        });
+    </script>
 
 {% endblock %}

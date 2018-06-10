@@ -1,9 +1,29 @@
 (function(){
+    angular.module('mapPermissionApp').controller('denyMapController',
+    function($scope,$modalInstance){
+        $scope.deny={
+            subject: undefined,
+            comment: undefined
+        };
+        $scope.ok=function () {
+            if($scope.deny.subject && $scope.deny.comment){
+                $modalInstance.close($scope.deny);
+            }
+        };
+
+        $scope.cancel=function () {
+            $modalInstance.dismiss('cancel');
+        }
+    });
+})();
+(function(){
     angular.module('mapPermissionApp').controller('approveMapController',
-    function($scope,mapPermissionService,uiGridConstants,$window,$q,$timeout){
+    function($scope,mapPermissionService,$modal,$q){
         $scope.mapId="";
         $scope.isAdmin=false;
         $scope.departments=[];
+        $scope.denyLoader=false;
+        $scope.isDisabledButton = false;
         $scope.layerApprovalUrl="/api/resource-attribute-permission-set/";
 
         function getPostLayerDataInformation(){
@@ -28,46 +48,78 @@
         }
 
         function postLayerData(url,data){
-            $scope.isDisabledButton=true;
             mapPermissionService.submitMapInformation(url,data).then(function(response){
                 document.location.href="/maps/";
                 $scope.isDisabledButton=false;
+                $scope.denyLoader = false;
             },function(error){
                 $scope.isDisabledButton=false;
+                $scope.denyLoader = false;
                 console.log(error);
             });
         }
 
 
-        $scope.approveLayer=function(){
+        $scope.submitforVerify=function(){
             var data=getPostLayerDataInformation();
             data.status="PENDING";
+            $scope.isDisabledButton=true;
             postLayerData($scope.layerApprovalUrl,data);
         };
 
-        $scope.publishLayer=function(){
+        $scope.verifyLayer=function(){
             var data=getPostLayerDataInformation();
-            data.status="ACTIVE";
-            console.log(data);
+            data.status="VERIFIED";
+            $scope.isDisabledButton=true;
             postLayerData($scope.layerApprovalUrl,data);
         };
+        $scope.approveLayer=function () {
+            var data=getPostLayerDataInformation();
+            data.status="ACTIVE";
+            $scope.isDisabledButton=true;
+            postLayerData($scope.layerApprovalUrl,data);
+        };
+
         angular.isUndefinedOrNull = function(val) {
             return angular.isUndefined(val) || val === null ;
         };
         function getLayerInformation(layerId){
-           mapPermissionService.getOrganizations('/api/groups')
-                    .then(function(response){
-                    var departments= response.objects;
-                    $scope.departments= _.object(_.map(departments, function(item) {
+            $q.all({
+                department: mapPermissionService.getOrganizations('/api/groups'),
+                permissions: mapPermissionService.getMapPermissions('/security/permissions/' + layerId)
+            })
+                .then(function (resolutions) {
+                    var departments = resolutions.department.objects;
+                    $scope.departments = _.object(_.map(departments, function (item) {
                         return [item.slug, item];
-                     }));
+                    }));
+                    var permissions = Object.keys(JSON.parse(resolutions.permissions.permissions).groups);
+                    angular.forEach(permissions, function (permission) {
+                        if ($scope.departments[permission])
+                            $scope.departments[permission].IsChecked = true;
+                    });
                 });
         }
 
         $scope.inIt=function(mapId,userRole){
-            getLayerInformation('');
             $scope.mapId=mapId;
+            getLayerInformation(mapId);
             $scope.userRole= (userRole == 'True' || userRole=='true');
         };
+        $scope.openDenyModal=function () {
+            $modal.open({
+                templateUrl: 'denyModalContent.html',
+                backdrop: 'static',
+                keyboard: false,
+                controller: 'denyMapController'
+            }).result.then(function(result) {
+                var data = getPostLayerDataInformation();
+                data.status = "DENIED";
+                data.comment = result.comment;
+                data.comment_subject= result.subject;
+                $scope.denyLoader=true;
+                postLayerData($scope.layerApprovalUrl, data);
+            });
+        }
     });
 })();
