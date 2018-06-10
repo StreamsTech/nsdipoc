@@ -1061,7 +1061,7 @@ class WorkSpaceDocumentApi(ModelResource):
         if settings.RESOURCE_PUBLISHING:
             queryset = queryset.filter(is_published=True)
         resource_name = 'workspace_document_api'
-        authorization = GeoNodeAuthorization()
+
 
     def get_object_list(self, request):
         if 'HTTP_AUTHORIZATION' in request.META:
@@ -1087,7 +1087,7 @@ class WorkSpaceDocumentApi(ModelResource):
             if user_type == 'admin':
                 if user.is_manager_of_any_group:
                     # groups = GroupProfile.objects.filter(groupmember__user=user, groupmember__role='manager')
-                    if resource_type == 'map':
+                    if resource_type == 'document':
                         if resource_state == 'user_verification_request_list':
                             return super(WorkSpaceDocumentApi, self).get_object_list(request).filter(
                                 status='PENDING', group=group).order_by('date_updated')
@@ -1114,7 +1114,7 @@ class WorkSpaceDocumentApi(ModelResource):
                     return nothing
 
             elif user_type == 'member':
-                if resource_type == 'map':
+                if resource_type == 'document':
                     if resource_state == 'draft_list':
                         return super(WorkSpaceDocumentApi, self).get_object_list(request).filter(owner=user,
                                                                                             status='DRAFT').order_by(

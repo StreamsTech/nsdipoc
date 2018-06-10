@@ -259,7 +259,7 @@ $(function () {
                     output+='<td><a href='+ item.detail_url +'>'+ item.title+'</a></td>';
                     output+='<td>'+ item.group +'</td>';
                     output+='<td>'+ item.date_created +'</td>';
-                    output+='<td><a href="'+ item.detail_url +'?user_role=member" class="btn btn-gd-primary"> {% trans "Continue for Approval" %}</a>';
+                    output+='<td><a href="'+ item.detail_url +'/preview" class="btn btn-gd-primary"> {% trans "Continue for Verification" %}</a>';
                     output+='<button type="button" class="btn btn-gd-primary" onclick="deleteDocument('+ item.id +')" style="color:#fff;margin-left:6px">{% trans "Delete Document" %}</button> <br>';
                     output+='</td>';
                     output+='</tr>';
@@ -413,7 +413,7 @@ $(function () {
                     output+='<td>'+ item.group +'</td>';
                     output+='<td>'+ item.last_auditor +'</td>';
                     output+='<td>'+ item.date_updated +'</td>';
-                    output+='<td><a href="'+ item.detail_url +'?user_role=member" class="btn btn-gd-primary"> {% trans "Edit and Push Again" %}</a></td>';
+                    output+='<td><a href="'+ item.detail_url +'/preview" class="btn btn-gd-primary"> {% trans "Edit and Push Again" %}</a></td>';
                     output+='</tr>';
                   });
                   outputpag+='<div>';
@@ -491,7 +491,6 @@ $(function () {
                         output += '<td>' + item.group + '</td>';
                         output += '<td>' + item.last_auditor + '</td>';
                         output += '<td>' + item.date_updated + '</td>';
-                        output += '<td><a href="' + item.detail_url + '/preview" class="btn btn-gd-primary"> {% trans "Edit and Push Again" %}</a></td>';
                         output += '</tr>';
                     });
                     outputpag += '<div>';

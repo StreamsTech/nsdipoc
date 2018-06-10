@@ -22,7 +22,7 @@
               <div class="col-md-12">
                   <div class="panel-body">
                     <div class="row" ng-app="mapPermissionApp" ng-cloak>
-                        <div ng-controller="approveMapController" ng-init="inIt({{map.id}},'{{request.user.is_working_group_admin}}')">
+                        <div ng-controller="approveMapController" ng-init="inIt({{map.id}},'{{request.user.is_working_group_admin}}')" ng-class="'{{ user_state }}'=='admin' ? 'disabled':'enabled'" >
                             <div class="col-md-6">
                                     <form class="form-horizontal" name="layer-approval-from">
                                             <div class="form-group">
