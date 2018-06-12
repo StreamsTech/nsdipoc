@@ -13,18 +13,19 @@
 {% block body_outer %}
     <div class="gd-content">
         <div class="gd-content-heading">
-            <div class="d-title small-content">
+            <div class="d-title" style="margin: 0;">
                 {% trans "Approve Document" %}
             </div>
             <div class="hr"></div>
+           {% include "layer_templates/_deny_comments.html" %}
         </div>
         <div class="gd-content-body gd-history transparent top-bottom-margin-20px">
             <div class="row">
               <div class="col-md-12">
                   <div class="panel-body">
-                    <div class="row" ng-app="documentPermissionApp">
-                        <div ng-controller="approveDocumentController" ng-init="inIt({{document.id}},'{{request.user.is_working_group_admin}}')">
-                            <div class="col-md-6">
+                    <div class="row" ng-app="documentPermissionApp" ng-cloak>
+                        <div ng-controller="approveDocumentController" ng-init="inIt({{document.id}},'{{request.user.is_working_group_admin}}')" ng-class="'{{ user_state }}'=='admin' ? 'disabled':'enabled'">
+                            <div class="col-md-7">
                                     <form class="form-horizontal" name="layer-approval-from">
                                             <div class="form-group">
                                               <label class="control-label col-sm-4" for="title">Title</label>
@@ -87,30 +88,90 @@
                                           </form>
     
                             </div>
-
-                            <div class="col-md-12">
-                                <div class="col-md-4">
-                                    <button type="button" 
-                                    ng-if="!userRole"
-                                    ng-disabled="isDisabledButton"
-                                    class="btn btn-primary pull-right"
-                                     ng-click="approveLayer()">Submit For Approval
-                                     <span ng-show="isDisabledButton">
-                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
-                                    </span>
-                                    </button>
-                                    <button type="button"
-                                    ng-if="userRole"
-                                    ng-disabled="isDisabledButton"
-                                    class="btn btn-primary pull-right" 
-                                    ng-click="publishLayer()">Publish
-                                    <span ng-show="isDisabledButton">
-                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
-                                    </span>
-                                    </button>
-                                    
+                            <div class="clearfix"></div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {% if  user_state == 'user' %}
+                                            <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#_deny_comments">{% trans "Comments" %}</button>
+                                            <button type="button"
+                                                    ng-disabled="isDisabledButton"
+                                                    style="margin-right: 10px"
+                                                    class="btn btn-primary pull-right enabled"
+                                                    ng-click="submitforVerify()">
+                                                        Submit For Verification
+                                                        <span ng-show="isDisabledButton">
+                                                            <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+                                                        </span>
+                                            </button>
+                                        {% elif user_state == 'manager' %}
+                                            <button type="button" style="margin-left: 10px"
+                                                    ng-disabled="isDisabledButton || denyLoader"
+                                                    class="btn btn-primary pull-right enabled"
+                                                    ng-click="openDenyModal()">
+                                                    Deny with message
+                                                    <span ng-show="denyLoader">
+                                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+                                                     </span>
+                                            </button>
+                                            <button type="button"
+                                                    ng-disabled="isDisabledButton || denyLoader"
+                                                    class="btn btn-primary pull-right enabled"
+                                                    ng-click="verifyDocument()">
+                                                    Push for Approval
+                                                    <span ng-show="isDisabledButton">
+                                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+                                                     </span>
+                                            </button>
+                                        {% elif user_state == 'admin'%}
+                                            <button type="button" style="margin-left: 10px"
+                                                    ng-disabled="isDisabledButton || denyLoader"
+                                                    class="btn btn-primary pull-right enabled"
+                                                    ng-click="openDenyModal()">
+                                                    Deny with message
+                                                    <span ng-show="denyLoader">
+                                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+                                                     </span>
+                                            </button>
+                                            <button type="button"
+                                                    ng-disabled="isDisabledButton || denyLoader"
+                                                    class="btn btn-primary pull-right enabled"
+                                                    ng-click="approveDocument()">
+                                                            Approve
+                                                        <span ng-show="isDisabledButton">
+                                                        <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+                                                    </span>
+                                            </button>
+                                    {% endif %}
                                 </div>
                             </div>
+                            <script type="text/ng-template" id="denyModalContent.html">
+                                <div class="modal-header">
+                                    <h3 class="modal-title" id="modal-title">Deny layer {{ name }}</h3>
+                                </div>
+                                <div class="modal-body" id="modal-body">
+                                    <form class="form-horizontal">
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label" for="subject">Subject:</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="subject"
+                                                       ng-model="deny.subject">
+                                            </div>
+                                        </div>
+                                        <div class="form-group ">
+                                            <label class="col-md-2 control-label" for="comment">Comment:</label>
+                                            <div class="col-md-9">
+                                                    <textarea class="form-control" id="comment" ng-model="deny.comment">
+
+                                                    </textarea>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+                                    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+                                </div>
+                            </script>
                         </div>
                     </div>
                     </div>    

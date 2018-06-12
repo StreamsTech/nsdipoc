@@ -41,7 +41,7 @@
         this.getOrganizations=function(url){
             return get(url);
         };
-        this.getMapPermissions=function(url){
+        this.getDocumentPermissions=function(url){
             return get(url);
         };
 

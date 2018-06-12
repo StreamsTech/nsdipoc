@@ -1,6 +1,6 @@
 (function(){
     angular.module('documentPermissionApp',
-    ['ui.grid', 'ui.grid.selection', 'ui.grid.cellNav','ui.grid.autoResize','ui.grid.pagination'])
+    ['ui.bootstrap','ui.grid', 'ui.grid.selection', 'ui.grid.cellNav','ui.grid.autoResize','ui.grid.pagination'])
     .config(['$interpolateProvider', '$locationProvider', function($interpolateProvider, $locationProvider) {
         $interpolateProvider.startSymbol('[{');
         $interpolateProvider.endSymbol('}]');

@@ -198,7 +198,7 @@ class DocumentUploadView(CreateView):
     def get_context_data(self, **kwargs):
         context = super(DocumentUploadView, self).get_context_data(**kwargs)
         context['ALLOWED_DOC_TYPES'] = ALLOWED_DOC_TYPES
-        context['ogranizations'] = GroupProfile.objects.filter(groupmember__user=self.request.user)
+        context['ogranizations'] = GroupProfile.objects.filter(groupmember__user=self.request.user).exclude(slug='working-group')
         context['categories'] = TopicCategory.objects.all()
         return context
 
@@ -227,7 +227,7 @@ class DocumentUploadView(CreateView):
         except TopicCategory.DoesNotExist:
             db_logger.error('Selected category does not exists')
             raise Http404('Selected category does not exists')
-        self.object.group = GroupProfile.objects.filter(groupmember__user=self.request.user).exclude('working-group')[0]
+        self.object.group = GroupProfile.objects.filter(groupmember__user=self.request.user).exclude(slug='working-group')[0]
         self.object.category = category
         #end
 
