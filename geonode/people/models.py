@@ -221,7 +221,7 @@ def profile_post_save(instance, sender, **kwargs):
         # set_user_to_workign_group_admin(instance)
         working_group, created = GroupProfile.objects.get_or_create(slug='working-group')
         if not working_group.title:
-            working_group.title = 'working group'
+            working_group.title = 'Committee'
         working_group.save()
         working_group.join(instance, role='manager')
 
