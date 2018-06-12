@@ -89,14 +89,13 @@
     
                             </div>
                             <div class="clearfix"></div>
-                            <div class="row">
-                                <div class="col-md-6">
+                            <div class="col-md-12">
+                                <div class="col-md-7">
                                     {% if  user_state == 'user' %}
-                                            <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#_deny_comments">{% trans "Comments" %}</button>
+                                            <button class="btn btn-primary pull-right enabled" data-toggle="modal" data-target="#_deny_comments">{% trans "Comments" %}</button>
                                             <button type="button"
                                                     ng-disabled="isDisabledButton"
-                                                    style="margin-right: 10px"
-                                                    class="btn btn-primary pull-right enabled"
+                                                    class="btn btn-primary pull-right enabled btn-margin-5"
                                                     ng-click="submitforVerify()">
                                                         Submit For Verification
                                                         <span ng-show="isDisabledButton">
@@ -104,9 +103,9 @@
                                                         </span>
                                             </button>
                                         {% elif user_state == 'manager' %}
-                                            <button type="button" style="margin-left: 10px"
+                                            <button type="button"
                                                     ng-disabled="isDisabledButton || denyLoader"
-                                                    class="btn btn-primary pull-right enabled"
+                                                    class="btn btn-primary pull-right enabled btn-margin-5"
                                                     ng-click="openDenyModal()">
                                                     Deny with message
                                                     <span ng-show="denyLoader">
@@ -115,17 +114,18 @@
                                             </button>
                                             <button type="button"
                                                     ng-disabled="isDisabledButton || denyLoader"
-                                                    class="btn btn-primary pull-right enabled"
+                                                    class="btn btn-primary pull-right enabled btn-margin-5"
                                                     ng-click="verifyDocument()">
                                                     Push for Approval
                                                     <span ng-show="isDisabledButton">
                                                         <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
                                                      </span>
                                             </button>
+                                           <button class="btn btn-primary pull-right btn-margin-5" data-toggle="modal" data-target="#_deny_comments">{% trans "Comments" %}</button>
                                         {% elif user_state == 'admin'%}
-                                            <button type="button" style="margin-left: 10px"
+                                            <button type="button"
                                                     ng-disabled="isDisabledButton || denyLoader"
-                                                    class="btn btn-primary pull-right enabled"
+                                                    class="btn btn-primary pull-right enabled btn-margin-5"
                                                     ng-click="openDenyModal()">
                                                     Deny with message
                                                     <span ng-show="denyLoader">
@@ -141,7 +141,11 @@
                                                         <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
                                                     </span>
                                             </button>
+                                            <button class="btn btn-primary pull-right btn-margin-5 enabled" data-toggle="modal" data-target="#_deny_comments">{% trans "Comments" %}</button>
                                     {% endif %}
+
+
+
                                 </div>
                             </div>
                             <script type="text/ng-template" id="denyModalContent.html">
@@ -168,7 +172,7 @@
                                     </form>
                                 </div>
                                 <div class="modal-footer">
-                                    <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+                                    <button class="btn btn-primary" type="button" ng-click="ok()">Deny</button>
                                     <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
                                 </div>
                             </script>
