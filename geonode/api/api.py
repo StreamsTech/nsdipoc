@@ -923,7 +923,7 @@ class GroupsWithFavoriteAndDoocked(TypeFilteredResource):
         return reverse('group_detail', args=[bundle.obj.slug])
 
     class Meta:
-        queryset = GroupProfile.objects.filter(favoriteresource__active=True)
+        queryset = GroupProfile.objects.filter(favoriteresource__active=True).exclude(slug='working-group')
         if settings.RESOURCE_PUBLISHING:
             queryset = queryset.filter(is_published=True)
 

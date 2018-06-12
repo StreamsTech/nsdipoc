@@ -1453,7 +1453,7 @@ def map_permission_preview(request, mapid, template='maps/map_attribute_permissi
 
         ctx = {
             'map': map,
-            'organizations': GroupProfile.objects.all(),
+            'organizations': GroupProfile.objects.all().exclude(slug='working-group'),
             'user_state': user_state,
             "denied_comments": MapAuditActivity.objects.filter(map_submission_activity__map=map).order_by('-date_updated')
         }

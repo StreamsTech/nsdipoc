@@ -1408,7 +1408,7 @@ def layer_permission_preview(request, layername, template='layers/layer_attribut
 
         ctx = {
             'layer': layer,
-            'organizations': GroupProfile.objects.all(),
+            'organizations': GroupProfile.objects.all().exclude(slug='working-group'),
             'user_state': user_state,
             "denied_comments": LayerAuditActivity.objects.filter(layer_submission_activity__layer=layer).order_by('-date_updated')
         }
