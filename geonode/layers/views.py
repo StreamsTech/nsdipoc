@@ -610,7 +610,7 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
         "user_role": user_role,
         "approve_form": approve_form,
         "deny_form": deny_form,
-        "denied_comments": LayerAuditActivity.objects.filter(layer_submission_activity__layer=layer),
+        "denied_comments": LayerAuditActivity.objects.filter(layer_submission_activity__layer=layer).order_by('-date_updated'),
         "status": layer.status,
         "chart_link": xlink
     }

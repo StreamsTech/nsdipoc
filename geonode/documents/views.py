@@ -155,7 +155,7 @@ def document_detail(request, docid):
             "status": document.status,
             "approve_form": approve_form,
             "deny_form": deny_form,
-            "denied_comments": DocumentAuditActivity.objects.filter(document_submission_activity__document=document),
+            "denied_comments": DocumentAuditActivity.objects.filter(document_submission_activity__document=document).order_by('-date_updated'),
             "document_layers": document.layers.all(),
 
         }
