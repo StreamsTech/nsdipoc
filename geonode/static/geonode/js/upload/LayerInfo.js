@@ -161,13 +161,21 @@ define(function (require, exports) {
         var permissions = {
             'users': {},
             'groups': {}
-          };
-          permissions.users['AnonymousUser'] = [];
-          var permissionAttributes=
-          ['view_resourcebase', 'download_resourcebase'];
-          $('#organization-checkbox input:checked').each(function() {
-            permissions.groups[$(this).attr('value')]= permissionAttributes;
-          });
+        };
+        permissions.users['AnonymousUser'] = [];
+        var permissionAttributes =
+            ['view_resourcebase', 'download_resourcebase'];
+        var selectedOrganizations = [];
+        if (getSelectedOrganizations) {
+            selectedOrganizations = getSelectedOrganizations();
+        }
+        $.each(selectedOrganizations, function (i, organization) {
+            permissions.groups[organization] = permissionAttributes;
+        });
+
+          // $('#organization-checkbox input:checked').each(function() {
+          //   permissions.groups[$(this).attr('value')]= permissionAttributes;
+          // });
           perm=permissions;
         // if (typeof permissionsString == 'undefined'){
         //     perm = {}

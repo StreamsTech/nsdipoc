@@ -35,6 +35,11 @@
             {% include "layer_templates/_deny_layer.html" %}
         {% endif %}
     {% endif %}
+    {% if FRONT_END_SETTINGS.attribute_permission %}
+        {% if status != 'ACTIVE' %}
+            {% include "layer_templates/_deny_comments.html" %}
+        {% endif %}
+    {% endif %}
     {% if user.is_authenticated %}
         {% comment_form resource as form %}
         <div id="form_post_comment_div" class="modal fade" tabindex="-1" role="dialog">
@@ -393,13 +398,27 @@
                                      aria-labelledby="headingOne">
                                     <div class="panel-body">
                                         <ul class="list-group gd-link-style inaccordion">
+                                        {% if FRONT_END_SETTINGS.attribute_permission %}
+                                            {% if status != 'ACTIVE' %}
+                                                <li class="list-group-item">
+                                                        <button class="btn btn-danger btn-md btn-block" data-toggle="modal" data-target="#_deny_comments" style="font-size: 12px;font-weight: bold">
+                                                            {% trans "Comments" %}
+                                                        </button>
+
+                                                </li>
+                                            {% endif %}
+                                        {% endif %}
                                             {% if resource.storeType != "remoteStore" %}
                                                 {% if user_role == "member" %}
                                                  {% if status == 'DENIED' %}
-                                                <li class="list-group-item">
-                                                        <button class="btn btn-gd-primary btn-md btn-block" data-toggle="modal" data-target="#_deny_comments">{% trans "Comments" %}</button>
-                                                        
-                                                </li>
+                                                     {% if not FRONT_END_SETTINGS.attribute_permission %}
+                                                         <li class="list-group-item">
+                                                             <button class="btn btn-gd-primary btn-md btn-block"
+                                                                     data-toggle="modal"
+                                                                     data-target="#_deny_comments">{% trans "Comments" %}</button>
+
+                                                         </li>
+                                                     {% endif %}
                                                 {% endif %}
                                                 <li class="list-group-item">
                                                         <button class="btn btn-gd-primary btn-md btn-block" data-toggle="modal" data-target="#_publish_layer">{% trans "Push for Approval" %}</button>

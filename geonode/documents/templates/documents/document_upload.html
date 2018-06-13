@@ -20,19 +20,19 @@
                
                   <form id="upload_form" class="form-horizontal"  method="post" enctype="multipart/form-data" action="{% url "document_upload" %}">
                     
-                    <div class="form-group">
-
-                            <label class="col-md-4 control-label"> <span style="color:red;"> * </span>{% trans "Select Organization " %} </label>
- 
-                        <div class="col-md-4">
-                            <select id= "org-id" name="org-id" class="form-control" >
-                            {% for organization in ogranizations %}
-                            <option  value={{ organization.id }} >{{ organization.title }}</option>
-                            {% endfor %}
-                           </select>
-                        </div>
-                   
-                </div>
+{#                    <div class="form-group">#}
+{##}
+{#                            <label class="col-md-4 control-label"> <span style="color:red;"> * </span>{% trans "Select Organization " %} </label>#}
+{# #}
+{#                        <div class="col-md-4">#}
+{#                            <select id= "org-id" name="org-id" class="form-control" >#}
+{#                            {% for organization in ogranizations %}#}
+{#                            <option  value={{ organization.id }} >{{ organization.title }}</option>#}
+{#                            {% endfor %}#}
+{#                           </select>#}
+{#                        </div>#}
+{#                   #}
+{#                </div>#}
 
                 <div class="form-group">
                     

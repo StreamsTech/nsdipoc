@@ -30,7 +30,7 @@ width: 100%;">
                 <label>Name</label>
                 <input required type="text" placeholder="Map name" validatefilename class="form-control input-sm" maxlength="100" ng-model="file.saveAs" autofocus />
             </div>
-            <div class="form-group">
+            <div class="form-group" ng-if="false">
                 <label for="user_organization">Organization:</label>
                 <select id="user_organization" ng-model="file.organizationId" class="form-control input-sm">
                         <option value="">---Please select---</option>
