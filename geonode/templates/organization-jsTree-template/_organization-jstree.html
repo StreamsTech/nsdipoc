@@ -55,10 +55,15 @@
                     "icons": false
                 }
             },
-            "plugins": ["checkbox","search"]
+            "plugins": ["checkbox","search"],
+            "search": {
+                "case_sensitive": false,
+                "show_only_matches": true
+            }
         });
         $( "#organization-search" ).keyup(function (e) {
-            $("#container").jstree(true).search($("#organization-search").val());
+            var searchValue = $("#organization-search").val() ? $("#organization-search").val().trim() : '';
+            $("#container").jstree(true).search(searchValue);
         });
         $('#container')
             .bind('ready.jstree', function (e, data) {
