@@ -57,9 +57,7 @@
           ['view_resourcebase', 'download_resourcebase'];
             var data={};
             data.layer_pk =$scope.layer_id;
-            var permittedOrganizations=_.map(_.filter($scope.departments,function(department){
-                return department.IsChecked;
-                }),"slug");
+            var permittedOrganizations= getSelectedOrganizations();
             angular.forEach(permittedOrganizations,function(organizationId){
                 permissions.groups[organizationId]= permissionAttributes;
             });
@@ -72,8 +70,6 @@
         function postLayerData(url,data){
             layerService.submitLayerInformation(url,data).then(function(response){
                 document.location.href="/layers/";
-                $scope.isDisabledButton=false;
-                $scope.denyLoader=false;
             },function(error){
                 $scope.isDisabledButton=false;
                 $scope.denyLoader=false;
@@ -124,17 +120,12 @@
               },function(error){
                   console.log(error);
             });
-            $q.all({department: layerService.getOrganizations('/api/groups'), permissions: layerService.getLayerPermissions('/security/permissions/'+layerId)})
+            $q.all({permissions: layerService.getLayerPermissions('/security/permissions/'+layerId)})
                     .then(function(resolutions){
-                    var departments= resolutions.department.objects;
-                    $scope.departments= _.object(_.map(departments, function(item) {
-                        return [item.slug, item];
-                     }));
-                    var permissions  = Object.keys(JSON.parse(resolutions.permissions.permissions).groups);
-                    angular.forEach(permissions,function(permission){
-                        if($scope.departments[permission])
-                            $scope.departments[permission].IsChecked=true;
-                    });
+                        var permissions = Object.keys(JSON.parse(resolutions.permissions.permissions).groups);
+                        $(document).ready(function () {
+                            getOrganizationData(permissions);
+                        });
                 });
         }
 

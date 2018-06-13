@@ -1,0 +1,81 @@
+<div class="row">
+    <div style="width: 250px" class="col-md-12">
+        <input type="text" class="form-control input-sm" placeholder="search organization" id="organization-search">
+    </div>
+    <div class="clearfix"></div>
+    <div class="col-md-12">
+        <div id="container">
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function getOrganizationData(selectedNodes){
+        $.ajax({
+            url: "/api/nsdi/sectors", success: function (result) {
+                var data = {
+                    text: "Organization  Hierarchy",
+                    id: '$',
+                    children: [],
+                    state: {
+                        opened: true
+                    }
+                };
+                result.forEach(function (sector) {
+                    var treeData = {text: sector.title, children: []};
+                    sector.departments.forEach(function (department) {
+                        var departmentTreeData =  {text: department.title, children: [], id:department.title};
+                        department.organizations.forEach(function (organization) {
+                            var organizationTreeData = {
+                                text: organization.title,
+                                id : organization.slug,
+                                children: []
+                            };
+                            departmentTreeData.children.push(organizationTreeData);
+                        });
+                        treeData.children.push(departmentTreeData);
+                    });
+                    data.children.push(treeData);
+                });
+                generateTree(data,selectedNodes);
+            }
+        });
+    }
+
+    function selectOrganization(selectedNodes) {
+        $.each(selectedNodes,function (i,node) {
+            $('#container').jstree('select_node', node);
+        })
+    }
+
+    function generateTree(data,selectedNodes) {
+        $('#container').jstree({
+            'core': {
+                'data': data,
+                "themes": {
+                    "icons": false
+                }
+            },
+            "plugins": ["checkbox","search"]
+        });
+        $( "#organization-search" ).keyup(function (e) {
+            $("#container").jstree(true).search($("#organization-search").val());
+        });
+        $('#container')
+            .bind('ready.jstree', function (e, data) {
+               selectOrganization(selectedNodes);
+            })
+    }
+
+
+
+    function getSelectedOrganizations() {
+        var selectedOrganizations= [];
+        var nodes = $("#container").jstree(true).get_selected("full", true);
+        $.each(nodes, function (i, node) {
+            if(node.parents.length == 4){
+                selectedOrganizations.push(node.id);
+            }
+        });
+        return selectedOrganizations;
+    }
+</script>

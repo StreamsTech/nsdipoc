@@ -54,11 +54,7 @@
                                                     <label class="control-label col-sm-4" for="organization">Permitted Organizations</label>
                                                     <div class="col-sm-8">
                                                         <div class="well well-sm">
-                                                                <label class="control-label">
-                                                                        <span class="glyphicon glyphicon-list-alt"></span> Organization</label> 
-                                                                        <div class="checkbox" ng-repeat="department in departments">
-                                                                                <label><input type="checkbox" value="true" ng-model="department.IsChecked">[{department.title}]</label>
-                                                                            </div>
+                                                            {% include 'organization-jsTree-template/_organization-jstree.html' %}
                                                         </div>
 
                                                     </div>

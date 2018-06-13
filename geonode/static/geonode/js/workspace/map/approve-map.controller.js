@@ -36,9 +36,7 @@
           ['view_resourcebase', 'download_resourcebase'];
             var data={};
             data.resource_pk =$scope.mapId;
-            var permittedOrganizations=_.map(_.filter($scope.departments,function(department){
-                return department.IsChecked;
-                }),"slug");
+            var permittedOrganizations= getSelectedOrganizations();
             angular.forEach(permittedOrganizations,function(organizationId){
                 permissions.groups[organizationId]= permissionAttributes;
             });
@@ -85,19 +83,13 @@
         };
         function getLayerInformation(layerId){
             $q.all({
-                department: mapPermissionService.getOrganizations('/api/groups'),
                 permissions: mapPermissionService.getMapPermissions('/security/permissions/' + layerId)
             })
                 .then(function (resolutions) {
-                    var departments = resolutions.department.objects;
-                    $scope.departments = _.object(_.map(departments, function (item) {
-                        return [item.slug, item];
-                    }));
                     var permissions = Object.keys(JSON.parse(resolutions.permissions.permissions).groups);
-                    angular.forEach(permissions, function (permission) {
-                        if ($scope.departments[permission])
-                            $scope.departments[permission].IsChecked = true;
-                    });
+                    $(document).ready(function () {
+                            getOrganizationData(permissions);
+                        });
                 });
         }
 
