@@ -155,7 +155,7 @@ def document_detail(request, docid):
             "status": document.status,
             "approve_form": approve_form,
             "deny_form": deny_form,
-            "denied_comments": DocumentAuditActivity.objects.filter(document_submission_activity__document=document),
+            "denied_comments": DocumentAuditActivity.objects.filter(document_submission_activity__document=document).order_by('-date_updated'),
             "document_layers": document.layers.all(),
 
         }
@@ -827,7 +827,7 @@ def document_permission_preview(request, docid, template='documents/document_att
 
         ctx = {
             'document': document,
-            'organizations': GroupProfile.objects.all(),
+            'organizations': GroupProfile.objects.all().exclude(slug='working-group'),
             'user_state': user_state,
             "denied_comments": DocumentAuditActivity.objects.filter(document_submission_activity__document=document).order_by('-date_updated')
         }

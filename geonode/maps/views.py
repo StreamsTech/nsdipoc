@@ -172,7 +172,7 @@ def map_detail(request, mapid, snapshot=None, template='maps/map_detail.html'):
         "status": map_obj.status,
         "approve_form": approve_form,
         "deny_form": deny_form,
-        "denied_comments": MapAuditActivity.objects.filter(map_submission_activity__map=map_obj),
+        "denied_comments": MapAuditActivity.objects.filter(map_submission_activity__map=map_obj).order_by('-date_updated'),
 
     }
 
@@ -1453,7 +1453,7 @@ def map_permission_preview(request, mapid, template='maps/map_attribute_permissi
 
         ctx = {
             'map': map,
-            'organizations': GroupProfile.objects.all(),
+            'organizations': GroupProfile.objects.all().exclude(slug='working-group'),
             'user_state': user_state,
             "denied_comments": MapAuditActivity.objects.filter(map_submission_activity__map=map).order_by('-date_updated')
         }

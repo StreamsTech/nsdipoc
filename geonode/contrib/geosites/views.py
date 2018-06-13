@@ -213,7 +213,7 @@ def ajax_lookup(request):
                          Q(organization__icontains=keyword)).exclude(username='AnonymousUser')
 
     groups = GroupProfile.objects.filter(Q(title__istartswith=keyword) |
-                                         Q(description__icontains=keyword))
+                                         Q(description__icontains=keyword)).exclude(slug='working-group')
     json_dict = {
         'users': [({'username': u.username}) for u in users],
         'count': users.count(),

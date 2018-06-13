@@ -126,8 +126,8 @@ class UserSignupFormExtend(SignupForm):
 
 
 class UserSignupFormWithWorkingGroup(SignupForm):
-    is_working_group_admin = forms.BooleanField(help_text=_('Select if the user is a member of working group'),
-                                    label=_('Is member of working group?'), required=False)
+    is_working_group_admin = forms.BooleanField(help_text=_('Select if the user is a member of Committee'),
+                                    label=_('Is member of committee?'), required=False)
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)

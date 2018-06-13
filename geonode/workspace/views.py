@@ -93,7 +93,7 @@ class AdminWorkspaceLayer(ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ListView, self).get_context_data(*args, **kwargs)
-        groups = GroupProfile.objects.filter(groupmember__user=self.request.user, groupmember__role='manager')
+        groups = GroupProfile.objects.filter(groupmember__user=self.request.user, groupmember__role='manager').exclude(slug='working-group')
         context['user_approval_request_list'] = Layer.objects.filter(status='PENDING', group__in=groups).order_by('date_updated')
         context['approved_list'] = Layer.objects.filter(status='ACTIVE', group__in=groups).order_by('date_updated')
         context['user_draft_list'] = Layer.objects.filter(status='DRAFT', group__in=groups).order_by('date_updated')
@@ -114,7 +114,7 @@ class AdminWorkspaceDocument(ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ListView, self).get_context_data(*args, **kwargs)
-        groups = GroupProfile.objects.filter(groupmember__user=self.request.user, groupmember__role='manager')
+        groups = GroupProfile.objects.filter(groupmember__user=self.request.user, groupmember__role='manager').exclude(slug='working-group')
         context['user_approval_request_list'] = Document.objects.filter(status='PENDING', group__in=groups).order_by('date_updated')
         context['approved_list'] = Document.objects.filter(status='ACTIVE', group__in=groups).order_by('date_updated')  #  [:15]
         context['user_draft_list'] = Document.objects.filter(status='DRAFT', group__in=groups).order_by('date_updated')
@@ -133,7 +133,7 @@ class AdminWorkspaceMap(ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ListView, self).get_context_data(*args, **kwargs)
-        groups = GroupProfile.objects.filter(groupmember__user=self.request.user, groupmember__role='manager')
+        groups = GroupProfile.objects.filter(groupmember__user=self.request.user, groupmember__role='manager').exclude(slug='working-group')
         context['user_approval_request_list'] = Map.objects.filter(status='PENDING', group__in=groups).order_by('date_updated')
         context['approved_list'] = Map.objects.filter(status='ACTIVE', group__in=groups).order_by('date_updated')  # [:15]
         context['user_draft_list'] = Map.objects.filter(status='DRAFT', group__in=groups).order_by('date_updated')
@@ -151,7 +151,7 @@ class AdminWorkspaceUserList(ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ListView, self).get_context_data(*args, **kwargs)
-        groups = GroupProfile.objects.filter(groupmember__user=self.request.user, groupmember__role='manager')
+        groups = GroupProfile.objects.filter(groupmember__user=self.request.user, groupmember__role='manager').exclude(slug='working-group')
         group_member_list = {}
         for group in groups:
             url = settings.SITEURL

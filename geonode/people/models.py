@@ -140,14 +140,14 @@ class Profile(AbstractUser):
     USERNAME_FIELD = 'username'
 
     def group_list_public(self):
-        return GroupProfile.objects.exclude(access="private").filter(groupmember__user=self)
+        return GroupProfile.objects.exclude(access="private").filter(groupmember__user=self).exclude(slug='working-group')
 
     def group_list_all(self):
-        return GroupProfile.objects.filter(groupmember__user=self)
+        return GroupProfile.objects.filter(groupmember__user=self).exclude(slug='working-group')
 
     #@jahangir091
     def group_list_with_default_check(self):
-        group_list = GroupProfile.objects.filter(groupmember__user=self)
+        group_list = GroupProfile.objects.filter(groupmember__user=self).exclude(slug='working-group')
         default_group = GroupProfile.objects.get(slug='default')
         if len(group_list) > 1 and default_group in group_list:
             return group_list.exclude(slug='default')
@@ -156,11 +156,11 @@ class Profile(AbstractUser):
 
     @property
     def is_manager_of_any_group(self):
-        return GroupProfile.objects.filter(groupmember__user=self, groupmember__role="manager").exists()
+        return GroupProfile.objects.filter(groupmember__user=self, groupmember__role="manager").exclude(slug='working-group').exists()
 
     @property
     def is_member_of_any_group(self):
-        return GroupProfile.objects.filter(groupmember__user=self, groupmember__role="member").exists()
+        return GroupProfile.objects.filter(groupmember__user=self, groupmember__role="member").exclude(slug='working-group').exists()
 
     @property
     def message_unread(self):
@@ -221,7 +221,7 @@ def profile_post_save(instance, sender, **kwargs):
         # set_user_to_workign_group_admin(instance)
         working_group, created = GroupProfile.objects.get_or_create(slug='working-group')
         if not working_group.title:
-            working_group.title = 'working group'
+            working_group.title = 'Committee'
         working_group.save()
         working_group.join(instance, role='manager')
 

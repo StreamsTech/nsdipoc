@@ -4,6 +4,7 @@ from osgeo import ogr, osr
 from rest_framework import status
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.response import Response
+from geonode.layers.views import _resolve_layer, _PERMISSION_MSG_VIEW
 
         
 class GeoserverWFSListAPIView(ListAPIView, GeoServerMixin):
@@ -18,9 +19,15 @@ class GeoserverWFSListAPIView(ListAPIView, GeoServerMixin):
         data = dict(request.query_params, access_token=access_token)
         query = self.get_configuration(data)
         query.update(dict(SERVICE='WFS'))
-        params = self.getAttributesPermission(data.get('typeNames', data.get('typeName', [None]))[0])
+        layer_name = data.get('typeNames', data.get('typeName', [None]))[0]
+        layer_obj = _resolve_layer(request,
+                                   layer_name,
+                                   'base.view_resourcebase',
+                                   _PERMISSION_MSG_VIEW)
+        params = self.getAttributesPermission(layer_name)
         if not kwargs.get('include_geometry', False):
-             params.remove('the_geom')
+            if 'the_geom' in params:
+                params.remove('the_geom')
 
         query.update(dict(propertyName=','.join(params)))
         

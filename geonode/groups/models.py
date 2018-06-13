@@ -56,7 +56,7 @@ class GroupProfile(models.Model):
     slug = models.SlugField(unique=True)
     logo = models.ImageField(_('Logo'), upload_to="people_group", blank=True)
     description = models.TextField(_('Description'))
-    department = models.ForeignKey(DepartmentModel, related_name='organizations', null=True)
+    department = models.ForeignKey(DepartmentModel, related_name='organizations', verbose_name='Type', null=True)
 
     #@jahangir
     favorite = models.BooleanField(_("Favorite"), default=False,
