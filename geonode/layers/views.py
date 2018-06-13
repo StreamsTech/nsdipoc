@@ -1393,7 +1393,7 @@ def layer_permission_preview(request, layername, template='layers/layer_attribut
 
     if request.method == 'GET':
         user_state = None
-        if request.user == layer.owner and (layer.status == 'DRAFT' or layer.status == 'DENIED'):
+        if request.user == layer.owner and (layer.status in ['DRAFT','DENIED', 'ACTIVE']):
             user_state = "user"
         elif request.user in layer.group.get_managers() and layer.status == "PENDING":
             user_state = "manager"
