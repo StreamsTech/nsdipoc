@@ -19,6 +19,7 @@ class GeoserverWFSListAPIView(ListAPIView, GeoServerMixin):
         data = dict(request.query_params, access_token=access_token)
         query = self.get_configuration(data)
         query.update(dict(SERVICE='WFS'))
+        import pdb; pdb.set_trace()
         layer_name = data.get('typeNames', data.get('typeName', [None]))[0]
         layer_obj = _resolve_layer(request,
                                    layer_name,
@@ -31,7 +32,7 @@ class GeoserverWFSListAPIView(ListAPIView, GeoServerMixin):
 
         query.update(dict(propertyName=','.join(params)))
         
-        result = self.get_response_from_geoserver('wfs', query)
+        result = self.get_response_from_geoserver('wfs', query, layer_name)
 
         return Response(result, status=status.HTTP_200_OK)
 
