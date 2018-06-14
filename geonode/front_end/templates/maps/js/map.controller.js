@@ -219,7 +219,8 @@
                 var url = self.MapConfig.sources[layer.source].url;
                 if (url) {
                     layer.geoserverUrl = re.test($window.location.pathname) ? getCqlFilterUrl(url) : url;
-                    mapService.addDataLayer(oldLayerService.map(layer, ind), true);
+                    if(layer.id) mapService.addDataLayer(oldLayerService.map(layer, ind), true, layer.id);
+                    else mapService.addDataLayer(oldLayerService.map(layer, ind), true);
                     if(layer.bbox)
                         extent= ol.extent.extend(extent, layer.bbox);
                 }

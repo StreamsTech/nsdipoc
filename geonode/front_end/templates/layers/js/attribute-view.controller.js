@@ -12,6 +12,7 @@
         self.propertyNames = [];
         // self.layerName = $location.search().name;
         self.layerName = $location.path().split('/').pop();
+        self.layerId = window.layerId;
         self.gridOptions = {
             paginationPageSizes: [25, 50, 75, 100],
             paginationPageSize: 25,
@@ -78,7 +79,7 @@
         }
 
         function getLayerFeature(url, layerName) {
-            LayerService.getLayerFeatureByName(url, layerName,false).then(function(res) {
+            LayerService.getLayerFeatureByName(url, layerName, false, self.layerId).then(function(res) {
                 if (typeof res.featureTypes === 'undefined') {
                     return getFeatureDetails(url, layerName, self.propertyNames);
                 }
