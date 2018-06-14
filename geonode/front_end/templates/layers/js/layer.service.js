@@ -147,6 +147,17 @@
                 return get(uri);
 
             },
+            getWMS: function (url, params, useProxy) {
+                url = url + "get-feature-info/?service=WMS";
+                for (var k in params) {
+                    url += '&' + k + '=' + params[k];
+                }
+                var uri = url;
+                if (useProxy == undefined || useProxy) {
+                    uri = '/proxy/?url=' + encodeURIComponent(url);
+                }
+                return get(uri);
+            },
             getWFSWithGeom: function(url, params, useProxy) {
                 url = url + "wfs/with-geometry/?service=WFS";
                 for (var k in params) {

@@ -54,10 +54,7 @@
                 y: Math.round(event.pixel[1])
             };
 
-
-            var wmsSource = $window.GeoServerTileRoot + '?access_token=' + $window.mapConfig.access_token;
-
-            layerRepository.getWMS(wmsSource, urlParams).then(function (response) {
+            LayerService.getWMS('api/geoserver/', urlParams, false).then(function (response) {
                 var geoJson = response;
                 geoJson.features.map(function (feature) {
                     if (!feature.geometry) {
@@ -70,7 +67,7 @@
                 });
                 var parser = new ol.format.GeoJSON();
                 var olFeatures = parser.readFeatures(geoJson);
-                var featureList= olFeatures.map(function (of) {
+                var featureList = olFeatures.map(function (of) {
                     var id = parseId(of);
                     var lookup = {};
                     for (var key in layers) {
@@ -86,11 +83,10 @@
                     };
                 });
                 deferred.resolve(featureList);
-
             }).catch(function () {
 
             });
-            return deferred.promise
+            return deferred.promise;
         }
 
         function adjustPopupPosition(map, coordinate,event) {

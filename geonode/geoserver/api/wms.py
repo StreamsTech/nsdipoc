@@ -24,7 +24,8 @@ class GeoserverWMSGetFeatureInfoListAPIView(ListAPIView, GeoServerMixin):
         result = dict()
         for layer_name in layers.split(','):
             attributes = self.getAttributesPermission(layer_name=layer_name)
-            attributes.remove('the_geom')
+            if 'the_geom' in attributes:
+                attributes.remove('the_geom')
             query.update(dict(SERVICE='WMS', 
                             REQUEST='GetFeatureInfo',
                             QUERY_LAYERS= layer_name,
