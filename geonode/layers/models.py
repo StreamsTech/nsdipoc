@@ -237,7 +237,7 @@ class Layer(ResourceBase):
 
     def attribute_config(self):
         # Get custom attribute sort order and labels if any
-        cfg = {}
+        cfg = {"id": self.id}
         visible_attributes = self.attribute_set.visible()
         if (visible_attributes.count() > 0):
             cfg["getFeatureInfo"] = {

@@ -321,7 +321,7 @@
             //         });
             //     }
             // },
-            addDataLayer: function(layer,preventZoom) {
+            addDataLayer: function(layer,preventZoom, layerId) {
                 if (typeof layer.Name === 'undefined') {
                     return;
                 }
@@ -355,11 +355,11 @@
                             p1_deferred.resolve({});
                         });
                 }
-                var p2 = newLayerService.getAttributesName(layer.Name)
+                var p2 = newLayerService.getAttributesName(layer.Name, layerId)
                     .then(function(res) {
                         layer.AttributeDefinition = res;
                     });
-                var p3 = newLayerService.getShapeType(layer.Name)
+                var p3 = newLayerService.getShapeType(layer.Name, layerId)
                     .then(function(res) {
                         layer.ShapeType = res;
                     });

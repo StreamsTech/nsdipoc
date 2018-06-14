@@ -147,6 +147,17 @@
                 return get(uri);
 
             },
+            getWMS: function (url, params, useProxy) {
+                url = url + "get-feature-info/?service=WMS";
+                for (var k in params) {
+                    url += '&' + k + '=' + params[k];
+                }
+                var uri = url;
+                if (useProxy == undefined || useProxy) {
+                    uri = '/proxy/?url=' + encodeURIComponent(url);
+                }
+                return get(uri);
+            },
             getWFSWithGeom: function(url, params, useProxy) {
                 url = url + "wfs/with-geometry/?service=WFS";
                 for (var k in params) {
@@ -159,14 +170,73 @@
                 return get(uri);
 
             },
-            getLayerFeatureByName: function(url, layerName,userProxy) {
-                return this.getWFS(url, {
+            getLayerFeatureByName1: function(url, layerName,userProxy,layerId) {
+                if(layerId) {
+                    var deferred = $q.defer();
+                    $q.all({
+                        wfsResult: this.getWFS(url, {
+                            typeName: layerName,
+                            request: "describeFeatureType",
+                            version: "2.0.0",
+                            outputFormat: "application/json"
+                        }, userProxy), layerAttributePermission: get('/api/layer-attributes-permission/' + layerId)
+                    })
+                        .then(function (resolutions) {
+                            var geoServerResult = resolutions.wfsResult;
+                            var layerDetails = resolutions.layerAttributePermission;
+                            var permittedAttributes = _.filter(layerDetails.attributes, function (attribute) {
+                                return attribute.is_permitted;
+                            }).map(function (attribute) {
+                                return attribute.attribute;
+                            });
+                            if (geoServerResult.featureTypes[0]) {
+                                geoServerResult.featureTypes[0].properties = _.filter(geoServerResult.featureTypes[0].properties, function (property) {
+                                    return _.contains(permittedAttributes, property.name); // -1 means not present
+                                })
+                            }
+                            deferred.resolve(geoServerResult);
+                        });
+                    return deferred.promise;
+                }else {
+                    return this.getWFS(url, {
+                        typeName: layerName,
+                        request: "describeFeatureType",
+                        version: "2.0.0",
+                        outputFormat: "application/json"
+                    }, userProxy);
+                }
+            },
+            getLayerFeatureByName: function(url, layerName,userProxy,layerId) {
+                var deferred = $q.defer();
+                this.getWFS(url, {
                     typeName: layerName,
                     request: "describeFeatureType",
                     version: "2.0.0",
                     outputFormat: "application/json"
+                }, userProxy)
+                    .then(function(geoServerResult){
+                        if (!layerId){
+                            deferred.resolve(geoServerResult);
+                        }
+                        else {
+                            get('/api/layer-attributes-permission/' + layerId)
+                            .then(function(layerDetails){
+                                var permittedAttributes = _.filter(layerDetails.attributes, function (attribute) {
+                                    return attribute.is_permitted;
+                                }).map(function (attribute) {
+                                    return attribute.attribute;
+                                });
+                                if (geoServerResult.featureTypes[0]) {
+                                    geoServerResult.featureTypes[0].properties = _.filter(geoServerResult.featureTypes[0].properties, function (property) {
+                                        return _.contains(permittedAttributes, property.name); // -1 means not present
+                                    })
+                                }
+                                deferred.resolve(geoServerResult);
+                            });
+                        }
 
-                },userProxy);
+                });
+                return deferred.promise;
             },
             getFeatureDetails: function(url, layerName, propertyNames) {
                 return this.getWFS(url, {
@@ -220,9 +290,9 @@
             updateLayerByMap: function(mapId, layerName, obj) {
                 return put('/maps/' + mapId + '/layer/' + layerName + '/', obj);
             },
-            getAttributesName: function(layerName) {
+            getAttributesName: function(layerName, layerId) {
                 var deferred = $q.defer();
-                this.getLayerFeatureByName($window.GeoServerHttp2Root, layerName).then(function(res) {
+                this.getLayerFeatureByName('api/geoserver/', layerName , false , layerId).then(function(res) {
                     if (typeof res.featureTypes === 'undefined') {
                         deferred.resolve([]);
                         return;
@@ -248,9 +318,9 @@
                 });
                 return deferred.promise;
             },
-            getShapeType: function(layerName) {
+            getShapeType: function(layerName, layerId) {
                 var deferred = $q.defer();
-                this.getLayerFeatureByName($window.GeoServerHttp2Root, layerName).then(function(res) {
+                this.getLayerFeatureByName( $window.GeoServerHttp2Root, layerName).then(function(res) {
                     var shapeType = "";
                     if (typeof res.featureTypes === 'undefined') {
                         deferred.resolve('geoTiff');

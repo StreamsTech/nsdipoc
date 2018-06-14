@@ -669,6 +669,7 @@ def new_map_config(request):
                 config = layer.attribute_config()
 
                 # Add required parameters for GXP lazy-loading
+                config["id"] = layer.id
                 config["title"] = layer.title
                 config["queryable"] = True
 

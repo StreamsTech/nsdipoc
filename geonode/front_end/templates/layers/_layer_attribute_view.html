@@ -12,6 +12,9 @@
     }
 
 </style>
+<script>
+    window.layerId = '{{ resource.id }}';
+</script>
 <div ng-controller="AttributeViewController as ctrl" ng-cloak>
     <div class="alert alert-success  alert-dismissable" ng-show="ctrl.isSuccess">
         <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
@@ -35,7 +38,7 @@
             </span>
         </div>
     </div>
-    <label for="" style="float: right;margin-top: 22px;padding-right: 10px;text-align: right;">Upload CSV to update information</label>
+    <label for="" style="float: right;margin-top: 22px;padding-right: 10px;text-align: right;">Upload CSV to update information {{ resource.id }}</label>
     <div class="clearfix"></div>
     {% endif %}
     

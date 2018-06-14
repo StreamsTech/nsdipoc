@@ -471,6 +471,7 @@ class MapLayer(models.Model, GXPLayerBase):
             try:
                 if self.local:
                     layer = Layer.objects.get(typename=self.name)
+                    cfg["id"] = layer.id
                 else:
                     layer = Layer.objects.get(
                         typename=self.name,
