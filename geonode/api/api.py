@@ -106,6 +106,8 @@ from geonode.layers.views import save_geometry_type
 from django.db.models import Count
 CONTEXT_LOG_FILE = None
 
+from geonode.api.tasks import sendMailToOrganizationAdmins
+
 if 'geonode.geoserver' in settings.INSTALLED_APPS:
     from geonode.geoserver.helpers import _render_thumbnail
     from geonode.geoserver.helpers import ogc_server_settings
@@ -923,7 +925,7 @@ class GroupsWithFavoriteAndDoocked(TypeFilteredResource):
         return reverse('group_detail', args=[bundle.obj.slug])
 
     class Meta:
-        queryset = GroupProfile.objects.filter(favoriteresource__active=True)
+        queryset = GroupProfile.objects.filter(favoriteresource__active=True).exclude(slug='working-group')
         if settings.RESOURCE_PUBLISHING:
             queryset = queryset.filter(is_published=True)
 
@@ -1230,6 +1232,7 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                     working_group_admins = Profile.objects.filter(is_working_group_admin=True)
                     notify.send(request.user, recipient_list=list(working_group_admins), actor=request.user,
                                 target=layer, verb='pushed a new layer for approval')
+                    sendMailToOrganizationAdmins.delay(layer.id, 'layer')
 
 
             elif request.user ==  layer.owner and status == "PENDING":
@@ -1289,9 +1292,9 @@ class MapPermissionPreviewApi(TypeFilteredResource):
 
         if request.method == 'POST':
             out = {'success': False}
-            map_pk = json.loads(request.body).get('map_pk')
+            map_pk = json.loads(request.body).get('resource_pk')
             permissions = json.loads(request.body).get('permissions')
-            attributes = json.loads(request.body).get('attributes')
+            # attributes = json.loads(request.body).get('attributes')
             status = json.loads(request.body).get('status')
             comment_body = json.loads(request.body).get('comment')
             comment_subject = json.loads(request.body).get('comment_subject')
@@ -1367,12 +1370,14 @@ class MapPermissionPreviewApi(TypeFilteredResource):
                 notify.send(request.user, recipient=map.owner, actor=request.user,
                             target=map, verb='{0} your map'.format(status))
 
+
                 #if the map is verified, the inform working group
                 #admins to approve this map
                 if status == "VERIFIED":
                     working_group_admins = Profile.objects.filter(is_working_group_admin=True)
                     notify.send(request.user, recipient_list=list(working_group_admins), actor=request.user,
                                 target=map, verb='pushed a new map for approval')
+                    sendMailToOrganizationAdmins.delay(map.id, 'map')
 
 
             elif request.user ==  map.owner and status == "PENDING":
@@ -1422,7 +1427,7 @@ class DocumentPermissionPreviewApi(TypeFilteredResource):
 
         if request.method == 'POST':
             out = {'success': False}
-            document_pk = json.loads(request.body).get('document_pk')
+            document_pk = json.loads(request.body).get('resource_pk')
             permissions = json.loads(request.body).get('permissions')
             attributes = json.loads(request.body).get('attributes')
             status = json.loads(request.body).get('status')
@@ -1506,6 +1511,7 @@ class DocumentPermissionPreviewApi(TypeFilteredResource):
                     working_group_admins = Profile.objects.filter(is_working_group_admin=True)
                     notify.send(request.user, recipient_list=list(working_group_admins), actor=request.user,
                                 target=document, verb='pushed a new document for approval')
+                    sendMailToOrganizationAdmins.delay(document.id, 'document')
 
 
             elif request.user ==  document.owner and status == "PENDING":

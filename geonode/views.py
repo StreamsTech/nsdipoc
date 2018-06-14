@@ -106,7 +106,7 @@ def ajax_lookup(request):
                                             Q(first_name__icontains=keyword) |
                                             Q(organization__icontains=keyword)) & Q(is_active=True)).exclude(username='AnonymousUser')
     groups = GroupProfile.objects.filter(Q(title__istartswith=keyword) |
-                                         Q(description__icontains=keyword))
+                                         Q(description__icontains=keyword)).exclude(slug='working-group')
     json_dict = {
 
         'users': [({'username': u.username, 'eamil': u.email }) for u in users],

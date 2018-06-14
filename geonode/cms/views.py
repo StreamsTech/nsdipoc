@@ -85,7 +85,7 @@ class IndexClass(ListView):
         #home page counters
         context['layer_counter'] = Layer.objects.filter(status='ACTIVE').count()
         context['map_counter'] = Map.objects.filter(status='ACTIVE').count()
-        context['group_counter'] = GroupProfile.objects.all().count()
+        context['group_counter'] = GroupProfile.objects.all().exclude(slug='working-group').count()
         if self.request.user.is_superuser:
             context['user_counter'] = get_user_model().objects.exclude(username='AnonymousUser').count()
         else:

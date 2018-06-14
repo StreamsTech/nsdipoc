@@ -24,7 +24,7 @@
         $scope.departments=[];
         $scope.denyLoader = false;
         $scope.isDisabledButton = false;
-        $scope.layerApprovalUrl="/api/resource-attribute-permission-set/";
+        $scope.layerApprovalUrl="/api/document-attribute-permission-set/";
 
         function getPostLayerDataInformation(){
             var permissions = {

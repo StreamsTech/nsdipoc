@@ -610,7 +610,7 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
         "user_role": user_role,
         "approve_form": approve_form,
         "deny_form": deny_form,
-        "denied_comments": LayerAuditActivity.objects.filter(layer_submission_activity__layer=layer),
+        "denied_comments": LayerAuditActivity.objects.filter(layer_submission_activity__layer=layer).order_by('-date_updated'),
         "status": layer.status,
         "chart_link": xlink
     }
@@ -1393,7 +1393,7 @@ def layer_permission_preview(request, layername, template='layers/layer_attribut
 
     if request.method == 'GET':
         user_state = None
-        if request.user == layer.owner and (layer.status == 'DRAFT' or layer.status == 'DENIED'):
+        if request.user == layer.owner and (layer.status in ['DRAFT','DENIED', 'ACTIVE']):
             user_state = "user"
         elif request.user in layer.group.get_managers() and layer.status == "PENDING":
             user_state = "manager"
@@ -1408,7 +1408,7 @@ def layer_permission_preview(request, layername, template='layers/layer_attribut
 
         ctx = {
             'layer': layer,
-            'organizations': GroupProfile.objects.all(),
+            'organizations': GroupProfile.objects.all().exclude(slug='working-group'),
             'user_state': user_state,
             "denied_comments": LayerAuditActivity.objects.filter(layer_submission_activity__layer=layer).order_by('-date_updated')
         }

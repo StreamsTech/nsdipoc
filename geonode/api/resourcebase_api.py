@@ -799,7 +799,7 @@ class GroupsResourceWithFavorite(ModelResource):
         return reverse('group_detail', args=[bundle.obj.slug])
 
     class Meta:
-        queryset = GroupProfile.objects.all()
+        queryset = GroupProfile.objects.all().exclude(slug='working-group')
         resource_name = 'groups_with_favorite'
         ordering = ['title', 'date']
 

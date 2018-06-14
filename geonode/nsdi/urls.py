@@ -8,8 +8,8 @@ urlpatterns = patterns('',
   url(r'^sector/edit/(?P<sector_pk>\d+)$', views.SectorUpdate.as_view(), name='sector_edit'),
   url(r'^sector/delete/(?P<sector_pk>\d+)$', views.SectorDelete.as_view(), name='sector_delete'),
 
-  url(r'^department/list$', views.DepartmentList.as_view(), name='department_list'),
-  url(r'^department/add$', views.DepartmentCreate.as_view(), name='department_new'),
-  url(r'^department/edit/(?P<department_pk>\d+)$', views.DepartmentUpdate.as_view(), name='department_edit'),
-  url(r'^department/delete/(?P<department_pk>\d+)$', views.DepartmentDelete.as_view(), name='department_delete'),
+  url(r'^type/list$', views.DepartmentList.as_view(), name='department_list'),
+  url(r'^type/add$', views.DepartmentCreate.as_view(), name='department_new'),
+  url(r'^type/edit/(?P<department_pk>\d+)$', views.DepartmentUpdate.as_view(), name='department_edit'),
+  url(r'^type/delete/(?P<department_pk>\d+)$', views.DepartmentDelete.as_view(), name='department_delete'),
 )

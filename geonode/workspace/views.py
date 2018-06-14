@@ -19,7 +19,7 @@ from geonode.layers.models import LayerSubmissionActivity, LayerAuditActivity
 from geonode.people.models import Profile
 from geonode.groups.models import GroupProfile, GroupMember
 from geonode import settings
-from .utils import prepare_messages
+from .utils import prepare_messages, convert_size
 
 
 class MemberWorkspaceLayer(ListView):
@@ -93,13 +93,14 @@ class AdminWorkspaceLayer(ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ListView, self).get_context_data(*args, **kwargs)
-        groups = GroupProfile.objects.filter(groupmember__user=self.request.user, groupmember__role='manager')
+        groups = GroupProfile.objects.filter(groupmember__user=self.request.user, groupmember__role='manager').exclude(slug='working-group')
         context['user_approval_request_list'] = Layer.objects.filter(status='PENDING', group__in=groups).order_by('date_updated')
         context['approved_list'] = Layer.objects.filter(status='ACTIVE', group__in=groups).order_by('date_updated')
         context['user_draft_list'] = Layer.objects.filter(status='DRAFT', group__in=groups).order_by('date_updated')
         context['denied_list'] = Layer.objects.filter(status='DENIED', group__in=groups).order_by('date_updated')  # [:15]
         context['total_layer'] = Layer.objects.all().count()
-        context['total_layer_size'] = Layer.objects.aggregate(Sum('file_size'))['file_size__sum']
+        context['total_layer_size'] = convert_size(Layer.objects.aggregate(Sum('file_size'))['file_size__sum'])[0]
+        context['layer_size_unit'] = convert_size(Layer.objects.aggregate(Sum('file_size'))['file_size__sum'])[1]
         return context
 
 
@@ -114,7 +115,7 @@ class AdminWorkspaceDocument(ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ListView, self).get_context_data(*args, **kwargs)
-        groups = GroupProfile.objects.filter(groupmember__user=self.request.user, groupmember__role='manager')
+        groups = GroupProfile.objects.filter(groupmember__user=self.request.user, groupmember__role='manager').exclude(slug='working-group')
         context['user_approval_request_list'] = Document.objects.filter(status='PENDING', group__in=groups).order_by('date_updated')
         context['approved_list'] = Document.objects.filter(status='ACTIVE', group__in=groups).order_by('date_updated')  #  [:15]
         context['user_draft_list'] = Document.objects.filter(status='DRAFT', group__in=groups).order_by('date_updated')
@@ -133,7 +134,7 @@ class AdminWorkspaceMap(ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ListView, self).get_context_data(*args, **kwargs)
-        groups = GroupProfile.objects.filter(groupmember__user=self.request.user, groupmember__role='manager')
+        groups = GroupProfile.objects.filter(groupmember__user=self.request.user, groupmember__role='manager').exclude(slug='working-group')
         context['user_approval_request_list'] = Map.objects.filter(status='PENDING', group__in=groups).order_by('date_updated')
         context['approved_list'] = Map.objects.filter(status='ACTIVE', group__in=groups).order_by('date_updated')  # [:15]
         context['user_draft_list'] = Map.objects.filter(status='DRAFT', group__in=groups).order_by('date_updated')
@@ -151,7 +152,7 @@ class AdminWorkspaceUserList(ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ListView, self).get_context_data(*args, **kwargs)
-        groups = GroupProfile.objects.filter(groupmember__user=self.request.user, groupmember__role='manager')
+        groups = GroupProfile.objects.filter(groupmember__user=self.request.user, groupmember__role='manager').exclude(slug='working-group')
         group_member_list = {}
         for group in groups:
             url = settings.SITEURL
