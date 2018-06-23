@@ -421,7 +421,7 @@ def activateimage(request, image_pk, section_pk):
 
 class TermsAndConditionView(ListView):
     """
-    This view returns terms and conditions for geodash.
+    This view returns terms and conditions for nsdi.
     """
     template_name = 'termsandcondition.html'
     model = FooterSectionDescriptions

@@ -266,7 +266,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
                     data_dict = reprojection(tmp_dir, shp_file_name)
                 else:
                     out['success'] = False
-                    out['errors'] = "Geodash can not detect projection for the uploaded layer" \
+                    out['errors'] = "NSDI can not detect projection for the uploaded layer" \
                                     "Please upload layer with known projection"
                     status_code = 400
                     return HttpResponse(
@@ -290,7 +290,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
                     data_dict = reprojection(tmp_dir, str(request.FILES['base_file'].name))
                 else:
                     out['success'] = False
-                    out['errors'] = "Geodash can not detect projection for the uploaded layer" \
+                    out['errors'] = "NSDI can not detect projection for the uploaded layer" \
                                     "Please upload layer with known projection"
                     status_code = 400
                     return HttpResponse(
