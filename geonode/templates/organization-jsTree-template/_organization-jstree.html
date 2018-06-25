@@ -8,6 +8,31 @@
         </div>
     </div>
 </div>
+<style>
+    #container {
+        width: 280px;
+    }
+    .jstree-default a {
+        white-space: normal !important;
+        height: auto;
+    }
+
+    .jstree-anchor {
+        height: auto !important;
+    }
+
+    .jstree-default li > ins {
+        vertical-align: top;
+    }
+
+    .jstree-leaf {
+        height: auto;
+    }
+
+    .jstree-leaf a {
+        height: auto !important;
+    }
+</style>
 <script type="text/javascript">
     function getOrganizationData(selectedNodes){
         $.ajax({
