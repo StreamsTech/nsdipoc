@@ -736,24 +736,25 @@
             </article>
         </div>
         <ul class="c-menu__items">
-            
+
             <li class="c-menu__item">
                 <a href="{% url "layer_upload"  %}" class="c-menu__link">
-                    <i class="fa fa-cloud-upload"></i>
-                    <span style="text-align:left;">{% trans "Upload Layers" %}</span>
+                    <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                    <span style="color:#fff;">{% trans "Upload Layers" %}</span>
                 </a>
             </li>
             <li class="c-menu__item">
                 <a href="{{ user.get_absolute_url }}" class="c-menu__link">
                     <i class="fa fa-user" aria-hidden="true"></i>
-                    <span style="text-align:left;">{% trans "Profile" %}</span>
+                    <span style="color:#fff;margin-left: 5px"> {% trans "Profile" %}</span>
                 </a>
             </li>
+
             {% if request.user.is_superuser %}
             <li class="c-menu__item">
                 <a href="{% url "keyword-list" %}" class="c-menu__link">
-                    <i class="fa fa-keyboard-o"></i>
-                    <span style="text-align:left;">{% trans "Keyword List" %}</span>
+                    <i class="fa fa-keyboard-o" aria-hidden="true"></i>
+                    <span style="color:#fff;">{% trans "Keyword List" %}</span>
                 </a>
             </li>
             {% endif %}
@@ -762,24 +763,24 @@
                 <li class="c-menu__item">
                         <a href="{% url "section-list-table" %}" class="c-menu__link">
                             <i class="fa fa-columns"></i>
-                            <span style="text-align:left;">{% trans "Manage Index Page Sections" %}</span>
+                            <span style="color:#fff;">{% trans "Manage Index Page Sections" %}</span>
                         </a>
                 </li>
             {% endif %}
 
             {% if FRONT_END_SETTINGS.templates_base.manage_sector_dept_section_createOrg %}
-            
+
                 {% if request.user.is_superuser and request.user.is_authenticated %}
                   <li class="c-menu__item">
                       <a href="{% url "sector_list" %}" class="c-menu__link">
                           <i class="fa fa-tasks"></i>
-                          <span style="text-align:left;color:#fff;margin-left:-8px;">{% trans "Manage Sector" %}</span>
+                          <span style="color:#fff;">{% trans "Manage Sector" %}</span>
                       </a>
                   </li>
                 <li class="c-menu__item">
                       <a href="{% url "department_list" %}" class="c-menu__link">
                           <i class="fa fa-tasks"></i>
-                          <span style="text-align:left;color:#fff;margin-left:-8px;">{% trans "Manage Type" %}</span>
+                          <span style="color:#fff;">{% trans "Manage Type" %}</span>
                       </a>
                   </li>
                   {% endif %}
@@ -787,7 +788,7 @@
                     <li class="c-menu__item">
                         <a href="{% url "group_create" %}" class="c-menu__link">
                             <i class="fa fa-tags"></i>
-                            <span style="text-align:left;">{% trans "Create Organization" %}</span>
+                            <span style="color:#fff;">{% trans "Create Organization" %}</span>
                         </a>
                     </li>
                 {% endif %}
@@ -795,18 +796,18 @@
                      <li class="c-menu__item">
                      <a href="{% url "section_list" %}" class="c-menu__link">
                          <i class="fa fa-tasks"></i>
-                         <span style="text-align:left;color:#fff;margin-left:-8px;">{% trans "Manage Section" %}</span>
+                         <span style="color:#fff;">{% trans "Manage Section" %}</span>
                      </a>
                      </li>
                  {% endif%}
             {% endif %}
 
-            
+
             {% if request.user.is_superuser %}
                 <li class="c-menu__item">
                     <a href="{% url "topiccategory-list" %}" class="c-menu__link">
                         <i class="fa fa-tags"></i>
-                        <span style="text-align:left;">{% trans "Manage Category" %}</span>
+                        <span style="color:#fff;">{% trans "Manage Category" %}</span>
                     </a>
                 </li>
             {% endif %}
@@ -815,7 +816,7 @@
             <li class="c-menu__item">
                 <a href="{% url "wms-server-list" %}" class="c-menu__link">
                     <i class="fa fa-tasks"></i>
-                    <span style="text-align:left;">{% trans "Add Server" %}</span>
+                    <span style="color:#fff;">{% trans "Add Server" %}</span>
                 </a>
             </li>
             {% endif %}
@@ -823,7 +824,7 @@
             <li class="c-menu__item">
                 <a href="{% url "news-create" %}" class="c-menu__link">
                     <i class="fa fa-file-text-o"></i>
-                    <span style="text-align:left;">{% trans "Add News" %}</span>
+                    <span style="color:#fff;">{% trans "Add News" %}</span>
                 </a>
             </li>
             {% endif %}
@@ -832,7 +833,7 @@
             <li class="c-menu__item">
                 <a href="{% url "member-workspace-layer" %}" class="c-menu__link">
                     <i class="fa fa-users"></i>
-                    <span style="text-align:left;">{% trans "Member-Workspace" %}</span>
+                    <span style="color:#fff;">{% trans "Member-Workspace" %}</span>
                 </a>
             </li>
             {% endif %}
@@ -842,7 +843,7 @@
             <li class="c-menu__item">
                 <a href="{% url "admin-workspace-layer" %}" class="c-menu__link">
                     <i class="fa fa-lock"></i>
-                    <span style="text-align:left;">{% trans "Admin-Workspace" %}</span>
+                    <span style="color:#fff;">{% trans "Admin-Workspace" %}</span>
                 </a>
             </li>
             {% endif %}
@@ -850,14 +851,14 @@
               <li class="c-menu__item">
                   <a href="{% url "create-user" %}" class="c-menu__link">
                     <i class="fa fa-user-plus"></i>
-                    <span style="text-align:left;">{% trans "Create User" %}</span>
+                    <span style="color:#fff;">{% trans "Create User" %}</span>
                   </a>
               </li>
                 {% if FRONT_END_SETTINGS.templates_base.backup_organization_layers %}
                 <li class="c-menu__item">
                   <a href="{% url "organization-layers-backup-view" %}" class="c-menu__link">
                     <i class="fa fa-user-plus"></i>
-                    <span style="text-align:left;">{% trans "Backup Organization Layers" %}</span>
+                    <span style="color:#fff;">{% trans "Backup Organization Layers" %}</span>
                   </a>
                 </li>
                 {% endif %}
@@ -866,7 +867,7 @@
             <li class="c-menu__item">
                 <a href="{% url "recent-activity" %}" class="c-menu__link">
                     <i class="fa"><img src="{{ STATIC_URL }}geonode/images/user-icon/recent-activity.png" alt="Recent Activity"></i>
-                    <span style="text-align:left;">{% trans "Recent Activity" %}</span>
+                    <span style="color:#fff;">{% trans "Recent Activity" %}</span>
                 </a>
             </li>
             {% if perms.announcements.can_manage %}
@@ -905,7 +906,7 @@
             <li class="c-menu__item">
                 <a href="{% url "admin:index" %}" class="c-menu__link">
                     <i class="fa fa-cog"></i>
-                    {% trans "Admin" %}
+                    <span style="text-align:left;margin-left: 5px">{% trans "Admin" %}</span>
                 </a>
             </li>
 		    {% endif %}
@@ -933,45 +934,45 @@
             </li>
             <li class="c-menu__item">
                 <a href="{% url "analytics" %}" class="c-menu__link">
-                    <img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help">
-                    <span style="text-align:left;margin-left:-10px;">{% trans "Analytics" %}</span>
+                    <i class="fa"> <img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help"></i>
+                    <span style="text-align:left;">{% trans "Analytics" %}</span>
                 </a>
             </li>
             <li class="c-menu__item">
                 <a href="{% url "error_reporting" %}" class="c-menu__link">
-                    <img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help">
-                    <span style="text-align:left;margin-left:-10px;">{% trans "Error Reporting" %}</span>
+                    <i class="fa"> <img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help"> </i>
+                    <span style="text-align:left;">{% trans "Error Reporting" %}</span>
                 </a>
             </li>
             <li class="c-menu__item">
                 <a href="{% url "system_settings" %}" class="c-menu__link">
-                    <img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help">
-                    <span style="text-align:left;margin-left:-10px;">{% trans "System Settings" %}</span>
+                    <i class="fa"><img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help"></i>
+                    <span >{% trans "System Settings" %}</span>
                 </a>
             </li>
             <li class="c-menu__item">
                 <a href="{% url "locations" %}" class="c-menu__link">
-                    <img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help">
-                    <span style="text-align:left;margin-left:-10px;">{% trans "Locations" %}</span>
+                    <i class="fa"><img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help"></i>
+                    <span >{% trans "Locations" %}</span>
                 </a>
             </li>
             <li class="c-menu__item">
                 <a href="{% url "data-folder-backup" %}" class="c-menu__link">
                     <i class="fa"><img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help"></i>
-                    <span style="text-align:left;">{% trans "Geoserver Data Backup" %}</span>
+                    <span >{% trans "Geoserver Data Backup" %}</span>
                 </a>
             </li>
             {% endif %}
             <li class="c-menu__item">
                 <a href="{% url "geo_location" %}" class="c-menu__link">
                     <i class="fa fa-cloud-upload"></i>
-                    <span style="text-align:left;">{% trans "Geo Location" %}</span>
+                    <span >{% trans "Geo Location" %}</span>
                 </a>
             </li>
             <li class="c-menu__item">
                 <a href="{% url "help" %}" class="c-menu__link">
                     <i class="fa"><img src="{{ STATIC_URL }}geonode/images/user-icon/help.png" alt="Help"></i>
-                    <span style="text-align:left;">{% trans "Help" %}</span>
+                    <span >{% trans "Help" %}</span>
                 </a>
             </li>
             <li class="c-menu__item active">
@@ -980,7 +981,7 @@
                   <a class="c-menu__link" href="javascript:{}"
                      onclick="document.getElementById('logout_form').submit();">
                      <i class="fa"><img src="{{ STATIC_URL }}geonode/images/user-icon/logout.png" alt="Logout"></i>
-                      <span style="text-align:left;">{% trans "Log out" %}</span>
+                      <span >{% trans "Log out" %}</span>
                   </a>
                 </form>
             </li>
