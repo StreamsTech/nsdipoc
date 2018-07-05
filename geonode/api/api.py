@@ -1232,7 +1232,7 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                     working_group_admins = Profile.objects.filter(is_working_group_admin=True)
                     notify.send(request.user, recipient_list=list(working_group_admins), actor=request.user,
                                 target=layer, verb='pushed a new layer for approval')
-                    #sendMailToOrganizationAdmins.delay(layer.id, 'layer')
+                    sendMailToOrganizationAdmins.delay(layer.id, 'layer')
 
 
             elif request.user ==  layer.owner and status == "PENDING":
