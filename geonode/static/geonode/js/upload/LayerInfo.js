@@ -166,7 +166,7 @@ define(function (require, exports) {
         var permissionAttributes =
             ['view_resourcebase', 'download_resourcebase'];
         var selectedOrganizations = [];
-        if (getSelectedOrganizations) {
+        if (typeof getSelectedOrganizations === 'function') {
             selectedOrganizations = getSelectedOrganizations();
         }
         $.each(selectedOrganizations, function (i, organization) {

@@ -112,8 +112,8 @@
                   </section>
 
                   <section class="margin-top-20px">
-                      <a href="#" id="clear-button" class="btn btn-default btn-gd">{% trans "Clear" %}</a>
-                      <a href="#" id="upload-button" class="btn btn-danger btn-gd">{% trans "Add New Version" %}</a>
+                      <a id="clear-button" class="btn btn-default btn-gd">{% trans "Clear" %}</a>
+                      <a id="upload-button" class="btn btn-danger btn-gd">{% trans "Add New Version" %}</a>
                   </section>
               </div>
           </div>
@@ -149,16 +149,6 @@
                   </table>
             </div>
           </div>
-          {% if GEONODE_SECURITY_ENABLED %}
-              <div class="col-md-4">
-                <div class="gd-content-body full-pad-20px box-shadow">
-                  <div class="sidebar-title">{% trans "Permissions" %}</div>
-                  <form id="permission_form">
-                      {% include "_permissions.html" %}
-                  </form>
-                </div>
-              </div>
-          {% endif %}
       </div>
   </div>
 </div>
