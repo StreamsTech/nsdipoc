@@ -862,6 +862,14 @@
                   </a>
                 </li>
                 {% endif %}
+                {% if FRONT_END_SETTINGS.templates_base.restore_organization_layers %}
+                <li class="c-menu__item">
+                  <a href="{% url "restore-backedup-organization-layers" %}" class="c-menu__link">
+                    <i class="fa fa-user-plus"></i>
+                    <span style="color:#fff;">{% trans "Restore Organization Layers" %}</span>
+                  </a>
+                </li>
+                {% endif %}
 
             {% endif %}
             <li class="c-menu__item">
