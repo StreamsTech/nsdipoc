@@ -1,5 +1,4 @@
 {% extends "site_base.html" %}
-{% load bootstrap_tags %}
 {% load i18n %}
 {% load url from future %}
 
@@ -18,16 +17,15 @@
                 </div>
                 <div class="hr"></div>
                 <div class="col-md-12">
-                    <form id="" method="post" enctype="multipart/form-data" action="">
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col-md-4">
-                                {{ form|as_bootstrap }}
-                            </div>
+                    {% if success %}
+                        <div class="alert alert-success">
+                            <strong>Success!</strong> {{ message }}
                         </div>
-                        <div class="block-separator"></div>
-                        <button type="submit" id="" class="btn btn-gd-primary">Submit</button>
-                    </form>
+                    {% else %}
+                        <div class="alert alert-danger">
+                            <strong>Error!</strong> {{ message }}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
