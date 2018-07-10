@@ -101,6 +101,7 @@ from geonode.layers.models import Layer, Attribute, UploadSession
 from geonode.base.enumerations import CHARSETS
 from geonode.base.models import TopicCategory
 from geonode.layers.tasks import backupOrganizationLayersMetadata
+# from geonode.layers.tasks import  restoreLayer, restoreOrganizationLayersMetadata
 
 from geonode.utils import default_map_config
 from geonode.utils import GXPLayer

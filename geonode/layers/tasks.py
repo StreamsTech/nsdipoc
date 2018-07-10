@@ -22,6 +22,9 @@ from geonode.settings import MEDIA_ROOT
 from geonode.groups.models import GroupProfile
 from geonode.people.models import Profile
 
+from geonode.geoserver.helpers import cascading_delete, gs_catalog
+from geonode.layers.utils import unzip_file
+from geonode.layers.utils import file_upload
 
 
 db_logger = logging.getLogger('db')
@@ -91,3 +94,33 @@ def send_mail_to_admin(host, organization, temdir, user):
     except Exception as e:
         # print e
         db_logger.exception(e)
+
+
+
+@shared_task
+def restoreOrganizationLayersMetadata(metadata_file):
+    # with open("/home/streamstech/bk/or2/metadata.txt", "r") as out:
+    with open(metadata_file, "r") as out:
+        data = out.read()
+
+    for obj in serializers.deserialize("json", data):
+        obj.save()
+
+
+
+@shared_task
+def restoreLayer(layer, file_path):
+    cat = gs_catalog
+    cascading_delete(cat, layer.typename)
+    # file_path = '/home/streamstech/nsdipoc/geonode/uploaded/backup/organization/or2/vcvc.zip'
+
+    base_file = unzip_file(file_path, '.shp', tempdir=None)
+    user = layer.owner
+    saved_layer = file_upload(
+        base_file,
+        name=layer.name,
+        user=user,
+        overwrite=True,
+        # charset=form.cleaned_data["charset"],
+    )
+    # saved_layer.save()
