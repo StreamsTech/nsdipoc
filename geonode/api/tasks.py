@@ -137,13 +137,15 @@ def sendMailToOrganizationAdmins(resource_id, resource_type ):
     subject = 'Approve or deny resource'
     from_email = settings.EMAIL_FROM
     recipient_list = []
-    for wg_admin in working_group_admins:
-        recipient_list.append(wg_admin.email)
+    # for wg_admin in working_group_admins:
+    #     recipient_list.append(wg_admin.email)
     # recipient_list = [str(user.email) for user in working_group_admins]  # str(request.user.email)
     html_message = "<a href='" + resource_link + "'>Please go to the following link to approve or deny {0}:</a> <br/><br/><br/>".format(resource_type) + resource_link
 
-    try:
-        send_mail(subject=subject, message=html_message, from_email=from_email, recipient_list=recipient_list,
-                  fail_silently=False, html_message=html_message)
-    except Exception as e:
-        db_logger.exception(e)
+    for wg_admin in working_group_admins:
+
+        try:
+            send_mail(subject=subject, message=html_message, from_email=from_email, recipient_list=[wg_admin.email],
+                      fail_silently=False, html_message=html_message)
+        except Exception as e:
+            db_logger.exception(e)
