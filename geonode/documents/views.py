@@ -206,7 +206,6 @@ class DocumentUploadView(CreateView):
         """
         If the form is valid, save the associated model.
         """
-        import pdb; pdb.set_trace()
         self.object = form.save(commit=False)
         self.object.owner = self.request.user
         resource_id = self.request.POST.get('resource', None)
