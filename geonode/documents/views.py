@@ -206,6 +206,7 @@ class DocumentUploadView(CreateView):
         """
         If the form is valid, save the associated model.
         """
+        import pdb; pdb.set_trace()
         self.object = form.save(commit=False)
         self.object.owner = self.request.user
         resource_id = self.request.POST.get('resource', None)
@@ -220,7 +221,7 @@ class DocumentUploadView(CreateView):
         # except GroupProfile.DoesNotExist:
         #     raise Http404('Selected organization does not exists')
         try:
-            category = [TopicCategory.objects.get(gn_description=category_id)]
+            category = [TopicCategory.objects.get(identifier=category_id)]
 
             if isinstance(category, list):
                 category = category[0]
