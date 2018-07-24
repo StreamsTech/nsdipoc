@@ -301,6 +301,7 @@ GEONODE_APPS = (
 
     'geonode.front_end',
     'geonode.nsdi_frontend',
+    'geonode.feedback',
 )
 
 GEONODE_CONTRIB_APPS = (
