@@ -14,7 +14,6 @@ class UserFeedbackCreateAPIView(ListCreateAPIView):
     Anyone can send a feedback.
     Only committee members can view the list of feedbacks.
     """
-    
     authentication_classes = (CsrfExemptSessionAuthentication,)
 
     def get_serializer_class(self):
