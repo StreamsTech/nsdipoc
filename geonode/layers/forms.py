@@ -67,7 +67,15 @@ class LayerForm(ResourceBaseForm):
             'status',
             # 'group',
             'last_auditor',
-            'user_data_epsg'
+            'user_data_epsg',
+            'current_iteration',
+            'current_version',
+            'latest_version',
+            'geometry_type',
+            'file_type',
+            'file_size',
+            'download_count',
+
         )
 
 
