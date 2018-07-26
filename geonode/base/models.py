@@ -533,7 +533,11 @@ class ResourceBase(PolymorphicModel, PermissionLevelMixin, ItemBase):
                                        help_text=_('Should this resource be published and searchable?'))
 
     # fields necessary for the apis
-    thumbnail_url = models.TextField(null=True, blank=True)
+    thumbnail_url = models.TextField(null=True,
+                                     blank=True,
+                                     help_text=_('Thumbnail url for this layer. You can '
+                                                 'change this if you want to use '
+                                                 'custom thumbnail'))
     detail_url = models.CharField(max_length=255, null=True, blank=True)
     rating = models.IntegerField(default=0, null=True, blank=True)
     

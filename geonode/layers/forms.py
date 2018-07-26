@@ -75,6 +75,9 @@ class LayerForm(ResourceBaseForm):
             'file_type',
             'file_size',
             'download_count',
+            'elevation_regex',
+            'is_base_layer',
+            'tkeywords'
 
         )
 

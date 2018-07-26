@@ -109,7 +109,12 @@ class Layer(ResourceBase):
     is_mosaic = models.BooleanField(default=False)
     has_time = models.BooleanField(default=False)
     has_elevation = models.BooleanField(default=False)
-    time_regex = models.CharField(max_length=128, null=True, blank=True, choices=TIME_REGEX)
+    time_regex = models.CharField(max_length=128,
+                                  null=True,
+                                  blank=True,
+                                  choices=TIME_REGEX,
+                                  help_text=_('regular expression for time. You can '
+                                              'use any one of these'))
     elevation_regex = models.CharField(max_length=128, null=True, blank=True)
     user_data_epsg = models.CharField(max_length=128, null=True, blank=True)
     is_base_layer = models.BigIntegerField(default=False)
