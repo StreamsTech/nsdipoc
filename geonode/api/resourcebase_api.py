@@ -1306,6 +1306,18 @@ class LayerAttributeApi(ModelResource):
     def dehydrate_date_created(self, bundle):
         return bundle.obj.date_created.strftime('%b %d %Y  %H:%M:%S ')
 
+    def dehydrate_attributes(self, bundle):
+        if bundle.request.user.is_working_group_admin and bundle.obj.status == 'VERIFIED':
+            permitted_list = []
+            for attr in bundle.data['attributes']:
+                if attr.obj.is_permitted:
+                    permitted_list.append(attr)
+            return permitted_list
+        else:
+            return bundle.data['attributes']
+
+
+
 
 class LayerAttributeApiPublic(ModelResource):
     """
