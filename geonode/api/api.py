@@ -378,6 +378,9 @@ class ProfileResource(TypeFilteredResource):
     documents_count = fields.IntegerField(default=0)
     current_user = fields.BooleanField(default=False)
     activity_stream_url = fields.CharField(null=True)
+    section = fields.CharField()
+    role = fields.CharField()
+
 
     def build_filters(self, filters=None):
         """adds filtering by group functionality"""
@@ -435,8 +438,14 @@ class ProfileResource(TypeFilteredResource):
     def dehydrate_profile_detail_url(self, bundle):
         return bundle.obj.get_absolute_url()
 
-    def dehydrate_current_user(self, bundle):
+    def dehydrate_current_user(self, bundle): 
         return bundle.request.user.username == bundle.obj.username
+
+    def dehydrate_role(self, bundle):
+        return 'Organization Admin' if bundle.obj.is_manager_of_any_group else 'Member'
+    
+    def dehydrate_section(self, bundle):
+        return bundle.obj.section.title if bundle.obj.section else None
 
     def dehydrate_activity_stream_url(self, bundle):
         return reverse(
