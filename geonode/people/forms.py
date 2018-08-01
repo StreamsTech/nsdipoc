@@ -112,8 +112,8 @@ class ProfileForm(forms.ModelForm):
 
 class UserSignupFormExtend(SignupForm):
     section = forms.ModelChoiceField(queryset=SectionModel.objects.all(),
-                                  help_text=_('select section for this user'),
-                                    label=_('Section'),
+                                #   help_text=_('select section for this user'),
+                                    label=_('Section/wing/branch'),
 
                                     )
 
