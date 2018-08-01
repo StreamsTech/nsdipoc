@@ -21,6 +21,7 @@
 from django.conf import settings
 from geonode import get_version
 from geonode.catalogue import default_catalogue_backend
+from geonode.groups.models import GroupProfile
 from django.contrib.sites.models import Site
 
 
@@ -123,6 +124,7 @@ def resource_urls(request):
             False
         ),
         THESAURI_FILTERS=[t['name'] for t in settings.THESAURI if t.get('filter')],
+        USER_ORGANIZATION = GroupProfile.objects.filter(groupmember__user=request.user).exclude(slug='working-group')[0] if request.user.is_authenticated() else None
     )
 
     return defaults
