@@ -28,7 +28,7 @@
                             <li>
                                 <a href="{{ group.detail_url }}" style="border-right: 0">
                                   <strong>{{ group.manager_count }}</strong>
-                                  <ng-pluralize count="group.manager_count" when="{'1': 'Manager', 'other': 'Managers'}"></ng-pluralize>
+                                  <ng-pluralize count="group.manager_count" when="{'1': 'Organization Admin', 'other': 'Organization Admins'}"></ng-pluralize>
                                 </a>
                             </li>
                             {% endverbatim %}
@@ -89,7 +89,7 @@
                                   <li>
                                       <a href="{{ group.detail_url }}">
                                         <strong>{{ group.manager_count }}</strong>
-                                        <ng-pluralize count="group.manager_count" when="{'1': 'Manager', 'other': 'Managers'}"></ng-pluralize>
+                                        <ng-pluralize count="group.manager_count" when="{'1': 'Organization Admin', 'other': 'Organization Admins'}"></ng-pluralize>
                                       </a>
                                   </li>
                                   <div class="block-separator"></div>
