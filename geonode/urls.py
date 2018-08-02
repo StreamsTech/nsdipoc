@@ -155,6 +155,8 @@ urlpatterns = patterns('',
                        (r'^autocomplete/', include('autocomplete_light.urls')),
                        (r'^admin/', include(admin.site.urls)),
                        (r'^organization/', include('geonode.groups.urls')),
+                       (r'^catalog/', include('geonode.catalog.urls')),
+                       (r'^feedback/', include('geonode.feedback.urls')),
                        (r'^documents/', include('geonode.documents.urls')),
                        (r'^services/', include('geonode.services.urls')),
 
@@ -171,7 +173,7 @@ urlpatterns = patterns('',
                        url(r'^api/error-reporting/', include('geonode.error_reporting.api.urls')),
                        
                        url(r'^api/analytics/', include('geonode.analytics.api.urls')),
-                       url(r'^api/feedback/', include('geonode.feedback.api.urls')),
+                       # url(r'^api/feedback/', include('geonode.feedback.api.urls')),
 
                        url(r'^api/security/', include('geonode.security.api.urls')),
                        url(r'^api/layers/', include('geonode.layers.api.urls')),

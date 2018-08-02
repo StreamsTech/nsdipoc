@@ -3919,3 +3919,7 @@ footer {
     margin-left: 5px;
     margin-right: 5px;
 }
+.table > thead > tr > th
+{
+vertical-align: middle !important;
+}

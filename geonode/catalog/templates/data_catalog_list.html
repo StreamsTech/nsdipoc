@@ -1,0 +1,167 @@
+{% extends "site_base.html" %}
+{% load bootstrap_tags %}
+
+{% load i18n %}
+{% block title %} {% trans "Data Catalog" %} - {{ block.super }} {% endblock %}
+
+{% block body_outer %}
+<div class="gd-content">
+    <div class="gd-content-heading">
+        <div class="row">
+          <div class="col-md-6">
+              <div class="title small-content">
+                  {% trans "Data Catalog" %}
+              </div>
+          </div>
+            {% if manager %}
+              <div class="col-md-6">
+                  <div class="small-content text-right">
+                      <a href="{% url "data_catalog_create" %}" class="btn btn-gd-primary pull-right icon-btn-color" style="font-size:12px;">
+                            {% trans "Add Data" %} <i class="fa " aria-hidden="true"></i>
+                      </a>
+                  </div>
+              </div>
+            {% endif %}
+      </div>
+      <div class="hr"></div>
+    </div>
+    <div class="gd-content-body transparent top-bottom-margin-20px">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="gd-content-body1 full-pad-40px1">
+                  <form id=""  method="post"  action="">
+                    {% csrf_token %}
+                      <div style="min-width:100%;overflow:scroll;">
+                           <table class="table table-bordered">
+                            <thead>
+                              <tr>
+                                <th>No.</th>
+                                <th>Title</th>
+                                <th>Owner Ship</th>
+                                <th>Format</th>
+                                <th>No. of Layers</th>
+                                <th>Coordinate System</th>
+                                <th>Projection</th>
+                                <th>2D/3D(with height)</th>
+                                <th>Suitable scale for display</th>
+                                <th>Area covered</th>
+                                <th>Year of preparation/revision</th>
+                                <th>Volume</th>
+                                <th>Govermental organization only</th>
+                                <th>Inside the Ministry only</th>
+                                <th>Inside the organization only</th>
+                                <th>Total restricted information</th>
+                                <th>Action</th>
+
+
+                              </tr>
+                            </thead>
+                            <tbody>
+                            {% for data in object_list %}
+                              <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ data.title }}</td>
+                                <td>{{ data.ownership }}</td>
+                                <td>{{ data.format }}</td>
+                                  <td>{{ data.no_of_layer }}</td>
+                                  <td>{{ data.coordinate_system }}</td>
+                                  <td>{{ data.projection }}</td>
+                                  <td>{{ data.dimension }}</td>
+                                  <td>{{ data.display_scale }}</td>
+                                  <td>{{ data.area }}</td>
+                                  <td>{{ data.preparation_year }}</td>
+                                  <td>{{ data.volume }}</td>
+                                  <td>{{ data.govt_org }}</td>
+                                  <td>{{ data.inside_ministry }}</td>
+                                  <td>{{ data.inside_org }}</td>
+                                  <td>{{ data.restricted_information }}</td>
+
+                                  <td>
+                                      {% if manager %}
+                                          <div>
+                                              <a href="{% url "data_catalog_edit" data.id %}"  class="btn btn-link" style="">Edit</a>
+                                              <br>
+                                              <a href="{% url "data_catalog_delete" data.id %}"  class="btn btn-link" style="">Delete </a>
+                                          </div>
+                                      {% endif %}
+                                      {% if not member %}
+                                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#downloadRequestModal">
+                                            Download Request
+                                        </button>
+                                      {% endif %}
+
+                                  </td>
+
+                              </tr>
+                            {% endfor %}
+
+                            </tbody>
+                          </table>
+                      </div>
+
+                  </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="downloadRequestModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Request Download</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+          <form id="download_request_form" role="form" method="post" enctype="multipart/form-data" action="{% url 'download_cat_request' org_slug %} "  >
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="layerTitle">Layer Title</label>
+            <input type="text" class="form-control" name="title" id="layerTitle" aria-describedby="titleHelp" placeholder="Enter layer title">
+            <small id="titlelHelp" class="form-text text-muted">The title of the layer/layer group you want to download .</small>
+          </div>
+          <div class="form-group">
+            <label for="email">Email address</label>
+            <input type="email" class="form-control" name="email" id="email" aria-describedby="emailHelp" placeholder="Enter email">
+            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+          </div>
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" name="name" id="name" placeholder="Your name">
+          </div>
+
+          <!--<div class="form-group">-->
+            <!--<label for="name">org</label>-->
+            <!--<input type="text" class="form-control" id="name" placeholder="Your name">-->
+          <!--</div>-->
+          <div class="form-group">
+            <label for="message">Message</label>
+              <textarea class="form-control" rows="5" name="message" id="message" placeholder="Your message here"></textarea>
+          </div>
+
+            <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Send</button>
+      </div>
+
+        </form>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+<!-- End Modal -->
+
+
+</div>
+
+
+{% endblock %}
+
