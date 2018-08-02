@@ -55,7 +55,7 @@
                 var latlngContainer = container.querySelector('.latlng');
                 var addressContainer = container.querySelector('.address');
 
-                var pointAdder = container.querySelector('.addtolayer');
+                // var pointAdder = container.querySelector('.addtolayer');
 
                 var olOverlay = new ol.Overlay(({
                     element: container,
@@ -64,21 +64,21 @@
 
                 olMap.addOverlay(olOverlay);
 
-                pointAdder.onclick = function () {
-                    var position = olOverlay.getPosition();
-                    var activeLayer = mapTools.activeLayer.getActiveLayer();
+                // pointAdder.onclick = function () {
+                //     var position = olOverlay.getPosition();
+                //     var activeLayer = mapTools.activeLayer.getActiveLayer();
 
-                    if (activeLayer && activeLayer.ShapeType == 'point') {
-                        var createFeatureTool = activeLayer.tools.createFeature;
-                        if (!createFeatureTool.isNull) {
-                            createFeatureTool.createGeometry(new ol.geom.Point(position));
-                            olOverlay.setPosition(undefined);
-                            return;
-                        }
-                    }
+                //     if (activeLayer && activeLayer.ShapeType == 'point') {
+                //         var createFeatureTool = activeLayer.tools.createFeature;
+                //         if (!createFeatureTool.isNull) {
+                //             createFeatureTool.createGeometry(new ol.geom.Point(position));
+                //             olOverlay.setPosition(undefined);
+                //             return;
+                //         }
+                //     }
 
-                    surfToastr.info('Please select an editable point layer to add this point');;
-                };
+                //     surfToastr.info('Please select an editable point layer to add this point');;
+                // };
 
                 return {
                     setPosition: function (position) {

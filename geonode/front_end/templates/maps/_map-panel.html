@@ -2,7 +2,8 @@
     <div class="navbar-inner map-toolbar" id="map-toobar">
 
         <cursor-tooltip content="tooTipContent"></cursor-tooltip>
-        <location-search></location-search>
+        <!-- <location-search></location-search> -->
+       
         <ul class="nav">
 
             <!-- <li draft-only>
@@ -16,6 +17,7 @@
             <!-- <li ng-repeat="tools in mapToolsSettings">
                 <div inject-template="[{tools.template}]"></div>
             </li>   -->
+            
             <li ng-show="toolsIsVisible('navigation-history-buttons')" ng-disabled="isDisable('navigation-history-buttons')">
                 <navigation-history-buttons></navigation-history-buttons>
             </li>
@@ -46,6 +48,9 @@
             </li>
             <li ng-show="toolsIsVisible('set-marker')">
                 <set-marker disable-function="disableAllDependentTools" buttons="toggleButtonsList" content="tooTipContent"></set-marker>
+            </li>
+            <li>
+                <location-search></location-search>
             </li>
             <li id="measurement-tools" ng-if="toolsIsVisible('measurement-tools')">
                 <div class="btn-group">
