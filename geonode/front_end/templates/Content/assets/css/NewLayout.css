@@ -808,6 +808,7 @@ color: #fff;
 {
     display: inline-flex;
     background-color: #ffffff;
+    position: absolute;
 }
 
 
