@@ -35,7 +35,7 @@ class UserFeedback(models.Model):
         help_text=_("your email"))
     message = models.TextField(
         verbose_name=_("message"),
-        max_length=500,
+        max_length=5000,
         blank=False,
         # null=False, CHAR and TEXT types are never saved as NULL by Django, so null=True is unnecessary.
         help_text=_("write your feedback here"))

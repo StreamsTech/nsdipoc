@@ -28,6 +28,8 @@ from geonode.people.views import CreateUser, activateuser, UserSignup, InviteUse
 urlpatterns = patterns('geonode.people.views',
                        url(r'^$', TemplateView.as_view(template_name='people/profile_list.html'),
                            name='profile_browse'),
+                       url(r'^committee$', TemplateView.as_view(template_name='people/committee_list.html'),
+                           name='committee_browse'),
                        url(r"^edit/$", "profile_edit", name="profile_edit"),
                        url(r"^edit/(?P<username>[^/]*)$", "profile_edit", name="profile_edit"),
                        url(r"^profile/(?P<username>[^/]*)/$", "profile_detail", name="profile_detail"),

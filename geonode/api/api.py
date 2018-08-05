@@ -392,13 +392,16 @@ class ProfileResource(TypeFilteredResource):
         if 'group' in filters:
             orm_filters['group'] = filters['group']
 
+        if 'committee' in filters:
+            orm_filters['committee'] = filters['committee']
+
         return orm_filters
 
     def apply_filters(self, request, applicable_filters):
         """filter by group if applicable by group functionality"""
 
         group = applicable_filters.pop('group', None)
-
+        committee = applicable_filters.pop('committee', None)
         semi_filtered = super(
             ProfileResource,
             self).apply_filters(
@@ -408,6 +411,10 @@ class ProfileResource(TypeFilteredResource):
         if group is not None:
             semi_filtered = semi_filtered.filter(
                 groupmember__group__slug=group)
+
+        if committee:
+            semi_filtered = semi_filtered.filter(
+                is_working_group_admin=True)
 
         return semi_filtered
 

@@ -178,6 +178,8 @@
                                         <ul class="dropdown-menu">
                                             <li id="nav_maps">
                                               <a href="{% url "group_list" %}">{% trans "Explore Organizations" %}</a>
+                                            </li><li id="nav_maps">
+                                              <a href="{% url "committee_browse" %}">{% trans "Explore Committee" %}</a>
                                             </li>
                                             {% if user.is_authenticated %}
                                             <li id="nav_layers">
@@ -420,6 +422,7 @@
 
                 <ul class="nav navbar-nav" style="display: inline-block;float: none;vertical-align: top">
                     <li><a href="{% url "footer-section-view" 'terms-and-condition' %}">{% trans "Terms and Condition" %}</a></li>
+                    <li><a href="{% url "user_feedback_create"  %}">{% trans "User Feedback" %}</a></li>
                     <li><a href="{% url "footer-section-view" 'privacy-policy' %}">{% trans "Privacy Policy" %}</a></li>
                     <li><a href="{% url "footer-section-view" 'terms-of-use' %}">{% trans "Terms of use" %}</a></li>
                    <li>

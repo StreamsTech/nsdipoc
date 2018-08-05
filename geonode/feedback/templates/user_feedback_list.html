@@ -2,37 +2,38 @@
 
 {% load i18n %}
 
-{% block head_title %}{% trans "Log in" %}{% endblock %}
+{% block head_title %}{% trans "User Feedback" %}{% endblock %}
 
 {% block body_outer %}
     <div class="gd-content-body-news">
-        {% for news in object_list %}
+        {% for feedback in object_list %}
         <div class="changepass-news" id="changepass">
             <div class="contents_news">
                 <div class="title">
                     <div class="row">
                         <div class="col-md-11">
-                            {{ news.title }}
-                            {% if user.is_superuser %}
-                                <span style="padding-left:15px;">
-                                    <a href="{% url "news-update" news.id %}" title="Edit News"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-                                </span>
+                            {{ feedback.title }}
+                            <!--{% if user.is_superuser %}-->
+                                <!--<span style="padding-left:15px;">-->
+                                    <!--<a href="{% url "news-update" feedback.id %}" title="Edit News"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>-->
+                                <!--</span>-->
                             {% endif %}
                         </div>
                         <div class="col-md-1 text-right">
                             {% if user.is_superuser %}
                                 <span>
-                                    <a href="{% url "news-delete" news.id %}" class="" title="Delete News"><i class="fa fa-times fa-stack-1x" aria-hidden="true"></i></a>
+                                    <a href="{% url "user_feedback_delete" feedback.id %}" class="" title="Delete Feedback"><i class="fa fa-times fa-stack-1x" aria-hidden="true"></i></a>
                                 </span>
                             {% endif %}
                         </div>
+
                     </div>
                 </div>
                 <div class="anchor-link">
                     <div class="row">
                         <div class="col-md-6">
                             <a href="javascript:;">
-                                {{ news.date_created }}
+                                {{ feedback.date_created }}
                             </a>
                         </div>
                         <div class="col-md-6 gd-txt-right">
@@ -45,20 +46,20 @@
                 <!--</div>-->
                 <!--<div class="block-separator"></div>-->
                 <div class="details">
-                    {% if news.image %}
+                    {% if feedback.image %}
                     <p>
-                        <img src="/uploaded/{{ news.image }}"  style="max-width:400px;max-height:500px;"/>
+                        <img src="/uploaded/{{ feedback.image }}"  style="max-width:400px;max-height:500px;"/>
                     </p>
                     {% endif %}
-                    {% if news.description|length >= 500 %}
-                        {{ news.description|truncatechars:500 }}
+                    {% if feedback.message|length >= 500 %}
+                        {{ feedback.message|truncatechars:500 }}
                         <div class="gd-txt-right">
-                            <span><a href="{% url "news-details" news.id %}">
+                            <span><a href="{% url "user_feedback_details" feedback.id %}">
                                      Read more
                             </a></span>
                         </div>
                     {% else %}
-                        {{ news.description }}
+                        {{ feedback.message }}
                     {% endif %}
                 </div>
             </div>

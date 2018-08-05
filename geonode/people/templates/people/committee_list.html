@@ -1,0 +1,106 @@
+{% extends "people/profile_base.html" %}
+{% load i18n %}
+
+{% block body_class %}people people-list explore{% endblock %}
+
+{% block body %}
+
+
+<div class="d-title">
+
+                                        <div class="pull-right">
+
+
+
+                                                        <div class="btn-group" role="group" aria-label="tools">
+                                                            <div id="profileSortId" class="btn-group" role="group">
+                                                                <a href="javascript:;" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                                                   aria-haspopup="true" aria-expanded="false">
+                                                                    <span id="currtenSortTitle">{% trans "Most recent" %}</span>
+                                                                    <span class="caret"></span>
+                                                                </a>
+                                                                <ul class="dropdown-menu dropdown-menu-right" id="sort">
+                                                                    <li>
+                                                                      <a data-value="-date" data-filter="order_by" class="selected" ng-click="single_choice_listener($event)">
+                                                                          {% trans "Most recent" %}
+                                                                      </a>
+                                                                    </li>
+                                                                    <li>
+                                                                      <a data-value="date" data-filter="order_by" ng-click="single_choice_listener($event)">
+                                                                        {% trans "Less recent" %}
+                                                                      </a>
+                                                                    </li>
+                                                                    <li>
+                                                                      <a data-value="title" data-filter="order_by" ng-click="single_choice_listener($event)">
+                                                                        {% trans "A - Z" %}
+                                                                      </a>
+                                                                    </li>
+                                                                    <li>
+                                                                      <a data-value="-title" data-filter="order_by" ng-click="single_choice_listener($event)">
+                                                                        {% trans "Z - A" %}
+                                                                      </a>
+                                                                    </li>
+                                                                    <!--<li>-->
+                                                                      <!--<a data-value="-popular_count" data-filter="order_by" ng-click="single_choice_listener($event)">-->
+                                                                        <!--{% trans "Most popular" %}-->
+                                                                      <!--</a>-->
+                                                                    <!--</li>-->
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+
+
+
+                                            <div class="btn-group" role="group">
+
+
+
+
+
+                                                                <a href="javascript:;" ng-class="{'btn-success' : pageViewing == 'list'}" class="btn btn-default" ng-click="displayView('list')">
+                                                                    <i class="fa fa-bars"></i>
+                                                                </a>
+
+
+
+                                                                    <a href="javascript:;" ng-class="{'btn-success' : pageViewing == 'grid'}" class="btn btn-default" ng-click="displayView('grid')">
+                                                                        <i class="fa fa-th-large"></i>
+                                                                        <!--<img src="images/user-separator-icon.png" />-->
+                                                                    </a>
+
+
+
+
+
+
+        </div>
+
+
+
+                                          </div>
+
+                                      {% trans "Explore Users " %}
+                                  </div>
+
+
+
+
+                                                {% include "people/_profile_list_item.html" %}
+
+                                        <div class="panel-footer" style="padding: 10px 0;margin-top:15px;">  {% include 'search/_pagination.html' %}</div>
+
+
+
+</div>
+{% endblock %}
+
+{% block extra_script %}
+<script type="text/javascript">
+  SEARCH_URL = '{% url 'api_dispatch_list' api_name='api' resource_name='profiles' %}';
+  SEARCH_URL = '{% url 'api_dispatch_list' api_name='api' resource_name='profiles' %}'+ '?committee='+ 'True';
+
+</script>
+  {% with include_spatial='false' %}
+  {% include 'search/search_scripts.html' %}
+  {% endwith %}
+{% endblock extra_script %}
