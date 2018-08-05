@@ -38,7 +38,7 @@ class UserFeedbackList(ListView):
                         })), status=404)
 
     def get_queryset(self):
-        return UserFeedback.objects.all().order_by('-date_created')[:15]
+        return UserFeedback.objects.all().order_by('-date_created')
 
 
 class UserFeedbackCreate(SuccessMessageMixin, CreateView):
@@ -63,15 +63,15 @@ class UserFeedbackCreate(SuccessMessageMixin, CreateView):
             return AnonymousUserFeedbackCreateUpdateForm
 
     def form_valid(self, form):
+        self.object = form.save(commit=False)
         if self.request.user.is_authenticated():
-            self.object = form.save(commit=False)
             if not self.object.commenter_name:
                 self.object.commenter_name = self.request.user.username
             if not self.object.commenter_email:
                 self.object.commenter_email = self.request.user.email
             if not self.object.contact_no:
                 self.object.contact_no = self.request.user.contact_no
-            self.object.save()
+        self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 
 
