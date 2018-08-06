@@ -63,17 +63,21 @@ def profile_edit(request, username=None):
 
     if username == request.user.username or request.user.is_superuser:
         if request.method == "POST":
-            form = ProfileForm(request.POST, request.FILES, instance=profile)
+            form = ProfileForm(request.user, request.POST, request.FILES, instance=profile)
             if form.is_valid():
-                form.save()
+                saved_user = form.save()
                 messages.success(request, ("Profile %s updated." % username))
+                if form.cleaned_data['is_working_group_admin'] and not saved_user.is_manager_of_any_group:
+                    saved_user.is_working_group_admin = False
+                    saved_user.save()
+                    messages.warning(request, "User must be an organization admin to be a committee member")
                 return redirect(
                     reverse(
                         'profile_detail',
                         args=[
                             username]))
         else:
-            form = ProfileForm(instance=profile)
+            form = ProfileForm(request.user, instance=profile)
 
         return render(request, "people/profile_edit.html", {
             "profile": profile,

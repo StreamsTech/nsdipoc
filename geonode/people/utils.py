@@ -102,3 +102,38 @@ def format_address(street=None, zipcode=None, city=None, area=None, country=None
             address.append(area)
         address.append(country)
         return " ".join(address)
+
+
+def getFields(user, fields):
+    # exclude form fields according to user role
+    # super admin can edit all the fields, but
+    # normal user are allowed to edit limited fields
+    # import pdb; pdb.set_trace()
+    if user.is_superuser:
+        exfields = ['password',
+            'last_login',
+            'groups',
+            'user_permissions',
+            'username',
+            'is_staff',
+            'is_superuser',
+            'is_active',
+            'date_joined']
+
+    else:
+        exfields = ['password',
+            'last_login',
+            'groups',
+            'user_permissions',
+            'username',
+            'is_staff',
+            'is_superuser',
+            'is_active',
+            'date_joined',
+            'section',
+            'is_working_group_admin']
+
+    for item in exfields:
+        del fields[item]
+
+    return fields

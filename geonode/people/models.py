@@ -83,7 +83,10 @@ class Profile(AbstractUser):
         null=True,
         help_text=_('name of the responsible organization'))
     profile = models.TextField(_('Profile'), null=True, blank=True, help_text=_('introduce yourself'))
-    is_working_group_admin = models.BooleanField(default=False)
+    is_working_group_admin = models.BooleanField(default=False,
+                                                 verbose_name=_('committee member'),
+                                                 help_text=_('User must be an organization admin to'
+                                                             'be committee member'))
     position = models.CharField(
         _('Position Name'),
         max_length=255,
@@ -223,12 +226,16 @@ def profile_post_save(instance, sender, **kwargs):
             EmailAddress.objects.filter(user=instance, primary=True).update(email=instance.email)
 
     if instance != get_anonymous_user() and instance.is_working_group_admin:
-        # set_user_to_workign_group_admin(instance)
-        working_group, created = GroupProfile.objects.get_or_create(slug='working-group')
-        if not working_group.title:
-            working_group.title = 'Committee'
-        working_group.save()
-        working_group.join(instance, role='manager')
+        if instance.is_manager_of_any_group:
+            # set_user_to_workign_group_admin(instance)
+            working_group, created = GroupProfile.objects.get_or_create(slug='working-group')
+            if not working_group.title:
+                working_group.title = 'Committee'
+            working_group.save()
+            working_group.join(instance, role='manager')
+        else:
+            instance.is_working_group_admin = False
+            instance.save()
 
     # #@jahangir091
     # default_group, created_group = GroupProfile.objects.get_or_create(slug='default')

@@ -31,6 +31,7 @@ from account.models import EmailAddress
 from account.forms import SignupForm
 from geonode.groups.models import SectionModel
 from geonode.groups.views import userOrganizationSections
+from utils import getFields
 
 # Ported in from django-registration
 attrs_dict = {'class': 'required'}
@@ -88,18 +89,15 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        exclude = (
-            'user',
-            'password',
-            'last_login',
-            'groups',
-            'user_permissions',
-            'username',
-            'is_staff',
-            'is_superuser',
-            'is_active',
-            'date_joined',
-            'last_notification_view')
+        exclude = ()
+
+    def __init__(self, user, *args, **kwargs):
+        super(ProfileForm, self).__init__(*args, **kwargs)
+        #exclude form fields according to user role
+        #super admin can edit all the fields, but
+        # normal user are allowed to edit limited fields
+        self.fields = getFields(user, self.fields)
+
 
     def clean_email(self):
         value = self.cleaned_data["email"]
