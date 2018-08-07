@@ -81,6 +81,7 @@
                             <div ng-show="profile.organization != '' && profile.organization != null">
                                 {{ profile.organization | limitTo: 50 }} {{ profile.organization.length  > 50 ? '...' : ''}}
                             </div>
+                            <div> <p class="text-muted"> {{profile.email}} | {{ profile.contact_no ? (profile.contact_no | limitTo: 14) : 'No contact info' }}</p></div>
                             <div ng-show="profile.organization == '' || profile.organization == null">
                                 No Organization info
                             </div>

@@ -55,7 +55,7 @@ from user_messages.models import UserThread
 from .utils import format_address
 
 phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$',
-                             message="Phone number must be entered in the format: '+8801xxxxxxxxx'. Up to 13 digits allowed.")
+                             message="Phone number must be entered in the format: '+8801xxxxxxxxx'. Up to 14 digits allowed.")
 
 if 'notification' in settings.INSTALLED_APPS:
     from notification import models as notification
@@ -128,7 +128,11 @@ class Profile(AbstractUser):
         null=True,
         help_text=_('country of the physical address'))
     section = models.ForeignKey('groups.SectionModel', related_name='section', null=True)
-    contact_no = models.CharField(verbose_name=_("contact no"),validators=[phone_regex], max_length=17, blank=True)  # validators should be a list
+    contact_no = models.CharField(verbose_name=_("contact no"),
+                                  validators=[phone_regex],
+                                  max_length=17,
+                                  blank=True,
+                                  default="None")  # validators should be a list
     keywords = TaggableManager(_('keywords'), blank=True, help_text=_(
         'commonly used word(s) or formalised word(s) or phrase(s) used to describe the subject \
             (space or comma-separated'))

@@ -67,10 +67,11 @@ def profile_edit(request, username=None):
             if form.is_valid():
                 saved_user = form.save()
                 messages.success(request, ("Profile %s updated." % username))
-                if form.cleaned_data['is_working_group_admin'] and not saved_user.is_manager_of_any_group:
-                    saved_user.is_working_group_admin = False
-                    saved_user.save()
-                    messages.warning(request, "User must be an organization admin to be a committee member")
+                if request.user.is_superuser:
+                    if form.cleaned_data['is_working_group_admin'] and not saved_user.is_manager_of_any_group:
+                        saved_user.is_working_group_admin = False
+                        saved_user.save()
+                        messages.warning(request, "User must be an organization admin to be a committee member")
                 return redirect(
                     reverse(
                         'profile_detail',
