@@ -27,6 +27,10 @@ from django.http import HttpResponse
 from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.core.mail import send_mail
+from django.conf import settings
+
+from notify.signals import notify
 
 from geonode.utils import resolve_object
 from geonode.base.models import ResourceBase
@@ -146,16 +150,34 @@ def request_permissions(request):
     uuid = request.POST['uuid']
     resource = get_object_or_404(ResourceBase, uuid=uuid)
     try:
-        notification.send(
-            [resource.owner],
-            'request_download_resourcebase',
-            {'from_user': request.user, 'resource': resource}
-        )
+        # notification.send(
+        #     [resource.owner],
+        #     'request_download_resourcebase',
+        #     {'from_user': request.user, 'resource': resource}
+        # )
+
+        recipient = resource.group.get_managers().first()
+
+        notify.send(request.user, recipient=recipient, actor=request.user,
+                    target=resource, verb='requested to download layer')
+
+        #send email to organization admin
+        mail_subject = 'requesting for downloading layer'
+        layer_link = settings.SITEURL + resource.detail_url[1:]
+
+        html_message = layer_link +  "<br/>Dear admin, Please permit me to download the above layer<br/><br/>"
+
+        html_message += "<br><br> Best regards, <br>"
+        html_message += settings.SITEURL + request.user.get_absolute_url()[1:]
+
+        send_mail(subject=mail_subject, message=html_message, from_email=settings.EMAIL_FROM, recipient_list=[recipient.email],
+                  fail_silently=False, html_message=html_message)
+
         return HttpResponse(
             json.dumps({'success': 'ok', }),
             status=200,
             content_type='text/plain')
-    except:
+    except Exception as ex:
         return HttpResponse(
             json.dumps({'error': 'error delivering notification'}),
             status=400,

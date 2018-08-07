@@ -54,7 +54,7 @@
               };
             permissions.users['AnonymousUser'] = [];
             var permissionAttributes=
-          ['view_resourcebase', 'download_resourcebase'];
+          ['view_resourcebase'];
             var data={};
             data.layer_pk =$scope.layer_id;
             var permittedOrganizations= getSelectedOrganizations();
