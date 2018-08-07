@@ -33,6 +33,8 @@ from django_downloadview.response import DownloadResponse
 from django.views.generic.edit import UpdateView, CreateView
 from django.db.models import F
 from django.forms.utils import ErrorList
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.utils.decorators import method_decorator
 
 
 #@jahangir091
@@ -52,6 +54,7 @@ from geonode.documents.models import Document, DocumentLayers
 from geonode.documents.forms import DocumentForm, DocumentCreateForm, DocumentReplaceForm
 from geonode.documents.models import IMGTYPES
 from geonode.utils import build_social_links
+from geonode.base.libraries.decorators import manager_or_member
 
 
 #@jahangir091
@@ -194,6 +197,18 @@ class DocumentUploadView(CreateView):
     template_name = 'documents/document_upload.html'
     form_class = DocumentCreateForm
 
+
+    # @user_passes_test(manager_or_member)
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        if manager_or_member(request.user):
+            return super(DocumentUploadView, self).dispatch(request, *args, **kwargs)
+        else:
+            return HttpResponse(
+                loader.render_to_string(
+                    '401.html', RequestContext(
+                        request, {
+                            'error_message': _("You are not allowed to view this document.")})), status=401)
 
     def get_context_data(self, **kwargs):
         context = super(DocumentUploadView, self).get_context_data(**kwargs)
