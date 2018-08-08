@@ -39,6 +39,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from taggit.models import Tag
+from django.contrib.auth import authenticate, login, get_user_model
 
 
 from geonode import get_version
@@ -102,9 +103,11 @@ def ajax_lookup(request):
             content='use a field named "query" to specify a prefix to filter usernames',
             content_type='text/plain')
     keyword = request.POST['query']
+    user_exclude_list = getExcludeUserList()
     users = get_user_model().objects.filter((Q(username__istartswith=keyword) |
                                             Q(first_name__icontains=keyword) |
                                             Q(organization__icontains=keyword)) & Q(is_active=True)).exclude(username='AnonymousUser')
+    users = users.exclude(id__in=user_exclude_list)
     groups = GroupProfile.objects.filter(Q(title__istartswith=keyword) |
                                          Q(description__icontains=keyword)).exclude(slug='working-group')
     json_dict = {
@@ -269,3 +272,19 @@ def keyword_delete(request):
         return HttpResponseRedirect(reverse('keyword-list'))
 #end
 
+
+
+def getExcludeUserList():
+    """
+    This function returns user ids who are already
+    member or manager of other organizations or super user.
+    As in NSDI single user cannot be member or manager of multiple
+    organizations, this filter is added when organization admin is
+    trying to add member to his organization.
+    :return:
+    """
+    user_ids = []
+    for user in get_user_model().objects.all():
+        if user.is_member_of_any_group or user.is_manager_of_any_group or user.is_superuser:
+            user_ids.append(user.id)
+    return user_ids

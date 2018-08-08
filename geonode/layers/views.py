@@ -226,7 +226,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
     if request.method == 'GET':
         mosaics = Layer.objects.filter(is_mosaic=True).order_by('name')
         organizations = GroupProfile.objects.all().exclude(slug='working-group')
-        user_organization = organizations.filter(groupmember__user=request.user).first()
+        user_organization = request.user.get_organization()
         ctx = {
             'mosaics': mosaics,
             'charsets': CHARSETS,
@@ -337,7 +337,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
             # organization_id = form.cleaned_data["organization"]
             admin_upload = form.cleaned_data["admin_upload"]
             # group = GroupProfile.objects.get(id=organization_id)
-            group = GroupProfile.objects.filter(groupmember__user=request.user).exclude(slug='working-group')[0]
+            group = request.user.get_organization()
             # Replace dots in filename - GeoServer REST API upload bug
             # and avoid any other invalid characters.
             # Use the title if possible, otherwise default to the filename
@@ -1845,7 +1845,7 @@ def backupOrganizationLayers(request):
     out = {}
     out['success'] = False
     if request.user.is_authenticated() and request.user.is_manager_of_any_group:
-        user_organization = GroupProfile.objects.filter(groupmember__user=request.user).exclude(slug='working-group')[0]
+        user_organization = request.user.get_organization()
         try:
             host = request.META['HTTP_HOST']
             #used celery for backup layers asynchronously

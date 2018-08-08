@@ -624,6 +624,6 @@ class SectionDelete(DeleteView):
 
 def userOrganizationSections(user):
 
-    user_organization = GroupProfile.objects.filter(groupmember__user=user).exclude(slug='working-group')[0]
+    user_organization = user.get_organization()
     org_sections = SectionModel.objects.filter(organization = user_organization)
     return org_sections

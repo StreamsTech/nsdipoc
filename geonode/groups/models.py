@@ -149,6 +149,17 @@ class GroupProfile(models.Model):
                 "user",
                 flat=True)).filter(is_active=True)
 
+    def  get_members(self):
+        """
+        Returns all the members including managers
+        :return:
+        """
+        return get_user_model().objects.filter(
+            id__in=self.member_queryset().filter(
+                ).values_list(
+                "user",
+                flat=True)).filter(is_active=True)
+
     def user_is_member(self, user):
         if not user.is_authenticated():
             return False

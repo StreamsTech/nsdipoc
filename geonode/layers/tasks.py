@@ -48,7 +48,7 @@ def backupOneLayer(layer, temdir):
 def backupOrganizationLayersMetadata( host, user_id):
 
     user = Profile.objects.get(id=user_id)
-    organization = GroupProfile.objects.filter(groupmember__user=user).exclude(slug='working-group').first()
+    organization = user.get_organization()
     # organization = GroupProfile.objects.get(id=organization_id)
 
 

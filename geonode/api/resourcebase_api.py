@@ -981,7 +981,7 @@ class WorkSpaceLayerApi(ModelResource):
             resource_state = request.GET.get('resource_state')
             resource_type = 'layer'
             user = request.user
-            group = GroupProfile.objects.filter(groupmember__user=request.user).exclude(slug='working-group')[0]
+            group = request.user.get_organization()
 
             if user_type == 'admin':
                 if user.is_manager_of_any_group:
@@ -1082,7 +1082,7 @@ class WorkSpaceDocumentApi(ModelResource):
             resource_type = 'document'
             user = request.user
 
-            group = GroupProfile.objects.filter(groupmember__user=request.user).exclude(slug='working-group')[0]
+            group = request.user.get_organization()
 
             if user_type == 'admin':
                 if user.is_manager_of_any_group:
@@ -1196,7 +1196,7 @@ class WorkSpaceMapApi(ModelResource):
             resource_state = request.GET.get('resource_state')
             resource_type = 'map'
             user = request.user
-            group = GroupProfile.objects.filter(groupmember__user=request.user).exclude(slug='working-group')[0]
+            group = request.user.get_organization()
 
             if user_type == 'admin':
                 if user.is_manager_of_any_group:

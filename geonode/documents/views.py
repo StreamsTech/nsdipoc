@@ -242,7 +242,7 @@ class DocumentUploadView(CreateView):
         except TopicCategory.DoesNotExist:
             db_logger.error('Selected category does not exists')
             raise Http404('Selected category does not exists')
-        self.object.group = GroupProfile.objects.filter(groupmember__user=self.request.user).exclude(slug='working-group')[0]
+        self.object.group = self.request.user.get_organization()
         self.object.category = category
         #end
 

@@ -166,6 +166,22 @@ class Profile(AbstractUser):
         else:
             return group_list
 
+    def get_organization(self):
+        """
+        Returns user organization of which
+        the user is a member or manager
+        :return:
+        """
+        if self != get_anonymous_user() and not self.is_superuser:
+            organization_set =  GroupProfile.objects.filter(groupmember__user=self).exclude(slug='working-group')
+            if len(organization_set) > 0:
+                return organization_set[0]
+            else:
+                return None
+        else:
+            return None
+
+
     @property
     def is_manager_of_any_group(self):
         return GroupProfile.objects.filter(groupmember__user=self, groupmember__role="manager").exclude(slug='working-group').exists()

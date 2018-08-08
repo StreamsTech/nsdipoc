@@ -75,7 +75,7 @@ class DataCatalogCreate(SuccessMessageMixin,  CreateView):
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
-        user_organization = GroupProfile.objects.filter(groupmember__user=self.request.user).exclude(slug='working-group')[0]
+        user_organization = self.request.user.get_organization()
         self.object.ownership = user_organization
         self.object.save()
         return HttpResponseRedirect(self.get_success_url(user_organization.slug))
@@ -96,12 +96,12 @@ class DataCatalogUpdate(SuccessMessageMixin, UpdateView):
         return DataCatalog.objects.get(pk=self.kwargs['cat_pk'])
 
     def get_success_url(self):
-        user_organization = GroupProfile.objects.filter(groupmember__user=self.request.user).exclude(slug='working-group')[0]
+        user_organization = self.request.user.get_organization()
         return reverse('data_catalog_list', kwargs={'org': user_organization.slug})
 
     def get_context_data(self, **kwargs):
         context = super(DataCatalogUpdate, self).get_context_data(**kwargs)
-        user_organization = GroupProfile.objects.filter(groupmember__user=self.request.user).exclude(slug='working-group')[0]
+        user_organization = self.request.user.get_organization()
         context['update'] = True
         context['slug'] = user_organization.slug
         return context
@@ -116,7 +116,7 @@ class DataCatalogDelete(DeleteView):
 
     def get_success_url(self):
         messages.success(self.request, self.success_message)
-        user_organization = GroupProfile.objects.filter(groupmember__user=self.request.user).exclude(slug='working-group')[0]
+        user_organization = self.request.user.get_organization()
         return reverse('data_catalog_list', kwargs={'org': user_organization.slug})
 
     @method_decorator(login_required)
@@ -129,7 +129,7 @@ class DataCatalogDelete(DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super(DataCatalogDelete, self).get_context_data(**kwargs)
-        user_organization = GroupProfile.objects.filter(groupmember__user=self.request.user).exclude(slug='working-group')[0]
+        user_organization = self.request.user.get_organization()
         context['slug'] = user_organization.slug
         if self.request.user.is_manager_of_any_group:
             context['manager'] = True

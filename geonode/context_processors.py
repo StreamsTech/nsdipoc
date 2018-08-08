@@ -124,7 +124,7 @@ def resource_urls(request):
             False
         ),
         THESAURI_FILTERS=[t['name'] for t in settings.THESAURI if t.get('filter')],
-        USER_ORGANIZATION = GroupProfile.objects.filter(groupmember__user=request.user).exclude(slug='working-group')[0] if (request.user.is_authenticated() and not request.user.is_superuser) else None
+        USER_ORGANIZATION = request.user.get_organization()
     )
 
     return defaults
