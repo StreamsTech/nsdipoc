@@ -55,6 +55,7 @@ from geonode.documents.forms import DocumentForm, DocumentCreateForm, DocumentRe
 from geonode.documents.models import IMGTYPES
 from geonode.utils import build_social_links
 from geonode.base.libraries.decorators import manager_or_member
+from geonode.nsdi.utils import get_organization
 
 
 #@jahangir091
@@ -242,7 +243,7 @@ class DocumentUploadView(CreateView):
         except TopicCategory.DoesNotExist:
             db_logger.error('Selected category does not exists')
             raise Http404('Selected category does not exists')
-        self.object.group = self.request.user.get_organization()
+        self.object.group = get_organization(self.request.user)
         self.object.category = category
         #end
 

@@ -25,6 +25,7 @@ from geonode.people.models import Profile
 from geonode.geoserver.helpers import cascading_delete, gs_catalog
 from geonode.layers.utils import unzip_file
 from geonode.layers.utils import file_upload
+from geonode.nsdi.utils import get_organization
 
 
 db_logger = logging.getLogger('db')
@@ -48,7 +49,7 @@ def backupOneLayer(layer, temdir):
 def backupOrganizationLayersMetadata( host, user_id):
 
     user = Profile.objects.get(id=user_id)
-    organization = user.get_organization()
+    organization = get_organization(user)
     # organization = GroupProfile.objects.get(id=organization_id)
 
 

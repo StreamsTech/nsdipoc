@@ -75,6 +75,7 @@ from .api import TagResource, RegionResource, OwnersResource
 from .api import ThesaurusKeywordResource
 from .api import TopicCategoryResource
 from .api import FILTER_TYPES
+from geonode.nsdi.utils import get_organization
 
 if settings.HAYSTACK_SEARCH:
     from haystack.query import SearchQuerySet  # noqa
@@ -981,7 +982,7 @@ class WorkSpaceLayerApi(ModelResource):
             resource_state = request.GET.get('resource_state')
             resource_type = 'layer'
             user = request.user
-            group = request.user.get_organization()
+            group = get_organization(request.user)
 
             if user_type == 'admin':
                 if user.is_manager_of_any_group:
@@ -1082,7 +1083,7 @@ class WorkSpaceDocumentApi(ModelResource):
             resource_type = 'document'
             user = request.user
 
-            group = request.user.get_organization()
+            group = get_organization(request.user)
 
             if user_type == 'admin':
                 if user.is_manager_of_any_group:
@@ -1196,7 +1197,7 @@ class WorkSpaceMapApi(ModelResource):
             resource_state = request.GET.get('resource_state')
             resource_type = 'map'
             user = request.user
-            group = request.user.get_organization()
+            group = get_organization(request.user)
 
             if user_type == 'admin':
                 if user.is_manager_of_any_group:

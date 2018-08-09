@@ -27,6 +27,9 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.generic import ListView, UpdateView, DeleteView, CreateView
 from django.contrib.contenttypes.models import ContentType
+from django.template import RequestContext, loader
+from django.utils.translation import ugettext as _
+from django.shortcuts import render
 
 
 from actstream.models import Action
@@ -41,7 +44,9 @@ from geonode.layers.models import Layer
 from geonode.groups.models import QuestionAnswer
 from geonode.groups.forms import QuestionForm, AnsewerForm, SectionForm
 from geonode.settings import ANONYMOUS_USER_ID
+from models import UserInvitationModel
 from geonode import settings
+from geonode.nsdi.utils import get_organization
 
 @login_required
 @user_passes_test(superuser_check)
@@ -477,10 +482,7 @@ class AnswerUpdate(UpdateView):
         return reverse('group_detail', kwargs={'slug': self.kwargs['slug']})
 
 
-from models import UserInvitationModel
-from django.template import RequestContext, loader
-from django.utils.translation import ugettext as _
-from django.shortcuts import render
+
 @require_POST
 @login_required
 def userinvitation(request, slug):
@@ -624,6 +626,6 @@ class SectionDelete(DeleteView):
 
 def userOrganizationSections(user):
 
-    user_organization = user.get_organization()
+    user_organization = get_organization(user)
     org_sections = SectionModel.objects.filter(organization = user_organization)
     return org_sections

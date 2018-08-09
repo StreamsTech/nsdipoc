@@ -96,7 +96,7 @@ class GroupUpdateForm(forms.ModelForm):
 class GroupMemberForm(forms.Form):
     role = forms.ChoiceField(choices=[
         ("member", "Member"),
-        ("manager", "Manager"),
+        # ("manager", "Manager"),
     ])
     user_identifiers = forms.CharField(
         widget=forms.TextInput(

@@ -149,6 +149,7 @@ from geonode.geoserver.helpers import cascading_delete, gs_catalog
 from geonode.groups.models import GroupProfile
 from geonode.settings import MEDIA_ROOT
 from geonode.layers.forms import OrganizationLayersUploadForm
+from geonode.nsdi.utils import get_organization
 
 
 
@@ -226,7 +227,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
     if request.method == 'GET':
         mosaics = Layer.objects.filter(is_mosaic=True).order_by('name')
         organizations = GroupProfile.objects.all().exclude(slug='working-group')
-        user_organization = request.user.get_organization()
+        user_organization = get_organization(request.user)
         ctx = {
             'mosaics': mosaics,
             'charsets': CHARSETS,
@@ -337,7 +338,7 @@ def layer_upload(request, template='upload/layer_upload.html'):
             # organization_id = form.cleaned_data["organization"]
             admin_upload = form.cleaned_data["admin_upload"]
             # group = GroupProfile.objects.get(id=organization_id)
-            group = request.user.get_organization()
+            group = get_organization(request.user)
             # Replace dots in filename - GeoServer REST API upload bug
             # and avoid any other invalid characters.
             # Use the title if possible, otherwise default to the filename
@@ -1845,7 +1846,7 @@ def backupOrganizationLayers(request):
     out = {}
     out['success'] = False
     if request.user.is_authenticated() and request.user.is_manager_of_any_group:
-        user_organization = request.user.get_organization()
+        user_organization = get_organization(request.user)
         try:
             host = request.META['HTTP_HOST']
             #used celery for backup layers asynchronously

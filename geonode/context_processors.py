@@ -23,6 +23,7 @@ from geonode import get_version
 from geonode.catalogue import default_catalogue_backend
 from geonode.groups.models import GroupProfile
 from django.contrib.sites.models import Site
+from nsdi.utils import get_organization
 
 
 def resource_urls(request):
@@ -124,7 +125,7 @@ def resource_urls(request):
             False
         ),
         THESAURI_FILTERS=[t['name'] for t in settings.THESAURI if t.get('filter')],
-        USER_ORGANIZATION = request.user.get_organization()
+        USER_ORGANIZATION = get_organization(request.user)
     )
 
     return defaults

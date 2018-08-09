@@ -77,6 +77,7 @@ from geonode.maps.models import MapSubmissionActivity, MapAuditActivity
 from geonode.groups.models import GroupProfile
 from geonode.maps.models import WmsServer
 from geonode.maps.forms import WmsServerForm
+from geonode.nsdi.utils import get_organization
 
 from rest_framework.generics import RetrieveUpdateAPIView
 from .serializers import MapLayerSerializer
@@ -552,7 +553,7 @@ def new_map_json(request):
         category_id = int(data['about']['category'])
         # organization_id = int(data['about']['organization'])
         # group = GroupProfile.objects.get(id=organization_id)
-        group = request.user.get_organization()
+        group = get_organization(request.user)
 
 
         map_obj = Map(owner=request.user, zoom=0,
