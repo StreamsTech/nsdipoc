@@ -106,7 +106,7 @@ from geonode.layers.views import save_geometry_type
 from django.db.models import Count
 CONTEXT_LOG_FILE = None
 
-from geonode.api.tasks import sendMailToOrganizationAdmins
+from utils import sendMailToCommitteeMembers
 
 if 'geonode.geoserver' in settings.INSTALLED_APPS:
     from geonode.geoserver.helpers import _render_thumbnail
@@ -1248,7 +1248,7 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                     working_group_admins = Profile.objects.filter(is_working_group_admin=True)
                     notify.send(request.user, recipient_list=list(working_group_admins), actor=request.user,
                                 target=layer, verb='pushed a new layer for approval')
-                    sendMailToOrganizationAdmins.delay(layer.id, 'layer')
+                    sendMailToCommitteeMembers(layer.id, 'layer')
 
 
             elif request.user ==  layer.owner and status == "PENDING":
@@ -1393,7 +1393,7 @@ class MapPermissionPreviewApi(TypeFilteredResource):
                     working_group_admins = Profile.objects.filter(is_working_group_admin=True)
                     notify.send(request.user, recipient_list=list(working_group_admins), actor=request.user,
                                 target=map, verb='pushed a new map for approval')
-                    sendMailToOrganizationAdmins.delay(map.id, 'map')
+                    sendMailToCommitteeMembers(map.id, 'map')
 
 
             elif request.user ==  map.owner and status == "PENDING":
@@ -1527,7 +1527,7 @@ class DocumentPermissionPreviewApi(TypeFilteredResource):
                     working_group_admins = Profile.objects.filter(is_working_group_admin=True)
                     notify.send(request.user, recipient_list=list(working_group_admins), actor=request.user,
                                 target=document, verb='pushed a new document for approval')
-                    sendMailToOrganizationAdmins.delay(document.id, 'document')
+                    sendMailToCommitteeMembers(document.id, 'document')
 
 
             elif request.user ==  document.owner and status == "PENDING":

@@ -7,6 +7,7 @@ from django.core.mail import send_mail
 
 from geonode.people.models import Profile
 from geonode.layers.models import Layer
+from geonode.nsdi.utils import getWorkingGroupAdmins
 
 db_logger = logging.getLogger('db')
 
@@ -122,30 +123,10 @@ def send_user_download_link(data, request):
 
 
 @shared_task
-def sendMailToOrganizationAdmins(resource_id, resource_type ):
-    working_group_admins = Profile.objects.filter(is_working_group_admin=True)
+def send_task_email(subject, message, from_email, recipient_list):
 
-    if resource_type == 'layer':
-        layer = Layer.objects.get(id=resource_id)
-        resource_link = settings.SITEURL + "layers/" + layer.typename + "/preview"
-    elif resource_type == 'map':
-        resource_link = settings.SITEURL + "layers/" + str(resource_id) + "/preview"
-    elif resource_type == 'document':
-        resource_link = settings.SITEURL + "layers/" + str(resource_id) + "/preview"
-
-    # Send email
-    subject = 'Approve or deny resource'
-    from_email = settings.EMAIL_FROM
-    recipient_list = []
-    # for wg_admin in working_group_admins:
-    #     recipient_list.append(wg_admin.email)
-    # recipient_list = [str(user.email) for user in working_group_admins]  # str(request.user.email)
-    html_message = "<a href='" + resource_link + "'>Please go to the following link to approve or deny {0}:</a> <br/><br/><br/>".format(resource_type) + resource_link
-
-    for wg_admin in working_group_admins:
-
-        try:
-            send_mail(subject=subject, message=html_message, from_email=from_email, recipient_list=[wg_admin.email],
-                      fail_silently=False, html_message=html_message)
-        except Exception as e:
-            db_logger.exception(e)
+    try:
+        send_mail(subject=subject, message=message, from_email=from_email, recipient_list=recipient_list,
+                  fail_silently=False, html_message=message)
+    except Exception as e:
+        db_logger.exception(e)

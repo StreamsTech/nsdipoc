@@ -108,28 +108,8 @@ def getFields(user, fields):
     # exclude form fields according to user role
     # super admin can edit all the fields, but
     # normal user are allowed to edit limited fields
-    # import pdb; pdb.set_trace()
-    if user.is_superuser:
-        exfields = ['password',
-            'last_login',
-            'groups',
-            'user_permissions',
-            'username',
-            'is_staff',
-            'is_superuser',
-            'is_active',
-            'date_joined']
-
-    else:
-        exfields = ['password',
-            'last_login',
-            'groups',
-            'user_permissions',
-            'username',
-            'is_staff',
-            'is_superuser',
-            'is_active',
-            'date_joined',
+    if not user.is_superuser:
+        exfields = [
             'section',
             'is_working_group_admin']
 

@@ -56,10 +56,30 @@
                   <span class="btn btn-gd-primary btn-xs">{% trans 'Manager' %}</span>
                   |
                   {% endif %}
-                  <form style="display: inline;" method="POST" action="{% url "group_member_remove" group.slug member.user.username %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger btn-gd-remove btn-xs">{% trans 'Remove' %}</button>
-                  </form>
+
+
+
+                  <!--<form style="display: inline;" method="POST" action="{% url "group_member_remove" group.slug member.user.username %}">-->
+                    <!--{% csrf_token %}-->
+                    <!--<button type="submit" class="btn btn-danger btn-gd-remove btn-xs">{% trans 'Removeppp' %}</button>-->
+                  <!--</form>-->
+
+
+                    {% if request.user.is_superuser or request.user != member.user %}
+                      {% if member.user.is_active%}
+                          <form style="display: inline;" method="POST" action="{% url "active-inactive-user" member.user.username %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-gd-remove btn-xs" data-toggle="tooltip" data-placement="top" title="Deactivate this member from NSDI">{% trans 'Deactivate' %}</button>
+                          </form>
+                      {% else %}
+                          <form style="display: inline;" method="POST" action="{% url "active-inactive-user" member.user.username %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-gd-remove btn-xs" data-toggle="tooltip" data-placement="top" title="Activate this member from NSDI">{% trans 'Activate' %}</button>
+                          </form>
+                        {% endif %}
+                    {% endif %}
+
+
                 </div>
                 <div class="">
                   {% trans 'Role' %}: {{ member.role }}
@@ -90,10 +110,29 @@
                   <span class="btn btn-gd-primary btn-xs">{% trans 'Manager' %}</span>
                   |
                   {% endif %}
-                  <form style="display: inline;" method="POST" action="{% url "group_member_remove" group.slug member.user.username %}">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-danger btn-gd-remove btn-xs">{% trans 'Remove' %}</button>
-                  </form>
+
+
+                  <!--<form style="display: inline;" method="POST" action="{% url "group_member_remove" group.slug member.user.username %}">-->
+                  <!--{% csrf_token %}-->
+                  <!--<button type="submit" class="btn btn-danger btn-gd-remove btn-xs">{% trans 'Remove222' %}</button>-->
+                  <!--</form>-->
+
+                    {% if request.user.is_superuser or request.user != member.user %}
+                      {% if member.user.is_active%}
+                          <form style="display: inline;" method="POST" action="{% url "active-inactive-user" member.user.username %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-gd-remove btn-xs" data-toggle="tooltip" data-placement="top" title="Deactivate this member from NSDI">{% trans 'Deactivate' %}</button>
+                          </form>
+                      {% else %}
+                          <form style="display: inline;" method="POST" action="{% url "active-inactive-user" member.user.username %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-gd-remove btn-xs" data-toggle="tooltip" data-placement="top" title="Activate this member from NSDI">{% trans 'Activate' %}</button>
+                          </form>
+                        {% endif %}
+                    {% endif %}
+
+
+
                 </div>
                 <div class="">
                   {% trans 'Role' %}: {{ member.role }}
@@ -125,10 +164,28 @@
                   <span class="btn btn-gd-primary btn-xs">{% trans 'Manager' %}</span>
                   |
                   {% endif %}
-                  <form style="display: inline;" method="POST" action="{% url "group_member_remove" group.slug member.user.username %}">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-danger btn-gd-remove btn-xs">{% trans 'Remove' %}</button>
-                  </form>
+
+
+                  <!--<form style="display: inline;" method="POST" action="{% url "group_member_remove" group.slug member.user.username %}">-->
+                  <!--{% csrf_token %}-->
+                  <!--<button type="submit" class="btn btn-danger btn-gd-remove btn-xs">{% trans 'Remove' %}</button>-->
+                  <!--</form>-->
+
+                    {% if request.user.is_superuser or request.user != member.user %}
+                      {% if member.user.is_active%}
+                          <form style="display: inline;" method="POST" action="{% url "active-inactive-user" member.user.username %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-gd-remove btn-xs" data-toggle="tooltip" data-placement="top" title="Deactivate this member from NSDI">{% trans 'Deactivate' %}</button>
+                          </form>
+                      {% else %}
+                          <form style="display: inline;" method="POST" action="{% url "active-inactive-user" member.user.username %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-gd-remove btn-xs" data-toggle="tooltip" data-placement="top" title="Activate this member from NSDI">{% trans 'Activate' %}</button>
+                          </form>
+                        {% endif %}
+                    {% endif %}
+
+
                 </div>
                 <div class="">
                   {% trans 'Role' %}: {{ member.role }}

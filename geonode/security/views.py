@@ -34,6 +34,8 @@ from notify.signals import notify
 
 from geonode.utils import resolve_object
 from geonode.base.models import ResourceBase
+from geonode.api.utils import send_task_email
+from geonode.nsdi.utils import get_organization
 
 if "notification" in settings.INSTALLED_APPS:
     from notification import models as notification
@@ -169,9 +171,14 @@ def request_permissions(request):
 
         html_message += "<br><br> Best regards, <br>"
         html_message += settings.SITEURL + request.user.get_absolute_url()[1:]
+        profile_link = settings.SITEURL + request.user.get_absolute_url()[1:]
 
-        send_mail(subject=mail_subject, message=html_message, from_email=settings.EMAIL_FROM, recipient_list=[recipient.email],
-                  fail_silently=False, html_message=html_message)
+        f = open("geonode/templates/layer_download_request_mail_template.html", "r")
+        html_message = f.read()
+        f.close()
+        html_message = html_message.format(request.user.username, profile_link, get_organization(request.user).title, resource.name, layer_link)
+
+        send_task_email.delay(mail_subject, html_message, settings.EMAIL_FROM, [recipient.email])
 
         return HttpResponse(
             json.dumps({'success': 'ok', }),

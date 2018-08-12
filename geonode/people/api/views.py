@@ -17,7 +17,6 @@ class MinimalMetadata(BaseMetadata):
     Just return the name and description.
     """
     def determine_metadata(self, request, view):
-        import pdb; pdb.set_trace()
         return {
             'name': view.get_view_name(),
             'description': view.get_view_description()

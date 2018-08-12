@@ -89,14 +89,24 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        exclude = ()
+        exclude = ['password',
+            'last_login',
+            'groups',
+            'user_permissions',
+            'username',
+            'is_staff',
+            'is_superuser',
+            'is_active',
+            'date_joined']
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         super(ProfileForm, self).__init__(*args, **kwargs)
         #exclude form fields according to user role
         #super admin can edit all the fields, but
         # normal user are allowed to edit limited fields
-        self.fields = getFields(user, self.fields)
+        if self.user:
+            self.fields = getFields(self.user, self.fields)
 
 
     def clean_email(self):

@@ -26,6 +26,7 @@ from geonode.geoserver.helpers import cascading_delete, gs_catalog
 from geonode.layers.utils import unzip_file
 from geonode.layers.utils import file_upload
 from geonode.nsdi.utils import get_organization
+from geonode.api.tasks import send_task_email
 
 
 db_logger = logging.getLogger('db')
@@ -86,14 +87,16 @@ def send_mail_to_admin(host, organization, temdir, user):
     subject = 'Download Organizations Layers'
     from_email = settings.EMAIL_FROM
     recipient_list = [str(user.email)]  # str(request.user.email)
-    html_message = "<a href='" + org_download_link + "'>Please go to the following link to download organizations layers:</a> <br/><br/><br/>" + org_download_link
+
+    # html_message = "<a href='" + org_download_link + "'>Please go to the following link to download organizations layers:</a> <br/><br/><br/>" + org_download_link
+    f = open("geonode/templates/org_layers_download_mail_template.html", "r")
+    html_message = f.read()
+    f.close()
+    html_message = html_message.format(org_download_link, org_download_link)
 
     try:
-
-        send_mail(subject=subject, message=html_message, from_email=from_email, recipient_list=recipient_list,
-                  fail_silently=False, html_message=html_message)
+        send_task_email.delay(subject, html_message, from_email, recipient_list)
     except Exception as e:
-        # print e
         db_logger.exception(e)
 
 

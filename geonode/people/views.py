@@ -48,6 +48,7 @@ from geonode.people.forms import ForgotUsernameForm, UserSignupFormExtend, UserS
 from geonode.tasks.email import send_email
 from geonode.groups.models import GroupProfile, GroupMember
 from account.views import InviteUserView
+from geonode.nsdi.utils import get_organization
 
 
 @login_required
@@ -63,7 +64,7 @@ def profile_edit(request, username=None):
 
     if username == request.user.username or request.user.is_superuser:
         if request.method == "POST":
-            form = ProfileForm(request.user, request.POST, request.FILES, instance=profile)
+            form = ProfileForm(request.POST, request.FILES, user=request.user, instance=profile)
             if form.is_valid():
                 saved_user = form.save()
                 messages.success(request, ("Profile %s updated." % username))
@@ -78,7 +79,7 @@ def profile_edit(request, username=None):
                         args=[
                             username]))
         else:
-            form = ProfileForm(request.user, instance=profile)
+            form = ProfileForm(user=request.user, instance=profile)
 
         return render(request, "people/profile_edit.html", {
             "profile": profile,
@@ -235,14 +236,16 @@ class CreateUser(SignupView):
 
 
 def activateuser(request, username):
-    if request.method == 'GET':
+    if request.method == 'POST':
         user = Profile.objects.get(username=username)
-        if user.is_active:
-            user.is_active = False
-        else:
-            user.is_active = True
+        user_org = get_organization(user)
+        if request.user in user_org.get_managers() or request.user.is_superuser:
+            if user.is_active:
+                user.is_active = False
+            else:
+                user.is_active = True
         user.save()
-        return HttpResponseRedirect(reverse('profile_detail', args=[username]))
+    return HttpResponseRedirect(reverse('group_members', args=[user_org.slug]))
 
 
 class UserSignup(SignupView):

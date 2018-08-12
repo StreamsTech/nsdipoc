@@ -183,7 +183,7 @@ def group_members(request, slug):
 
     ctx.update({
         "group": group,
-        "members": group.member_queryset().filter(user__is_active=True),
+        "members": group.member_queryset().filter(),
         "is_member": group.user_is_member(request.user),
         "is_manager": group.user_is_role(request.user, "manager"),
     })

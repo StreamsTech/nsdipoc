@@ -22,6 +22,8 @@ from geonode.groups.models import GroupProfile
 from forms import DataCatalogCreateUpdateForm
 from geonode.authentication_decorators import manager_required
 from geonode.nsdi.utils import get_organization
+from geonode.api.tasks import send_task_email
+from geonode.nsdi.utils import get_organization
 
 # Create your views here.
 
@@ -150,24 +152,33 @@ class CatDownloadRequest(SuccessMessageMixin, View):
         else:
             to_email = org.get_managers()[0].email
         layer_title = request.POST.get('title')
+        user_profile_link = 'Not nsdi user'
+        user_organization = 'Not nsdi user'
         if request.user.is_authenticated():
             email = request.user.email
             name = request.user.name
+            user_profile_link = settings.SITEURL + request.user.get_absolute_url()[1:]
+            user_organization = get_organization(request.user).title
         else:
             email = request.POST.get('email')
             name = request.POST.get('name')
 
         message = request.POST.get('message')
 
-        html_message = "<h3>"  + message
-        html_message += "<br><br><br><br>Best regards,<br>Name: " + name + "<br>"
-        html_message += "Email: " + email + "<br> <h3>"
+        # html_message = "<h3>"  + message
+        # html_message += "<br><br><br><br>Best regards,<br>Name: " + name + "<br>"
+        # html_message += "Email: " + email + "<br> <h3>"
+
+        f = open("geonode/templates/catalog_download_request_mail_template.html", "r")
+        html_message = f.read()
+        f.close()
+        html_message = html_message.format(layer_title, name, user_profile_link, user_organization, email)
 
         mail_subject = 'requesting for downloading layer,  ' + layer_title
 
         if layer_title and email and name and message:
-            send_mail(subject=mail_subject, message=html_message, from_email=settings.EMAIL_FROM, recipient_list=[to_email],
-                      fail_silently=False, html_message=html_message)
+            send_task_email.delay(mail_subject, html_message, settings.EMAIL_FROM, [to_email])
+
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
