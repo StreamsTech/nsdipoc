@@ -138,6 +138,7 @@ celery==4.2
 markdown==2.6.9
 
 notebook==4.4.1
+django-simple-captcha
 
 # Do not remove below lines
 # pip install -e git+https://github.com/celery/billiard.git#egg=billiard

@@ -392,6 +392,7 @@ INSTALLED_APPS = (
 
 
     'oauth2_provider',
+    'captcha',
 
 ) + GEONODE_APPS
 

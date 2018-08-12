@@ -206,6 +206,11 @@ if "geonode.contrib.dynamic" in settings.INSTALLED_APPS:
                             (r'^dynamic/', include('geonode.contrib.dynamic.urls')),
                             )
 
+if "captcha" in settings.INSTALLED_APPS:
+    urlpatterns += patterns('',
+                            url(r'^captcha/', include('captcha.urls')),
+                            )
+
 if "geonode.contrib.metadataxsl" in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
                             (r'^showmetadata/', include('geonode.contrib.metadataxsl.urls')),
