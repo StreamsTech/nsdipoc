@@ -22,12 +22,32 @@ from django import forms
 from django.core.validators import validate_email, ValidationError
 from slugify import slugify
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import Q
 
 from django.contrib.auth import get_user_model
 
 from geonode.groups.models import GroupProfile, SectionModel
 from geonode.people.models import Profile
 from geonode.groups.models import QuestionAnswer
+
+
+def getExcludeUserList():
+    """
+    This function returns user ids who are already
+    member or manager of other organizations or super user.
+    As in NSDI single user cannot be member or manager of multiple
+    organizations, this filter is added when organization admin is
+    trying to add member to his organization.
+    :return:
+    """
+    user_ids = []
+    for user in get_user_model().objects.all():
+        if user.is_member_of_any_group or user.is_manager_of_any_group or user.is_superuser:
+            user_ids.append(user.id)
+    return user_ids
+
+def getAdminList():
+    return get_user_model().objects.filter(is_active=True).exclude(id__in=getExcludeUserList())
 
 
 class GroupForm(forms.ModelForm):
@@ -38,11 +58,15 @@ class GroupForm(forms.ModelForm):
         widget=forms.HiddenInput,
         required=False)
 
-    admin = forms.ModelChoiceField(queryset=Profile.objects.all().filter(is_active=True),
+    admins = forms.ModelChoiceField(queryset=Profile.objects.all().filter(is_active=True),
         help_text=_('select an admin for this organization'),
         label=_('Organization Admin'),
 
     )
+
+    def __init__(self, *args, **kwargs):
+        super(GroupForm, self).__init__(*args, **kwargs)
+        self.fields['admins'].queryset = getAdminList()
 
     def clean_slug(self):
         if GroupProfile.objects.filter(
