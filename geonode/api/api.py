@@ -903,6 +903,7 @@ class MetaFavorite:
         'rating',
         'featured',
         'resource_type',
+        'download_count',
 
     ]
 
