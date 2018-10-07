@@ -113,7 +113,7 @@ def getFields(user, fields):
             'section',
             'is_working_group_admin']
 
-    for item in exfields:
-        del fields[item]
+        for item in exfields:
+            del fields[item]
 
     return fields
