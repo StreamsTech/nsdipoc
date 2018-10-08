@@ -1440,7 +1440,7 @@ def map_permission_preview(request, mapid, template='maps/map_attribute_permissi
 
     if request.method == 'GET':
         user_state = None
-        if request.user == map.owner and (map.status == 'DRAFT' or map.status == 'DENIED'):
+        if request.user == map.owner and (map.status in ['DRAFT', 'DENIED', 'ACTIVE']):
             user_state = "user"
         elif request.user in map.group.get_managers() and map.status == "PENDING":
             user_state = "manager"

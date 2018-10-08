@@ -148,6 +148,7 @@
                                                         <th>Organization</th>
                                                         <th>Activator</th>
                                                         <th>Activation Date</th>
+                                                        <th>Preview Permission</th>
                                                         <th>Document Edit</th>
                                                     </tr>
                                                 </thead>
@@ -569,6 +570,7 @@ $(function () {
                     output+='<td>'+ item.group +'</td>';
                     output+='<td>'+ item.last_auditor +'</td>';
                     output+='<td>'+ item.date_updated +'</td>';
+                    output+='<td><a href="'+ item.detail_url +'/preview" class="btn btn-gd-primary"> {% trans "Preview" %}</a></td>';
                     output+='<td><a href="'+ item.detail_url +'?user_role=member" class="btn btn-gd-primary"> {% trans "Edit" %}</a></td>';
                     output+='</tr>';
                   });

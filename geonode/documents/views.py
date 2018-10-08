@@ -828,7 +828,7 @@ def document_permission_preview(request, docid, template='documents/document_att
 
     if request.method == 'GET':
         user_state = None
-        if request.user == document.owner and (document.status == 'DRAFT' or document.status == 'DENIED'):
+        if request.user == document.owner and (document.status in ['DRAFT', 'DENIED', 'ACTIVE']):
             user_state = "user"
         elif request.user in document.group.get_managers() and document.status == "PENDING":
             user_state = "manager"

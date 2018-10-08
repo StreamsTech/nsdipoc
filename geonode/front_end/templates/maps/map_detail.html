@@ -287,6 +287,10 @@
 
                                             {% endif %}
                                             <li class="list-group-item">
+                                                <a href="{% url "map_permission_preview" resource.id %}"
+                                                   class="btn btn-primary btn-md btn-block btn-gd">{% trans "Preview Permission" %}</a>
+                                            </li>
+                                            <li class="list-group-item">
                                                 <a href="{% url "map_view" resource.id %}"
                                                    class="btn btn-default btn-md btn-block btn-gd">{% trans "View Map" %}</a>
                                             </li>
