@@ -34,6 +34,7 @@
     }
 </style>
 <script type="text/javascript">
+    var userOrganization = '{{USER_ORGANIZATION.slug}}';
     function getOrganizationData(selectedNodes){
         $.ajax({
             url: "/api/nsdi/sectors", success: function (result) {
@@ -50,12 +51,14 @@
                     sector.departments.forEach(function (department) {
                         var departmentTreeData =  {text: department.title, children: [], id:department.title};
                         department.organizations.forEach(function (organization) {
-                            var organizationTreeData = {
+                            if(userOrganization !== organization.slug){
+                                var organizationTreeData = {
                                 text: organization.title,
                                 id : organization.slug,
                                 children: []
                             };
-                            departmentTreeData.children.push(organizationTreeData);
+                              departmentTreeData.children.push(organizationTreeData);
+                            }
                         });
                         treeData.children.push(departmentTreeData);
                     });
@@ -106,6 +109,7 @@
                 selectedOrganizations.push(node.id);
             }
         });
+        if(userOrganization) selectedOrganizations.push(userOrganization);
         return selectedOrganizations;
     }
 </script>

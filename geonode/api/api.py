@@ -106,7 +106,7 @@ from geonode.layers.views import save_geometry_type
 from django.db.models import Count
 CONTEXT_LOG_FILE = None
 
-from utils import sendMailToCommitteeMembers
+from utils import sendMailToCommitteeMembers, sendMailToOrganizationAdmin, sendMailToResourceOwner
 
 if 'geonode.geoserver' in settings.INSTALLED_APPS:
     from geonode.geoserver.helpers import _render_thumbnail
@@ -1184,6 +1184,11 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                 notify.send(request.user, recipient=layer.owner, actor=request.user,
                                 target=layer, verb='{0} your layer'.format(verb))
 
+                # if organization admin/committee member verifies/denies the layer then send a mail to the layer owner
+                # and organization admin informing that admin has verified/denied the requested layer
+                sendMailToResourceOwner(layer_pk, 'layer', status)
+                sendMailToOrganizationAdmin(layer_pk, 'layer')
+
                 layer_submission_activity.is_audited = True
                 layer_submission_activity.save()
 
@@ -1239,17 +1244,22 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                 layer_audit_activity.auditor = request.user
                 layer_audit_activity.save()
 
-                # notify layer owner that manager have verified the layer
+                # notify layer owner that manager have verified/denied the layer
                 notify.send(request.user, recipient=layer.owner, actor=request.user,
                             target=layer, verb='{0} your layer'.format(status))
 
-                #if the layer is verified, the inform working group
-                #admins to approve this layer
+                # if the layer is verified, then inform working group
+                # admins that a new layr has been sent to him for approval
                 if status == "VERIFIED":
                     working_group_admins = Profile.objects.filter(is_working_group_admin=True)
                     notify.send(request.user, recipient_list=list(working_group_admins), actor=request.user,
                                 target=layer, verb='pushed a new layer for approval')
                     sendMailToCommitteeMembers(layer.id, 'layer')
+
+                # if organization admin verifies/denies the layer then send a mail to the layer owner
+                # informing that admin has verified/denied the requested layer
+                sendMailToResourceOwner(layer_pk, 'layer', status)
+
 
 
             elif request.user ==  layer.owner and status == "PENDING":
@@ -1285,6 +1295,10 @@ class LayerPermissionPreviewApi(TypeFilteredResource):
                 # notify organization admin about the new published layer
                 notify.send(request.user, recipient=layer.group.get_managers().first(), actor=request.user,
                                 verb='pushed a new layer for verification', target=layer)
+
+                # send email to organization admin that a new layer has been sent for verification
+                sendMailToOrganizationAdmin(layer_pk, 'layer')
+
                 out['success'] = True
 
             else:
@@ -1339,6 +1353,11 @@ class MapPermissionPreviewApi(TypeFilteredResource):
                 # notify map owner that someone have approved the map
                 notify.send(request.user, recipient=map.owner, actor=request.user,
                                 target=map, verb='{0} your map'.format(verb))
+
+                # if organization admin/committee member verifies/denies the map then send a mail to the map owner
+                # and organization admin informing that admin has verified/denied the requested map
+                sendMailToResourceOwner(map_pk, 'map', status)
+                sendMailToOrganizationAdmin(map_pk, 'map')
 
                 map_submission_activity.is_audited = True
                 map_submission_activity.save()
@@ -1396,6 +1415,10 @@ class MapPermissionPreviewApi(TypeFilteredResource):
                                 target=map, verb='pushed a new map for approval')
                     sendMailToCommitteeMembers(map.id, 'map')
 
+                # if organization admin verifies/denies the map then send a mail to the map owner
+                # informing that admin has verified/denied the requested map
+                sendMailToResourceOwner(map_pk, 'map', status)
+
 
             elif request.user ==  map.owner and status == "PENDING":
 
@@ -1420,6 +1443,10 @@ class MapPermissionPreviewApi(TypeFilteredResource):
                 # notify organization admin about the new published map
                 notify.send(request.user, recipient=map.group.get_managers().first(), actor=request.user,
                                 verb='pushed a new map for verification', target=map)
+
+                # send email to organization admin that a new map has been sent for verification
+                sendMailToOrganizationAdmin(map_pk, 'map')
+
                 out['success'] = True
 
             else:
@@ -1474,6 +1501,11 @@ class DocumentPermissionPreviewApi(TypeFilteredResource):
                 # notify document owner that someone have approved the document
                 notify.send(request.user, recipient=document.owner, actor=request.user,
                                 target=document, verb='{0} your document'.format(verb))
+
+                # if organization admin/committee member verifies/denies the document then send a mail to the document owner
+                # and organization admin informing that admin has verified/denied the requested document
+                sendMailToResourceOwner(document_pk, 'document', status)
+                sendMailToOrganizationAdmin(document_pk, 'document')
 
                 document_submission_activity.is_audited = True
                 document_submission_activity.save()
@@ -1530,6 +1562,10 @@ class DocumentPermissionPreviewApi(TypeFilteredResource):
                                 target=document, verb='pushed a new document for approval')
                     sendMailToCommitteeMembers(document.id, 'document')
 
+                # if organization admin verifies/denies the document then send a mail to the document owner
+                # informing that admin has verified/denied the requested document
+                sendMailToResourceOwner(document_pk, 'document', status)
+
 
             elif request.user ==  document.owner and status == "PENDING":
 
@@ -1554,6 +1590,10 @@ class DocumentPermissionPreviewApi(TypeFilteredResource):
                 # notify organization admin about the new published document
                 notify.send(request.user, recipient=document.group.get_managers().first(), actor=request.user,
                                 verb='pushed a new document for verification', target=document)
+
+                # send email to organization admin that a new document has been sent for verification
+                sendMailToOrganizationAdmin(document_pk, 'document')
+
                 out['success'] = True
 
             else:
