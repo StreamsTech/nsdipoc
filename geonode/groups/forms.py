@@ -227,9 +227,9 @@ class SectionForm(forms.ModelForm):
 
     class Meta:
          model = SectionModel
-         fields = ('organization', 'title')
+         fields = ('title',)
 
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)
-        super(SectionForm, self).__init__(*args, **kwargs)
-        self.fields['organization'].queryset = GroupProfile.objects.filter(groupmember__user=self.user).exclude(slug='working-group')
+    # def __init__(self, *args, **kwargs):
+    #     self.user = kwargs.pop('user', None)
+    #     super(SectionForm, self).__init__(*args, **kwargs)
+    #     self.fields['organization'].queryset = GroupProfile.objects.filter(groupmember__user=self.user).exclude(slug='working-group')
