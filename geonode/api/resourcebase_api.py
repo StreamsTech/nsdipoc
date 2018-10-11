@@ -629,6 +629,8 @@ class ResourceBaseResource(CommonModelApi):
         group = request.GET.get('group')
         if group:
             return super(ResourceBaseResource, self).get_object_list(request).filter(group=group, status='ACTIVE')
+        else:
+            return super(ResourceBaseResource, self).get_object_list(request)
 
 
 class FeaturedResourceBaseResource(CommonModelApi):
