@@ -1279,7 +1279,19 @@ class AttributeApi(ModelResource):
         allowed_method = 'get'
         fields = ['attribute', 'attribute_type', 'id', 'is_permitted']
 
+    def dehydrate_is_permitted(self, bundle):
+        # import pdb; pdb.set_trace()
+        if 'pk' in bundle.request.resolver_match.kwargs:
+            layer_pk = bundle.request.resolver_match.kwargs['pk']
+            layer = Layer.objects.get(id=layer_pk)
+            if bundle.request.user in layer.group.get_managers():
+                return True
+            else:
+                return False
+        else:
+            return bundle.obj.is_permitted
 
+import copy
 class LayerAttributeApi(ModelResource):
     attributes = fields.ToManyField('geonode.api.resourcebase_api.AttributeApi', 'attributes', full=True, null=True)
 
@@ -1310,6 +1322,17 @@ class LayerAttributeApi(ModelResource):
         return bundle.obj.date_created.strftime('%b %d %Y  %H:%M:%S ')
 
     def dehydrate_attributes(self, bundle):
+        # if bundle.request.user in bundle.obj.group.get_managers():
+        #
+        #     permitted_list = []
+        #     for attr in bundle.data['attributes']:
+        #         attr2 =  copy.copy(attr)
+        #         attr2.obj.is_permitted = True
+        #         permitted_list.append(attr2)
+        #     import pdb;
+        #     pdb.set_trace()
+        #     bundle.data['attributes'] = permitted_list
+        #     return bundle.data['attributes']
         if bundle.request.user.is_working_group_admin and bundle.obj.status == 'VERIFIED':
             permitted_list = []
             for attr in bundle.data['attributes']:
