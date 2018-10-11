@@ -1080,6 +1080,18 @@
                         longitude : userLocation.longitude
                     }
                 })
+
+                var sendInfo = {
+                    "layer_id": layerId
+                    };
+
+                $.ajax({
+                    type : 'post',
+                    url: '/api/layer-download-count/',
+                    dataType: "json",
+                    data :JSON.stringify(sendInfo)
+                })
+
             }
 
             {% if user_data_epsg and user_data_epsg != "4326" %}
