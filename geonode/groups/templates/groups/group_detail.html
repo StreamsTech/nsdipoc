@@ -222,10 +222,13 @@
                                                           {% if request.user.is_superuser %}
                                                           <input type="button" class="btn btn-primary pull-right" id="org-layer-download" value="Backup Data">
                                                           {% endif %}
-                          
-                                                        {% include 'search/_pagination.html' %}
+
+
                                                     </div>
                                                   </div>
+
+                                                  <div style="clear: both"></div>
+                                                   {% include 'search/_pagination.html' %}
                                               </article>
                                               <article id="userlist" class="tab-pane">
                                                   <div class="no-style-list">
