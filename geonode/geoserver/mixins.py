@@ -25,3 +25,9 @@ class GeoServerMixin(object):
 
         return attributes
 
+
+    def getOwnerAttributesPermission(self, layer_name):
+        attributes = [ l.attribute for l in Layer.objects.get(typename=layer_name).attribute_set.all() ]
+
+        return attributes
+

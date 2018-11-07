@@ -24,7 +24,11 @@ class GeoserverWFSListAPIView(ListAPIView, GeoServerMixin):
                                    layer_name,
                                    'base.view_resourcebase',
                                    _PERMISSION_MSG_VIEW)
-        params = self.getAttributesPermission(layer_name)
+        if request.user in layer_obj.group.get_members():
+            params = self.getOwnerAttributesPermission(layer_name=layer_name)
+        else:
+            params = self.getAttributesPermission(layer_name=layer_name)
+        # params = self.getAttributesPermission(layer_name)
         if not kwargs.get('include_geometry', False):
             if 'the_geom' in params:
                 params.remove('the_geom')

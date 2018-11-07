@@ -1279,20 +1279,11 @@ class AttributeApi(ModelResource):
         allowed_method = 'get'
         fields = ['attribute', 'attribute_type', 'id', 'is_permitted']
 
-    def dehydrate_is_permitted(self, bundle):
-        # import pdb; pdb.set_trace()
-        if 'pk' in bundle.request.resolver_match.kwargs:
-            layer_pk = bundle.request.resolver_match.kwargs['pk']
-            layer = Layer.objects.get(id=layer_pk)
-            if bundle.request.user in layer.group.get_managers():
-                return True
-            else:
-                return False
-        else:
-            return bundle.obj.is_permitted
 
-import copy
 class LayerAttributeApi(ModelResource):
+    """
+    This api is used for getting layers with their corresponding attributes(feature properties)
+    """
     attributes = fields.ToManyField('geonode.api.resourcebase_api.AttributeApi', 'attributes', full=True, null=True)
 
     def dehydrate(self, bundle):
@@ -1320,29 +1311,6 @@ class LayerAttributeApi(ModelResource):
 
     def dehydrate_date_created(self, bundle):
         return bundle.obj.date_created.strftime('%b %d %Y  %H:%M:%S ')
-
-    def dehydrate_attributes(self, bundle):
-        # if bundle.request.user in bundle.obj.group.get_managers():
-        #
-        #     permitted_list = []
-        #     for attr in bundle.data['attributes']:
-        #         attr2 =  copy.copy(attr)
-        #         attr2.obj.is_permitted = True
-        #         permitted_list.append(attr2)
-        #     import pdb;
-        #     pdb.set_trace()
-        #     bundle.data['attributes'] = permitted_list
-        #     return bundle.data['attributes']
-        if bundle.request.user.is_working_group_admin and bundle.obj.status == 'VERIFIED':
-            permitted_list = []
-            for attr in bundle.data['attributes']:
-                if attr.obj.is_permitted:
-                    permitted_list.append(attr)
-            return permitted_list
-        else:
-            return bundle.data['attributes']
-
-
 
 
 class LayerAttributeApiPublic(ModelResource):

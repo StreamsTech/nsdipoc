@@ -222,6 +222,8 @@
                             get('/api/layer-attributes-permission/' + layerId)
                             .then(function(layerDetails){
                                 var permittedAttributes = _.filter(layerDetails.attributes, function (attribute) {
+                                    if($window.enbleAttributeFilter == 'True')
+                                        return true;
                                     return attribute.is_permitted;
                                 }).map(function (attribute) {
                                     return attribute.attribute;

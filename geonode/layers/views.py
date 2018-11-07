@@ -598,6 +598,11 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
 
     xlink = style_chart_legend_color(layer)
 
+    if request.user in layer.group.get_members():
+        group_member = True
+    else:
+        group_member = False
+
     context_dict = {
         "resource": layer,
         'perms_list': get_perms(request.user, layer.get_self_resource()),
@@ -614,7 +619,8 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
         "deny_form": deny_form,
         "denied_comments": LayerAuditActivity.objects.filter(layer_submission_activity__layer=layer).order_by('-date_updated'),
         "status": layer.status,
-        "chart_link": xlink
+        "chart_link": xlink,
+        "is_org_member": group_member
     }
 
     if 'access_token' in request.session:
