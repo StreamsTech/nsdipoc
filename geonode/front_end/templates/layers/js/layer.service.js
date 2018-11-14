@@ -237,7 +237,9 @@
                             });
                         }
 
-                });
+                }, function(error){
+                        deferred.resolve([]);
+                    });
                 return deferred.promise;
             },
             getFeatureDetails: function(url, layerName, propertyNames) {
