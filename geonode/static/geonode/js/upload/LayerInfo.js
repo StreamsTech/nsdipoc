@@ -164,7 +164,7 @@ define(function (require, exports) {
         };
         permissions.users['AnonymousUser'] = [];
         var permissionAttributes =
-            ['view_resourcebase'];
+            ['view_resourcebase', 'download_resourcebase']; //'download_resourcebase'
         var selectedOrganizations = [];
         if (typeof getSelectedOrganizations === 'function') {
             selectedOrganizations = getSelectedOrganizations();
