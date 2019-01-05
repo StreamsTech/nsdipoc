@@ -236,7 +236,9 @@
             function getSobBaseMaps(){
                 var baseMaps = [];
                 var urlRoot = 'http://nsdi.gov.bd/';
-                baseMaps.push({title: 'Zoom Level (7-17)', url: urlRoot+'uploaded/basemaps/sob/',thumb : 'sob1M.jpg'});
+                baseMaps.push({title: 'Topography', url: urlRoot+'uploaded/basemaps/sob/topography/',thumb : 'sob1M.jpg'});
+                baseMaps.push({title: 'Orthophoto', url: urlRoot+'uploaded/basemaps/sob/orthophoto/',thumb : 'sob1M.jpg'});
+                baseMaps.push({title: 'DEM', url: urlRoot+'uploaded/basemaps/sob/dem/',thumb : 'sob1M.jpg'});
                 addxyzPart(baseMaps, 'SoB', '{z}/{x}/{y}.png');
                 return baseMaps;
             }
