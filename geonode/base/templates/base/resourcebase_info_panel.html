@@ -115,13 +115,15 @@
 
     <dl class="dl-horizontal">
         <br>
-        <dt><a href="#more" data-toggle="collapse" data-target=".more">{% trans "More info" %}</a></dt>
+        <dt>
+        <dt><a data-toggle="collapse" data-target="#id-more">{% trans "More info" %}</a></dt>
+        </dt>
         <dd>-</dd>
     </dl>
 
 {#    <dl class="dl-horizontal">#}
     <dl class="dl-vertical">
-        <div class="more collapse">
+        <div class="more collapse" id="id-more">
 
             {% if resource.srid and SRID_DETAIL == 'below' %}
                 <br>

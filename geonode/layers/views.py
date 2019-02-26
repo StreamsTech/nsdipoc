@@ -455,6 +455,16 @@ def layer_upload(request, template='upload/layer_upload.html'):
             content_type='application/json',
             status=status_code)
 
+def has_permission_preview_access(user, layer):
+    if user == layer.owner and (layer.status in ['DRAFT', 'DENIED', 'ACTIVE']):
+        return True
+    elif user in layer.group.get_managers() and layer.status == "PENDING":
+        return True
+    elif user.is_working_group_admin and layer.status == "VERIFIED":
+        return True
+    else:
+        return False
+
 
 def layer_detail(request, layername, template='layers/layer_detail.html'):
     try:
@@ -626,7 +636,8 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
         "denied_comments": LayerAuditActivity.objects.filter(layer_submission_activity__layer=layer).order_by('-date_updated'),
         "status": layer.status,
         "chart_link": xlink,
-        "is_org_member": group_member
+        "is_org_member": group_member,
+        "permission_review": has_permission_preview_access(request.user, layer)
     }
 
     if 'access_token' in request.session:

@@ -481,10 +481,12 @@
                                         {% if GEOSERVER_BASE_URL %}
                                             {% get_obj_perms request.user for resource.layer as "layer_perms" %}
                                         {% endif %}
+                                        {% if permission_review %}
                                             <li class="list-group-item">
                                                 <a class="btn btn-gd-primary btn-md btn-block"
                                                href="{% url "layer_permission_preview" resource.service_typename %}">{% trans "Permission Preview" %}</a>
                                             </li>
+                                        {% endif %}
                                         {% if "change_resourcebase_metadata" in perms_list or "change_resourcebase" in perms_list or "delete_resourcebase" in perms_list or "change_layer_style" in layer_perms %}
                                             <li class="list-group-item">
                                                 <button class="btn btn-gd-primary btn-md btn-block"
