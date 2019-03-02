@@ -33,23 +33,21 @@
            
         </div>
 
-        <div class="panel panel-default">
-                <div class="panel-body">
+
                         
                                 
                                    
-                                        {% with include_type_filter='true' %}
-                                            {% with header='Type' %}
-                                                {% with filter='type__in' %}
-                                                    {% include "search/_search_content.html" %}
-                                                {% endwith %}
-                                            {% endwith %}
-                                        {% endwith %}
+        {% with include_type_filter='true' %}
+            {% with header='Type' %}
+                {% with filter='type__in' %}
+                    {% include "search/_search_content.html" %}
+                {% endwith %}
+            {% endwith %}
+        {% endwith %}
                                    
                                
                            
-                </div>
-              </div>
+
 
 
        
@@ -64,9 +62,9 @@
     {% endif %}
     <script type="text/javascript">
         {% if HAYSTACK_SEARCH %}
-            SEARCH_URL = '{% url 'api_get_search' api_name='api' resource_name='base' %}'
+            SEARCH_URL = '{% url 'api_get_search' api_name='api' resource_name='layers_with_favorite' %}'
         {% else %}
-            SEARCH_URL = '{% url 'api_dispatch_list' api_name='api' resource_name='base' %}'
+            SEARCH_URL = '{% url 'api_dispatch_list' api_name='api' resource_name='layers_with_favorite' %}'
         {% endif %}
         /*$(document).ready(function() {
          $("#advanced-search-menu").show();
