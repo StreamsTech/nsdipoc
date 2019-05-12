@@ -2037,7 +2037,7 @@ def organization_wise_layer_stat(request, template='layers/org_layers_stat.html'
     :param request:
     :return:
     """
-    organizations = GroupProfile.objects.all()
+    organizations = GroupProfile.objects.all().exclude(slug='working-group')
     layers = Layer.objects.all()
     statistics = []
     for org in organizations:
