@@ -2037,7 +2037,7 @@ def organization_wise_layer_stat(request, template='layers/org_layers_stat.html'
     :param request:
     :return:
     """
-    if request.user.is_authenticated() and user.is_working_group_admin:
+    if request.user.is_authenticated() and request.user.is_working_group_admin:
         organizations = GroupProfile.objects.all().exclude(slug='working-group')
         layers = Layer.objects.all()
         statistics = []
