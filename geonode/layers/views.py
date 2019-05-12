@@ -2026,3 +2026,35 @@ def save_geometry_type(layer):
                 else:
                     name = "point"
     return name
+
+
+def organization_wise_layer_stat(request, template='layers/org_layers_stat.html'):
+    """
+    This view is for layer statistics.
+    Committee members can overlook all the
+    organizations and their corresponding layer
+    uplads.
+    :param request:
+    :return:
+    """
+    organizations = GroupProfile.objects.all()
+    layers = Layer.objects.all()
+    statistics = []
+    for org in organizations:
+        tempdict = {}
+        tempdict["organization_name"] = org.title
+        tempdict["organization_logo"] = org.logo
+        tempdict["url"] = org.slug
+        tempdict["layer_count"] = layers.filter(group=org).count()
+        tempdict["active_count"] = layers.filter(group=org, status='ACTIVE').count()
+        statistics.append(tempdict)
+
+    context_dict = {
+        "statistics": statistics,
+        "total_org": organizations.count(),
+        "total_uploaded_layers": layers.count(),
+        "active_layers":layers.filter(status='ACTIVE').count()
+
+    }
+
+    return render_to_response(template, RequestContext(request, context_dict))

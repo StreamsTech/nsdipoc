@@ -1,0 +1,118 @@
+{% extends 'site_base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Admin Workspace" %}{% endblock %}
+
+{% comment %}
+{% block subnav %}
+{% endblock %}
+{% endcomment %}
+
+{% block body_outer %}
+
+<style>
+    .layer-stats-table tr td {
+        vertical-align: middle !important;
+    }
+
+    .stats-bar {
+        background: transparent;
+        border: none
+    }
+
+    .stats-bar span.info-box {
+        padding: 15px;
+        color: #555;
+        font-size: 18px;
+    }
+    .badge
+    {
+        background-color: #ff8831;
+    }
+
+</style>
+
+<div class="gd-content">
+    <div class="gd-content-heading">
+        <div class="d-title">
+            {% trans "Organization Wise Layer Upload Statistics" %}
+        </div>
+        <div class="hr"></div>
+    </div>
+    <div class="gd-content-body gd-history transparent">
+        <div class="row">
+
+            <div class="panel-body">
+
+                <div class="alert alert-info stats-bar" style="padding-left: 0" role="alert">
+
+                    <span class="info-box" style="padding-left: 0">
+                        Number of organization <span class="badge">{{total_org}}</span>
+                    </span>
+
+                    <span class="info-box">
+                        Number of uploaded layers <span class="badge">{{total_uploaded_layers}}</span>
+                    </span>
+
+                    <span class="info-box">
+                        Number of active layers <span class="badge">{{active_layers}}</span>
+                    </span>
+
+                </div>
+
+
+                <table class="table table-hover layer-stats-table">
+                    <thead>
+                    <tr>
+                        <th style="width: 80px"></th>
+                        <th>Organizatopn name</th>
+                        <th>Total uploaded layers</th>
+                        <th>Active layers</th>
+
+                    </tr>
+                    </thead>
+                    {% for item in statistics %}
+
+
+                    <tbody>
+                    <tr style="height: 80px">
+                        <th scope="row">
+                            {% if item.organization_logo %}
+                            <a href="/organization/organization/{{item.url}}">
+                                <img src="/uploaded/{{item.organization_logo}}" style="width: 50px;height: auto">
+                            </a>
+                            {% else %}
+                            <a href="/organization/organization/{{item.url}}">
+                                <img src="/static/geonode/images/no-image.png" style="width: 50px;height: auto">
+                            </a>
+                            {% endif %}
+
+                        </th>
+                        <td>
+                            <a href="/organization/organization/{{item.url}}">
+                                {{item.organization_name}}
+                            </a>
+                        </td>
+                        <td>{{item.layer_count}}</td>
+                        <td>{{item.active_count}}</td>
+
+
+                    </tr>
+
+
+                    </tbody>
+                    {% endfor%}
+                </table>
+
+
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_script %}
+
+{{ block.super }}
+{% endblock %}

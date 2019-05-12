@@ -62,6 +62,7 @@ urlpatterns = patterns(
     url(r'^(?P<layer_pk>[0-9]+)/delete$', 'layer_delete', name='layer-delete'),
 
     url(r'^(?P<layername>[^/]*)/preview$', 'layer_permission_preview', name="layer_permission_preview"),
+    url(r'^orglayers/stat$', 'organization_wise_layer_stat', name="layer_stat"),
 
 
 #end
