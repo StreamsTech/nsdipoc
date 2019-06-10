@@ -232,6 +232,14 @@
                 addxyzPart(baseMaps, 'Stamen', '{z}/{x}/{y}.png');
                 return baseMaps;
             }
+
+            function getSobBaseMaps(){
+                var baseMaps = [];
+                var urlRoot = 'http://172.16.0.206/';
+                baseMaps.push({title: 'Mouza.Map', url: urlRoot+'mouza/',thumb : 'Stamen.Toner.jpg'});
+                addxyzPart(baseMaps, 'SOBMAPS', '{z}/{x}/{y}.png');
+                return baseMaps;
+            }
     
             function getEsriBaseMaps(){
                 var baseMaps = [];
@@ -379,7 +387,8 @@
                 otherBaseLayers = otherBaseLayers.concat(getOSMBaseMaps(),
                     getThunderForestBaseMaps(), 
                     getStamenBaseMaps(),
-                    getEsriBaseMaps());
+                    getEsriBaseMaps(),
+                    getSobBaseMaps());
     
                 var olLayers = _.map(otherBaseLayers, function(item){
     
