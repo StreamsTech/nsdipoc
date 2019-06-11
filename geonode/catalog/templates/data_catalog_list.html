@@ -5,33 +5,46 @@
 {% block title %} {% trans "Data Catalog" %} - {{ block.super }} {% endblock %}
 
 {% block body_outer %}
+
+<style>
+    .container
+    {
+        width: 100% !important;
+    }
+</style>
+
 <div class="gd-content">
     <div class="gd-content-heading">
         <div class="row">
-          <div class="col-md-6">
-              <div class="title small-content">
-                  {% trans "Data Catalog" %}
-              </div>
-          </div>
-            {% if manager %}
-              <div class="col-md-6">
-                  <div class="small-content text-right">
+          <div class="col-md-12">
+              <div class="d-title">
+
+                  <div class="pull-right">
+                       {% if manager %}
+
+                  <div class="text-right">
                       <a href="{% url "data_catalog_create" %}" class="btn btn-gd-primary pull-right icon-btn-color" style="font-size:12px;">
                             {% trans "Add Data" %} <i class="fa " aria-hidden="true"></i>
                       </a>
                   </div>
-              </div>
+
             {% endif %}
+                  </div>
+
+                 {% trans "Data Catalog" %}
+              </div>
+          </div>
+
       </div>
-      <div class="hr"></div>
+
     </div>
-    <div class="gd-content-body transparent top-bottom-margin-20px">
+    <div class="gd-content-body transparent" style="margin-bottom: 20px;">
         <div class="row">
             <div class="col-md-12">
                 <div class="gd-content-body1 full-pad-40px1">
                   <form id=""  method="post"  action="">
                     {% csrf_token %}
-                      <div style="min-width:100%;overflow:scroll;">
+                      <div class="table-responsive">
                            <table class="table table-bordered">
                             <thead>
                               <tr>

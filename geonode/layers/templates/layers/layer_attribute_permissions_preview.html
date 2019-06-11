@@ -122,9 +122,9 @@
                             </div>
                             <div class="clearfix"></div>
                             <div class="row">
-                                <div class="col-md-5 pull-right">
+                                <div class="col-md-12">
                                     {% if  user_state == 'user' %}
-                                            <button class="btn btn-primary pull-right enabled" data-toggle="modal" data-target="#_deny_comments">{% trans "Comments" %}</button>
+                                            <button class="btn btn-primary enabled" data-toggle="modal" data-target="#_deny_comments">{% trans "Comments" %}</button>
                                             <button type="button"
                                                     ng-disabled="isDisabledButton"
                                                     class="btn btn-primary pull-right enabled btn-margin-5"
@@ -137,7 +137,7 @@
                                         {% elif user_state == 'manager' %}
                                             <button type="button"
                                                     ng-disabled="isDisabledButton || denyLoader"
-                                                    class="btn btn-primary pull-right enabled btn-margin-5"
+                                                    class="btn btn-primary enabled btn-margin-5"
                                                     ng-click="openDenyModal()">
                                                     Deny with message
                                                     <span ng-show="denyLoader">
@@ -146,14 +146,14 @@
                                             </button>
                                             <button type="button"
                                                     ng-disabled="isDisabledButton || denyLoader"
-                                                    class="btn btn-primary pull-right enabled btn-margin-5"
+                                                    class="btn btn-primary enabled btn-margin-5"
                                                     ng-click="verifyLayer()">
                                                     Push for Approval
                                                     <span ng-show="isDisabledButton">
                                                         <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
                                                      </span>
                                             </button>
-                                           <button class="btn btn-primary pull-right btn-margin-5" data-toggle="modal" data-target="#_deny_comments">{% trans "Comments" %}</button>
+                                           <button class="btn btn-primary btn-margin-5" data-toggle="modal" data-target="#_deny_comments">{% trans "Comments" %}</button>
                                         {% elif user_state == 'admin'%}
                                             <button type="button"
                                                     ng-disabled="isDisabledButton || denyLoader"
@@ -166,7 +166,7 @@
                                             </button>
                                             <button type="button"
                                                     ng-disabled="isDisabledButton || denyLoader"
-                                                    class="btn btn-primary pull-right enabled"
+                                                    class="btn btn-primary enabled"
                                                     ng-click="approveLayer()">
                                                             Approve
                                                         <span ng-show="isDisabledButton">
