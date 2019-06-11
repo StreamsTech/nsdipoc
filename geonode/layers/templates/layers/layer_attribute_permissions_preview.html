@@ -127,7 +127,7 @@
                                             <button class="btn btn-primary enabled" data-toggle="modal" data-target="#_deny_comments">{% trans "Comments" %}</button>
                                             <button type="button"
                                                     ng-disabled="isDisabledButton"
-                                                    class="btn btn-primary pull-right enabled btn-margin-5"
+                                                    class="btn btn-primary enabled btn-margin-5"
                                                     ng-click="submitforVerify()">
                                                         Submit For Verification
                                                         <span ng-show="isDisabledButton">
@@ -157,7 +157,7 @@
                                         {% elif user_state == 'admin'%}
                                             <button type="button"
                                                     ng-disabled="isDisabledButton || denyLoader"
-                                                    class="btn btn-primary pull-right enabled btn-margin-5"
+                                                    class="btn btn-primary enabled btn-margin-5"
                                                     ng-click="openDenyModal()">
                                                     Deny with message
                                                     <span ng-show="denyLoader">
@@ -173,7 +173,7 @@
                                                         <i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
                                                     </span>
                                             </button>
-                                            <button class="btn btn-primary pull-right btn-margin-5 enabled" data-toggle="modal" data-target="#_deny_comments">{% trans "Comments" %}</button>
+                                            <button class="btn btn-primary btn-margin-5 enabled" data-toggle="modal" data-target="#_deny_comments">{% trans "Comments" %}</button>
                                     {% endif %}
 
 
