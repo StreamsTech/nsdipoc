@@ -2048,6 +2048,10 @@ def organization_wise_layer_stat(request, template='layers/org_layers_stat.html'
             tempdict["url"] = org.slug
             tempdict["layer_count"] = layers.filter(group=org).exclude(status='DELETED').count()
             tempdict["active_count"] = layers.filter(group=org, status='ACTIVE').count()
+            tempdict["pending_for_verification_count"] = layers.filter(group=org, status='PENDING').count()
+            tempdict["pending_for_approval_count"] = layers.filter(group=org, status='VERIFIED').count()
+            tempdict["denied_count"] = layers.filter(group=org, status='DENIED').count()
+            tempdict["draft_count"] = layers.filter(group=org, status='DRAFT').count()
             statistics.append(tempdict)
 
         context_dict = {
