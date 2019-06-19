@@ -2046,14 +2046,14 @@ def organization_wise_layer_stat(request, template='layers/org_layers_stat.html'
             tempdict["organization_name"] = org.title
             tempdict["organization_logo"] = org.logo
             tempdict["url"] = org.slug
-            tempdict["layer_count"] = layers.filter(group=org).count()
+            tempdict["layer_count"] = layers.filter(group=org).exclude(status='DELETED').count()
             tempdict["active_count"] = layers.filter(group=org, status='ACTIVE').count()
             statistics.append(tempdict)
 
         context_dict = {
             "statistics": statistics,
             "total_org": organizations.count(),
-            "total_uploaded_layers": layers.count(),
+            "total_uploaded_layers": layers.exclude(status='DELETED').count(),
             "active_layers":layers.filter(status='ACTIVE').count()
 
         }

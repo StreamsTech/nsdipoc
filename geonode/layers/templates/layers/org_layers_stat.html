@@ -25,8 +25,8 @@
         color: #555;
         font-size: 18px;
     }
-    .badge
-    {
+
+    .badge {
         background-color: #ff8831;
     }
 
@@ -65,9 +65,13 @@
                     <thead>
                     <tr>
                         <th style="width: 80px"></th>
-                        <th>Organizatopn name</th>
-                        <th>Total uploaded layers</th>
-                        <th>Active layers</th>
+                        <th align="center">Organizatopn name</th>
+                        <th align="center">Total uploaded layers</th>
+                        <th align="center">Active layers</th>
+                        <th align="center">Pending layers for verification</th>
+                        <th align="center">Pending layers for approval</th>
+                        <th align="center">Denied layers</th>
+                        <th align="center">Draft layers</th>
 
                     </tr>
                     </thead>
@@ -88,13 +92,17 @@
                             {% endif %}
 
                         </th>
-                        <td>
+                        <td align="center">
                             <a href="/organization/organization/{{item.url}}">
                                 {{item.organization_name}}
                             </a>
                         </td>
-                        <td>{{item.layer_count}}</td>
-                        <td>{{item.active_count}}</td>
+                        <td align="center">{{item.layer_count}}</td>
+                        <td align="center"> {{item.active_count}}</td>
+                        <td align="center">{{item.pending_for_verification_count}}</td>
+                        <td align="center">{{item.pending_for_approval_count}}</td>
+                        <td align="center">{{item.denied_count}}</td>
+                        <td align="center">{{item.draft_count}}</td>
 
 
                     </tr>
