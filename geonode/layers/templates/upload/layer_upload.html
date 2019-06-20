@@ -117,15 +117,22 @@
                         {% endif %}
 
                         <div id="upload-status"></div>
-                        <div class="row">
+
                             <div class="col-md-12">
                                 <label class="control-label"><span style="color:red;"> * </span> {% trans "Title of Data Layer" %} </label>
                             </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                            <div id="title-alert" style="display: none" class="alert alert-danger">
+                                You forgot to give a title to this layer.
+                            </div>
+                            </div>
                         </div>
+
                         <div class="row">
                             <div class="col-md-12">
                                 <input id="id-layer-upload-title" class="form-control" type="text" name="title"
-                                       maxlength="255" placeholder="Name of your data layer">
+                                       maxlength="255" placeholder="Name of your data layer" oninput="layerTitleChanged()">
                             </div>
                         </div>
                         <div class="block-separator"></div>
@@ -165,14 +172,22 @@
                             </div>
                         </div>
                         <div class="row">
+                        <div id="cat-alert" style="display: none" class="alert alert-danger col-md-3">
+                                Please select a category.
+                        </div>
+                            </div>
+                        <div class="row">
                             <div class="col-md-4">
-                                <select id="id-select-category" class="col-md-12 form-control">
+                                <select id="id-select-category" class="col-md-12 form-control" onchange="categoryChanged()">
+                                    <option value="null">None</option>
                                     {% for category in categories %}
                                         <option value={{ category.identifier }}>{{ category.gn_description }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
+
                         </div>
+
                         <div class="block-separator"></div>
 
                         <section id="fileTypeSection">
@@ -222,6 +237,9 @@
                         </section>
 
                         <div><span style="color:red;"> * </span> {% trans " or select them one by one:" %}</div>
+                        <div id="file-alert" style="display: none" class="alert alert-danger">
+                                Please select layer files.
+                        </div>
 
                         <form id="file-uploader" method="post" enctype="multipart/form-data">
                             <input class="btn btn-gd" id="file-input" type="file" multiple>
@@ -308,7 +326,7 @@
                             </div>
                             <div class="block-separator"></div>
                         </section>
-                        <section class="charset">
+                        <section class="charset" style="display: none">
                             <div class="row">
                                 <div class="col-md-12">
                                     <label class="control-label"> {% trans "Select the charset or leave default" %} </label>
@@ -392,6 +410,41 @@
     </script>
     <script type="text/javascript" language="JavaScript">
 
+        function layerUploadFormValidation(){
+
+            if ($("#id-layer-upload-title").val() == "")
+            {
+                $("#id-layer-upload-title").focus();
+                $("#title-alert").show();
+                return false;
+            }
+            $("#title-alert").hide();
+
+            if ($("#id-select-category").val() == "null")
+            {   $("#id-select-category").focus();
+                $("#cat-alert").show();
+                return false;
+            }
+            $("#cat-alert").hide();
+
+            if ($("#file-input").prop('files').length == 0)
+            {
+                $("#file-input").focus();
+                $("#file-alert").show();
+                return false;
+            }
+
+        };
+
+        function categoryChanged(){
+            $("#cat-alert").hide();
+        }
+
+        function layerTitleChanged(){
+            $("#title-alert").hide();
+        }
+
+
         $(document).ready(function () {
             anyonePermissionDisable();
             $("#upload-button-publish").click(function () {
@@ -461,6 +514,7 @@
         $('input[type=file]').change(function(e){
 
           var inputFiles = document.getElementById('file-input');
+          $("#file-alert").hide();
 
           var checkTifFileName = inputFiles.files[0].name;
           var fileExtension = checkTifFileName.substr((checkTifFileName.lastIndexOf('.') +1));

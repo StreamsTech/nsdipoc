@@ -284,8 +284,11 @@ define(['underscore',
      *  @returns false
      */
     doUploads = function () {
+        if(layerUploadFormValidation() == false){
+            return false;
+        }
         if ($.isEmptyObject(layers)) {
-            common.logError('Please provide layer files');
+            // common.logError('Please provide layer files');
             return false;
         }
 
@@ -327,6 +330,9 @@ define(['underscore',
             dropZone = document.querySelector(options.dropZone),
             file_queue = $(options.file_queue),
             doClearState = function () {
+                $("#title-alert").hide();
+                $("#cat-alert").hide();
+                $("#file-alert").hide();
                 // http://stackoverflow.com/questions/1043957/clearing-input-type-file-using-jquery/13351234#13351234
                 $("#file-input").wrap('<form>').closest('form').get(0).reset();
                 $("#file-input").unwrap();
