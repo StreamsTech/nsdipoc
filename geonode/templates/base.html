@@ -187,10 +187,12 @@
                                             <li id="nav_maps">
                                               <a href="{% url "committee_browse" %}">{% trans "Explore Committee" %}</a>
                                             </li>
-                                            {% if user.is_authenticated %}
+                                            {% if request.user.group_list_all.first.slug %}
                                             <li id="nav_maps">
                                               <a href="{% url "group_detail" request.user.group_list_all.first.slug %}">{% trans "My Organization" %}</a>
                                             </li>
+                                            {% endif %}
+                                            {% if user.is_authenticated %}
                                             <li id="nav_layers">
                                               <a href="{% url "profile_browse" %}">{% trans "Explore Users" %}</a>
                                             </li>
