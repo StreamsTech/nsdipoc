@@ -74,6 +74,8 @@ from geonode.social.templatetags.social_tags import get_data
 from .api import TagResource, RegionResource, OwnersResource
 from .api import ThesaurusKeywordResource
 from .api import TopicCategoryResource
+
+from geonode.base.models import TopicCategory
 from .api import FILTER_TYPES
 from geonode.nsdi.utils import get_organization
 
@@ -658,9 +660,14 @@ class LayerResource(CommonModelApi):
     #jahangir091
     def get_object_list(self, request):
         group_id = request.GET.get('group', None)
+        category_id = request.GET.get('category', None)
         if group_id:
             group = get_object_or_404(GroupProfile, id=group_id)
-            return super(LayerResource, self).get_object_list(request).filter(group=group)
+            return super(LayerResource, self).get_object_list(request).filter(group=group, status='ACTIVE')
+        if category_id:
+            cat = get_object_or_404(TopicCategory, id=category_id)
+            return super(LayerResource, self).get_object_list(request).filter(category=cat, status='ACTIVE')
+
         else:
             return super(LayerResource, self).get_object_list(request).filter(status='ACTIVE')
     #end

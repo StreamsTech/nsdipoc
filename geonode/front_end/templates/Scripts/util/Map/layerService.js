@@ -322,10 +322,10 @@ function layerService($rootScope, layerRepository, featureService, layerStyleGen
                 }
             });
         },
-        fetchLayers: function() {
+        fetchLayers: function(group, category) {
             var mappedLayer = [];
             var deferred = $q.defer();
-            layerRepository.getLayers()
+            layerRepository.getLayers(group, category)
                 .then(function(res) {
                     mappedLayer = res.map(function(e) {
                         return _map({
