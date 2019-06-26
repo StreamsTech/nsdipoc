@@ -170,12 +170,12 @@
             getLayers: function(group, category) {
                 var deferred = $q.defer();
                 var query_string = '?';
-                if (group !== undefined)
+                if (group !== null)
                 {
                     query_string += "group=" + group + "&";
                 }
-                if (category !== undefined){
-                    query_string += "category=" + category;
+                if (category !== null){
+                    query_string += "cat=" + category;
                 }
                 var layers_url = 'api/layers/' + query_string;
                 $http.get(layers_url, {

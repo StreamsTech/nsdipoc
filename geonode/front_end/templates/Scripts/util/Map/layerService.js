@@ -5,7 +5,7 @@ layerService.$inject = [
 ];
 
 function layerService($rootScope, layerRepository, featureService, layerStyleGenerator, featureFilterGenerator, sldTemplateService, interactionHandler, $q, newLayerService, visualizationService, layerRenderingModeFactory, $window) {
-    function _map(layer, order) {
+    function _map(layer, group, order) {
         if (layer.BoundingBox) {
             layer.bbox = [layer.BoundingBox[0].extent[0],
                 layer.BoundingBox[0].extent[1],
@@ -27,6 +27,7 @@ function layerService($rootScope, layerRepository, featureService, layerStyleGen
             // "LastUpdateOn": "2017-10-10T11:10:26.083Z",
             "ClassifierDefinitions": {},
             "CanWrite": true,
+            "organization_logo":layer.organization_logo,
             // "DataId": "s_facf34ee54914605943fe987f5b3637c",
             // "ShapeType": "point",
 
@@ -330,6 +331,7 @@ function layerService($rootScope, layerRepository, featureService, layerStyleGen
                     mappedLayer = res.map(function(e) {
                         return _map({
                             Name: e.detail_url.match(/\w+:\w+/)[0],
+                            organization_logo: e.group__logo,
                             bbox: ol.proj.transformExtent([parseFloat(e.bbox_x0),
                                     parseFloat(e.bbox_y0),
                                     parseFloat(e.bbox_x1),

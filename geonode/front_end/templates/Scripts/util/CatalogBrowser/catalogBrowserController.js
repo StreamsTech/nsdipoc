@@ -25,10 +25,10 @@ function catalogBrowserController($scope, $http, $rootScope, surfToastr, mapServ
     ];
 
     $scope.organization = {
-        selectedOrganization:''
+        selectedOrganization:null
     };
     $scope.category = {
-        selectedCategory:''
+        selectedCategory:null
     };
 
     function loadLayersByWms(server) {
@@ -50,7 +50,7 @@ function catalogBrowserController($scope, $http, $rootScope, surfToastr, mapServ
     }
     $scope.loadLayers = function(server) {
         $scope.selectedServerName = server.name;
-        server.method(server, $scope.organization.selectedOrganization.id, $scope.category.selectedCategory.id);
+        server.method(server, $scope.organization.selectedOrganization, $scope.category.selectedCategory);
 
     };
 
@@ -71,6 +71,8 @@ function catalogBrowserController($scope, $http, $rootScope, surfToastr, mapServ
     $scope.initdata = function(){
         $scope.loadCategoryList();
         $scope.loadOrganizationsList();
+        $scope.organization.selectedOrganization = null;
+        $scope.category.selectedCategory = null;
         $scope.loadLayers($scope.serverList[0])
     };
 
