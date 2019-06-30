@@ -393,6 +393,7 @@ INSTALLED_APPS = (
 
     'oauth2_provider',
     'captcha',
+    'django_filters'
 
 ) + GEONODE_APPS
 
@@ -1080,7 +1081,8 @@ SEARCH_FILTERS = {
     'T_KEYWORDS_ENABLED': True,
     'DATE_ENABLED': True,
     'REGION_ENABLED': True,
-    'EXTENT_ENABLED': True,
+    'EXTENT_ENABLED': False,
+    'ORGANIZATION_ENABLED': True,
 }
 
 # Queue non-blocking notifications.
@@ -1140,10 +1142,14 @@ if S3_MEDIA_ENABLED:
 DATABASE_ROUTERS = ['geonode.db_router.DbRouter']
 
 # REST_FRAMEWORK settings
+# Never set drf settings globally for this project
+# it can generate unnecessary inconsistencies for
+#some apis and can make some problems
+# so set inside apis if necessary
 
 # REST_FRAMEWORK = {
 #     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-#     'PAGE_SIZE': 50
+#     'PAGE_SIZE': 10
 # }
 
 

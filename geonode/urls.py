@@ -179,6 +179,7 @@ urlpatterns = patterns('',
                        url(r'^api/layers/', include('geonode.layers.api.urls')),
                        url(r'^api/users/', include('geonode.people.api.urls')),
                        url(r'^api/nsdi/', include('geonode.nsdi.api.urls')),
+                       url(r'^api/list_search/', include('geonode.list_search.api.urls')),
 
                        url(r'', include(api.urls)),
 

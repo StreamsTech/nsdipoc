@@ -1,0 +1,39 @@
+{% extends "layers/layer_base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% load url from future %}
+
+{% block title %} {% trans "Explore Layers" %} - {{ block.super }} {% endblock %}
+
+{% block body_class %}layers explore{% endblock %}
+
+{% block body %}
+
+
+<div class="d-title" ng-app="listSearchApp" ng-controller="LayerListSearchController">
+
+    {% trans "Explore Layers" %}
+
+    <div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Dropdown button
+  </button>
+  <div class="dropdown-menu search" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" href="#">Action</a>
+    <a class="dropdown-item" href="#">Another action</a>
+    <a class="dropdown-item" href="#">Something else here</a>
+  </div>
+</div>
+
+</div>
+
+
+{% endblock %}
+
+{% block extra_script %}
+<script src="{{ STATIC_URL }}list_search/js/apps.js"></script>
+<script src="{{ STATIC_URL }}list_search/js/services.js"></script>
+<script src="{{ STATIC_URL }}list_search/js/layers.listsearch.controllers.js"></script>
+
+{% endblock extra_script %}
+
