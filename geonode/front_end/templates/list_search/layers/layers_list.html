@@ -10,30 +10,412 @@
 {% block body %}
 
 
-<div class="d-title" ng-app="listSearchApp" ng-controller="LayerListSearchController">
 
-    {% trans "Explore Layers" %}
 
-    <div class="dropdown">
-  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Dropdown button
-  </button>
-  <div class="dropdown-menu search" aria-labelledby="dropdownMenuButton">
-    <a class="dropdown-item" href="#">Action</a>
-    <a class="dropdown-item" href="#">Another action</a>
-    <a class="dropdown-item" href="#">Something else here</a>
-  </div>
-</div>
 
-</div>
+    {#<div class="d-title" ng-app="listSearchApp" ng-controller="LayerListSearchController">#}
+    {##}
+    {##}
+    {##}
+    {##}
+    {#    {% trans "Explore Layers" %}#}
+    {##}
+    {#     </div>#}
+
+    {#    <div class="dropdown">#}
+    {#  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
+    {#    Dropdown button#}
+    {#  </button>#}
+    {#  <div class="dropdown-menu search" aria-labelledby="dropdownMenuButton">#}
+    {#    <a class="dropdown-item" href="#">Action</a>#}
+    {#    <a class="dropdown-item" href="#">Another action</a>#}
+    {#    <a class="dropdown-item" href="#">Something else here</a>#}
+    {#  </div>#}
+    {#</div>#}
+
+
+
+    <style>
+        .newone {
+            display:none;
+            position: absolute;
+            bottom: 0;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 0;
+            top: 39px;
+            width: 100%;
+            z-index: 999;
+        }
+    </style>
+
+    <div class="d-title">
+
+        <div class="pull-right">
+
+
+
+
+
+
+
+
+        <div style="display: inline;width: 100px;position: relative">
+
+            <div style="display: inline-block">
+    <div class="input-group" style="width: 100px;">
+      <input type="text" class="form-control" style="display: inline-block;width: auto;height: 39px" id='myinput' placeholder="Search for...">
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button">Go!</button>
+      </span>
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-6 -->
+
+
+{#            <input class="abc form-control" type="text" id='myinput' style="display: inline-block;width: auto;height: 39px"/>#}
+            <div class="newone">
+              <ul class="list-group">
+  <li class="list-group-item">Cras justo odio</li>
+  <li class="list-group-item">Dapibus ac facilisis in</li>
+  <li class="list-group-item">Morbi leo risus</li>
+  <li class="list-group-item">Porta ac consectetur ac</li>
+  <li class="list-group-item">Vestibulum at eros</li>
+</ul>
+            </div>
+        </div>
+
+
+
+
+            <select class="form-control" style="display: inline;width: 100px;height: 39px;">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+            </select>
+
+            <select class="form-control" style="display: inline;width: 100px;height: 39px;">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+            </select>
+
+
+
+            <div class="btn-group" role="group" aria-label="tools">
+                <div id="profileSortId" class="btn-group" role="group">
+                    <a href="javascript:;" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">
+                        <span id="currtenSortTitle">{% trans "Most recent" %}</span>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-right" id="sort">
+                        <li>
+                            <a data-value="-date" data-filter="order_by" class="selected" ng-click="single_choice_listener($event)">
+                                {% trans "Most recent" %}
+                            </a>
+                        </li>
+                        <li>
+                            <a data-value="date" data-filter="order_by" ng-click="single_choice_listener($event)">
+                                {% trans "Less recent" %}
+                            </a>
+                        </li>
+                        <li>
+                            <a data-value="title" data-filter="order_by" ng-click="single_choice_listener($event)">
+                                {% trans "A - Z" %}
+                            </a>
+                        </li>
+                        <li>
+                            <a data-value="-title" data-filter="order_by" ng-click="single_choice_listener($event)">
+                                {% trans "Z - A" %}
+                            </a>
+                        </li>
+                        <!--<li>-->
+                        <!--<a data-value="-popular_count" data-filter="order_by" ng-click="single_choice_listener($event)">-->
+                        <!--{% trans "Most popular" %}-->
+                        <!--</a>-->
+                        <!--</li>-->
+                    </ul>
+                </div>
+            </div>
+
+
+
+            <div class="btn-group" role="group" aria-label="tools">
+                <div id="profileSortId" class="btn-group" role="group">
+                    <a href="javascript:;" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">
+                        <span id="limitOfpage">100</span>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-right" id="sort">
+                        <li>
+                            <a ng-click="limit_choice_listener(20)">
+                                20
+                            </a>
+                        </li>
+                        <li>
+                            <a ng-click="limit_choice_listener(40)">
+                                40
+                            </a>
+                        </li>
+                        <li>
+                            <a ng-click="limit_choice_listener(100)">
+                                100
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+
+
+
+
+
+            <div class="btn-group" role="group">
+
+
+
+
+
+                <a href="javascript:;" ng-class="{'btn-success' : pageViewing == 'list'}" class="btn btn-default" ng-click="displayView('list')">
+                    <i class="fa fa-bars"></i>
+                </a>
+
+
+
+                <a href="javascript:;" ng-class="{'btn-success' : pageViewing == 'grid'}" class="btn btn-default" ng-click="displayView('grid')">
+                    <i class="fa fa-th-large"></i>
+                    <!--<img src="images/user-separator-icon.png" />-->
+                </a>
+
+
+
+
+
+
+            </div>
+
+
+
+            <div class="btn-group">
+                <div ng-show="cart.getCart().items.length > 0" ng-controller="CartList">
+                    <div class="selectfixed">
+                        <resource-cart></resource-cart>
+                    </div>
+                </div>
+                <a href="javascript:;" id="advanced-search-control" class="btn btn-gd-primary pull-right icon-btn-color">
+                    {% trans "Advanced" %} <i class="fa fa-search"></i>
+                </a>
+                {% if not user.is_authenticated %}
+                    <a onclick="layerpopup('SigninModal');" class="btn btn-gd-primary pull-right icon-btn-color">
+                        {% trans "Upload Layers" %} <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                    </a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                    <a href="{% url "layer_upload"  %}" class="btn btn-gd-primary pull-right icon-btn-color">
+                        {% trans "Upload Layers"  %} <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                    </a>
+                {% endif %}
+            </div>
+
+
+
+
+
+        </div>
+
+        {% trans "Explore Layers" %}
+    </div>
+
+
+    <div class="panel panel-default gallery-container">
+
+        <div class="panel-body">
+
+            <div class="row">
+
+
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                    <div class="grid-container lmd">
+                        <div class="avater">
+                            <div class="avater-img">
+                                <a class="avater-img-mid" href="/layers/geonode:jjhhj" target="_self">
+                                    <!-- ngIf: item.thumbnail_url != null --><img ng-if="item.thumbnail_url != null" ng-src="http://localhost:8000/uploaded/thumbs/layer-299f596c-9361-11e9-9d10-18dbf22a34e1-thumb.png" alt="" class="group-logo ng-scope" src="http://localhost:8000/uploaded/thumbs/layer-299f596c-9361-11e9-9d10-18dbf22a34e1-thumb.png"><!-- end ngIf: item.thumbnail_url != null -->
+                                    <!-- ngIf: item.thumbnail_url == null -->
+                                </a>
+                            </div>
+                            <!-- ngIf: false -->
+
+                        </div>
+                        <div class="information">
+                            <div class="top-content text-center">
+                                <div class="title">
+                                    <a href="/layers/geonode:jjhhj" title="jjhhj" target="_self" class="ng-binding">
+                                        jjhhj
+                                    </a>
+                                </div>
+                                <div class="category ng-binding">
+                                    administrative
+
+                                </div>
+                                <div class="details ng-binding">
+                                    Layer abstract is very important! You are requested to update it now.
+                                </div>
+                            </div>
+
+                            <!--<div class="summery">-->
+                            <!--<div class="item-items">-->
+                            <!--<ul class="list-inline lmd">-->
+                            <!--<li>-->
+                            <!--<a href="/people/profile/{{ item.owner__username }}" title="{{item.resource_type}} owner">-->
+                            <!--<i class="fa fa-user"></i>-->
+                            <!--{{ item.owner__username }}-->
+                            <!--</a>-->
+                            <!--</li>-->
+                            <!--<li>-->
+                            <!--<a href="{{ item.detail_url }}#info" title="{{item.resource_type}} creation date">-->
+                            <!--<i class="fa fa-calendar-o"></i>-->
+                            <!--{{ item.date|date:'d MMM y' }}-->
+                            <!--</a>-->
+                            <!--</li>-->
+                            <!--<li>-->
+                            <!--<a href="{{ item.detail_url }}" title="{{item.resource_type}} view count">-->
+                            <!--<i class="fa fa-eye"></i>-->
+                            <!--{{ item.popular_count }}-->
+                            <!--</a>-->
+                            <!--</li>-->
+                            <!--<li>-->
+                            <!--<a href="{{ item.detail_url }}#share" title="{{item.resource_type}} share count">-->
+                            <!--<i class="fa fa-share"></i>-->
+                            <!--{{ item.share_count }}-->
+                            <!--</a>-->
+                            <!--</li>-->
+                            <!--<li>-->
+                            <!--<a href="{{ item.detail_url }}#rate" title="{{item.resource_type}} rating">-->
+                            <!--<i class="fa fa-star"></i>-->
+                            <!--{{ item.rating }}-->
+                            <!--</a>-->
+                            <!--</li>-->
+                            <!--</ul>-->
+                            <!--</div>-->
+                            <!--</div>-->
+                            <!--</div>-->
+                            <div class="summery" style="float: left;width:319px;border: 1px solid #e7e7e7;height: 79px;background-color: #f6f6f6;padding: 9px;border-right: 0;margin-bottom: 15px;">
+                                <div class="item-items">
+                                    <ul class="list-inline lmd">
+                                        <li> <a href="/people/profile/orgAadmin" title="layer owner" target="_self" class="ng-binding">
+                                            <i class="fa fa-user"></i> orgAadmin </a>
+                                        </li>
+                                        <li> <a href="/layers/geonode:jjhhj#info" title="layer creation date" target="_self" class="ng-binding">
+                                            <i class="fa fa-calendar-o"></i> 20 Jun 2019 </a>
+                                        </li>
+                                        <li> <a href="/layers/geonode:jjhhj" title="layer view count" target="_self" class="ng-binding">
+                                            <i class="fa fa-eye"></i> 0 </a>
+                                        </li>
+                                        <li> <a href="/layers/geonode:jjhhj#share" title="layer share count" target="_self" class="ng-binding">
+                                            <i class="fa fa-download"></i> 0 </a>
+                                        </li>
+                                        <li> <a href="/layers/geonode:jjhhj#share" title="layer share count" target="_self" class="ng-binding">
+                                            <i class="fa fa-share"></i> 0 </a>
+                                        </li>
+                                        <li> <a href="/layers/geonode:jjhhj#rate" title="layer rating" target="_self" class="ng-binding">
+                                            <i class="fa fa-star"></i> 0 </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div style="float:left;padding:5px;border: 1px solid #c8d2d8;">
+                                <div style="font-size: 11px;color:rgb(255, 255, 255); font-weight: bold;background-color:#00489c; text-align: center;margin:-6px -6px 5px;">Shared by </div>
+                                <a href="/organization/organization/orgA" target="_self">
+                                    <img ng-src="/uploaded/people_group/download.jpeg" class="center-block" alt="" title="" src="/uploaded/people_group/download.jpeg" width="50px" height="53px">
+                                </a>
+
+                            </div>
+                        </div>
+
+
+                        <div class="clearfix"></div>
+                        <div>
+                            <div class="bottom-content">
+                                <div class="row">
+                                    <div class="profile-items text-center">
+                                        <ul class="list-inline">
+
+                                            <!--[&lt;GroupProfile: orgA&gt;]-->
+                                            <!-- ngIf: item.featured && item.resource_type=='layer' && item.can_make_featured==true -->
+
+                                            <!-- ngIf: !item.featured && item.resource_type=='layer' && item.can_make_featured==true --><li ng-if="!item.featured &amp;&amp; item.resource_type=='layer' &amp;&amp; item.can_make_featured==true" class="col-md-6 ng-scope" id="featured_chng">
+
+                                            <button class="btn btn-gd-primary btn-block" dataname="orgA" ng-click="featuredFunction(item.id,true);" data-layerid="336" data-statusid="true">
+                                                <i class="fa fa-star-o"></i>
+                                                Make Featured
+                                            </button>
+
+                                        </li><!-- end ngIf: !item.featured && item.resource_type=='layer' && item.can_make_featured==true -->
+                                            <!-- ngIf: item.favorite && item.resource_type=='layer' && item.can_make_featured==false -->
+                                            <!-- ngIf: !item.favorite && item.resource_type=='layer' && item.can_make_featured==false -->
+
+                                            <!-- ngIf: item.favorite && item.resource_type=='layer' && item.can_make_featured==true -->
+                                            <!-- ngIf: !item.favorite && item.resource_type=='layer' && item.can_make_featured==true --><li ng-if="!item.favorite &amp;&amp; item.resource_type=='layer' &amp;&amp; item.can_make_featured==true" class="col-md-6 ng-scope">
+
+                                            <button class="btn btn-gd-primary btn-block" ng-click="favouriteFunction(item.id,true);" data-favouriteid="336" data-favouritestatus="true">
+                                                <i class="fa fa-heart-o"></i>
+                                                Add to favorite
+                                            </button>
+
+                                        </li><!-- end ngIf: !item.favorite && item.resource_type=='layer' && item.can_make_featured==true -->
+
+                                            <!-- ngIf: item.favorite && item.resource_type=='map' -->
+                                            <!-- ngIf: !item.favorite && item.resource_type=='map' -->
+
+                                            <!-- ngIf: item.favorite && item.resource_type=='document' -->
+                                            <!-- ngIf: !item.favorite && item.resource_type=='document' -->
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+
 
 
 {% endblock %}
 
 {% block extra_script %}
-<script src="{{ STATIC_URL }}list_search/js/apps.js"></script>
-<script src="{{ STATIC_URL }}list_search/js/services.js"></script>
-<script src="{{ STATIC_URL }}list_search/js/layers.listsearch.controllers.js"></script>
+    <script src="{{ STATIC_URL }}list_search/js/apps.js"></script>
+    <script src="{{ STATIC_URL }}list_search/js/services.js"></script>
+    <script src="{{ STATIC_URL }}list_search/js/layers.listsearch.controllers.js"></script>
+
+    <script>
+        var input = document.getElementById('myinput');
+        var message = document.getElementsByClassName('newone')[0];
+        input.addEventListener('focus', function() {
+            message.style.display = 'block';
+        });
+        input.addEventListener('focusout', function() {
+            message.style.display = 'none';
+        });
+    </script>
 
 {% endblock extra_script %}
 
