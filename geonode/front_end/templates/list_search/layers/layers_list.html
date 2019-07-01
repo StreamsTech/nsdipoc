@@ -11,17 +11,7 @@
 
 
     <style>
-        .search-resource {
-            display: none;
-            position: absolute;
-            bottom: 0;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            padding: 0;
-            top: 39px;
-            width: 100%;
-            z-index: 999;
-        }
+
     </style>
 
     <div ng-app="listSearchApp" ng-controller="LayerListSearchController" ng-init="initdata()">
@@ -40,7 +30,7 @@
                             <input type="search" class="form-control" style="display: inline-block;width: auto;height: 39px"
                                    id='myinput' placeholder="Search for..." ng-click="showSearchResults()" ng-blur="hideSearchResults()" ng-change="seaerchAutocomplete()" ng-model="titleSearch">
                             <span class="input-group-btn">
-                        <button class="btn btn-gd-primary" style="padding: 10px" ng-click="updateLayersWithTitle()" type="button">Go</button>
+                        <button class="btn btn-gd-primary" style="padding: 6px 10px;font-size:18px" ng-click="updateLayersWithTitle()" type="button"><i class="fa fa-search"></i></button>
                         </span>
                         </div><!-- /input-group -->
                     </div><!-- /.col-lg-6 -->
