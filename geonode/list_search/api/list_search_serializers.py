@@ -1,9 +1,10 @@
 from rest_framework import serializers
 
 from geonode.layers.models import Layer
+from geonode.base.models import ResourceBase
 
 
-class LayersListSearchSerializer(serializers.ModelSerializer):
+class ResourceBaseListSearchSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
     organization_slug = serializers.ReadOnlyField(source='group.slug')
     organization_logo = serializers.ImageField(source='group.logo')
@@ -18,9 +19,8 @@ class LayersListSearchSerializer(serializers.ModelSerializer):
 
 
     class Meta:
-        model = Layer
+        model = ResourceBase
         fields = [
-        # fields in the db
         'id',
         'uuid',
         'title',

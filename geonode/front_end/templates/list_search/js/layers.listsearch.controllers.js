@@ -3,15 +3,15 @@
 
     angular
         .module('listSearchApp')
-        .controller('LayerListSearchController', function ($scope, $q, $window, $http, $timeout, dataListService) {
+        .controller('ResourceListSearchController', function ($scope, $q, $window, $http, $timeout, dataListService) {
             var self = $scope;
             self.printme = "please convert me to angular js";
             self.searchString = "";
             self.resourceList = [];
-            self.LAYER_LIST_API = "../api/list_search/layers-list";
+            self.RESOURCE_LIST_API = "../api/list_search/resources-list";
             self.titleSearch = "";
             self.searchResults = [];
-
+            self.resource_type = null;
             self.organization = {
                 selectedOrganization: null
             };
@@ -19,24 +19,38 @@
                 selectedCategory: null
             };
 
+
+            //----------------------------------------------------------------------------------------------------------
+            self.getUrl = function (resource_type, organization, category, searchString) {
+                var url;
+                if (resource_type === 'layer')
+                    url = self.RESOURCE_LIST_API + "?resource_type=layer";
+                else if (resource_type === 'map')
+                    url = self.RESOURCE_LIST_API + "?resource_type=map";
+                else
+                    url = self.RESOURCE_LIST_API + "?resource_type=document";
+
+                if (organization)
+                    url += "&group__slug=" + organization;
+                if (category)
+                    url += "&category__gn_description=" + category;
+                if (searchString)
+                    url += "&title__icontains=" + searchString;
+                return url;
+
+            };
+
             self.setItems = function (url) {
-
-                if (self.searchString) {
-                    url += self.searchString;
-                }
                 self.resourceList = [];
-
                 dataListService.getDataList(url).then(function (datalist) {
                     self.resourceList = datalist.data.results;
                     self.nextUrl = datalist.data.next;
                     self.previousUrl = datalist.data.previous;
                     self.counter = datalist.data.count;
-
                 });
-
             };
 
-            self.setSearchResults = function (url, searchString) {
+            self.setSearchItems = function (url, searchString) {
                 if (searchString) {
                     url += searchString;
                 }
@@ -47,36 +61,66 @@
                 });
             };
 
-            self.getResourceList = function () {
-                self.setItems(self.LAYER_LIST_API);
+            self.loadOrganizationsList = function () {
+                var url = '/api/groups/';
+                dataListService.getDataList(url).then(function (datalist) {
+                    self.organizations = datalist.data.objects;
+                });
+            };
+
+            self.loadCategoryList = function () {
+                var url = '/api/categories/';
+
+                dataListService.getDataList(url).then(function (datalist) {
+                    self.categories = datalist.data.objects;
+                });
+            };
+
+            self.updateResourceList = function(){
+              self.setItems(self.getUrl(self.resource_type, self.organization.selectedOrganization, self.category.selectedCategory, null));
             };
 
 
-            self.updateSearchString = function () {
-                self.searchString = "";
-                if (self.organization.selectedOrganization != null) {
-                    self.searchString += "?group__slug=" + self.organization.selectedOrganization;
-                }
-                if (self.category.selectedCategory != null) {
-                    if (self.searchString) {
-                        self.searchString += "&category__gn_description=" + self.category.selectedCategory;
-                    }
-                    else {
-                        self.searchString = "?category__gn_description=" + self.category.selectedCategory;
-                    }
 
+            //----------------------------------------------------------------------------------------------------------
+            self.showSearchResults = function () {
+                var message = document.getElementsByClassName('search-resource')[0];
+                if(self.searchString)
+                    message.style.display = 'block';
+                else
+                    self.hideSearchResults();
+            };
+
+            self.hideSearchResults = function () {
+                var message = document.getElementsByClassName('search-resource')[0];
+                message.style.display = 'none';
+            };
+
+            self.searchAutocomplete = function () {
+                if(self.searchString){
+                    self.setSearchItems(self.getUrl(self.resource_type, null, null, self.searchString));
+                self.showSearchResults();
                 }
-                if (self.titleSearch) {
-                    if (self.searchString) {
-                        self.searchString += "&title__icontains=" + self.titleSearch;
-                    }
-                    else {
-                        self.searchString = "?title__icontains=" + self.titleSearch;
-                    }
-                }
+                else
+                    self.hideSearchResults();
+
+            };
+
+            self.searchResources = function(){
+                self.setItems(self.getUrl(self.resource_type, self.organization.selectedOrganization, self.category.selectedCategory, self.searchString));
             };
 
 
+            //----------------------------------------------------------------------------------------------------------
+            self.initdata = function (resource_type) {
+                self.resource_type = resource_type;
+                self.loadOrganizationsList();
+                self.loadCategoryList();
+                self.setItems(self.getUrl(self.resource_type, null, null, null));
+            };
+
+
+            // ---------------------------------------------------------------------------------------------------------
             self.nextItems = function () {
                 self.setItems(self.nextUrl);
             };
@@ -86,75 +130,6 @@
 
             self.redirectTo = function (url, queryString) {
                 $window.location.href = url + queryString;
-            };
-
-            self.loadOrganizationsList = function () {
-                var url = '/api/groups/';
-
-                dataListService.getDataList(url).then(function (datalist) {
-                    self.organizations = datalist.data.objects;
-
-
-                });
-            };
-
-            self.updateLayersWithTitle = function () {
-                self.updateSearchString();
-                self.setItems(self.LAYER_LIST_API);
-
-            };
-
-            self.updateLayersWithOrganization = function () {
-                self.updateSearchString();
-                self.setItems(self.LAYER_LIST_API);
-
-            };
-
-
-            self.loadCategoryList = function () {
-                var url = '/api/categories/';
-
-                dataListService.getDataList(url).then(function (datalist) {
-                    self.categories = datalist.data.objects;
-
-
-                });
-            };
-
-            self.updateLayersWithCategory = function () {
-                self.updateSearchString();
-                self.setItems(self.LAYER_LIST_API);
-
-            };
-
-            self.initdata = function () {
-                self.loadOrganizationsList();
-                self.loadCategoryList();
-                self.getResourceList();
-
-            };
-
-            self.showSearchResults = function () {
-                var message = document.getElementsByClassName('search-resource')[0];
-                if (self.titleSearch)
-                    message.style.display = 'block';
-                else
-                    self.hideSearchResults();
-            };
-
-            self.hideSearchResults = function () {
-                var message = document.getElementsByClassName('search-resource')[0];
-                message.style.display = 'none';
-
-            };
-
-            self.seaerchAutocomplete = function () {
-
-                self.updateSearchString();
-                self.setSearchResults(self.LAYER_LIST_API, self.searchString);
-                self.showSearchResults();
-
-
             };
 
 

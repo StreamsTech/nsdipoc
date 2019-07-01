@@ -14,7 +14,7 @@
 
     </style>
 
-    <div ng-app="listSearchApp" ng-controller="LayerListSearchController" ng-init="initdata()">
+    <div ng-app="listSearchApp" ng-controller="ResourceListSearchController" ng-init="initdata('layer')">
 
 
             <div class="d-title">{% trans "Explore Layers" %}</div>
@@ -28,9 +28,9 @@
                     <div style="display: inline-block">
                         <div class="input-group" style="width: 100px;">
                             <input type="search" class="form-control" style="display: inline-block;width: auto;height: 39px"
-                                   id='myinput' placeholder="Search for..." ng-click="showSearchResults()" ng-blur="hideSearchResults()" ng-change="seaerchAutocomplete()" ng-model="titleSearch">
+                                   id='myinput' placeholder="Search for..." ng-click="showSearchResults()" ng-blur="hideSearchResults()" ng-change="searchAutocomplete()" ng-model="searchString">
                             <span class="input-group-btn">
-                        <button class="btn btn-gd-primary" style="padding: 6px 10px;font-size:18px" ng-click="updateLayersWithTitle()" type="button"><i class="fa fa-search"></i></button>
+                        <button class="btn btn-gd-primary" style="padding: 6px 10px;font-size:18px" ng-click="searchResources()" type="button"><i class="fa fa-search"></i></button>
                         </span>
                         </div><!-- /input-group -->
                     </div><!-- /.col-lg-6 -->
@@ -47,12 +47,12 @@
 
 
                 <select class="form-control" style="display: inline;width: 180px;height: 39px;float: left;margin-right: 5px;"
-                        ng-model="organization.selectedOrganization" ng-change="updateLayersWithOrganization()"
+                        ng-model="organization.selectedOrganization" ng-change="updateResourceList()"
                         ng-options="org.slug as org.title for org in organizations">
                     <option value="">All Organization</option>
                 </select>
 
-                <select class="form-control" style="display: inline;width: 180px;height: 39px;float: left;" ng-model="category.selectedCategory" ng-change="updateLayersWithCategory()"
+                <select class="form-control" style="display: inline;width: 180px;height: 39px;float: left;" ng-model="category.selectedCategory" ng-change="updateResourceList()"
                         ng-options="cat.identifier as cat.gn_description for cat in categories">
                     <option value="">All Category</option>
                 </select>
