@@ -57,6 +57,10 @@
                     <option value="">All Category</option>
                 </select>
 
+                  <a href="{% url "layer_browse"  %}" class="btn btn-gd-primary pull-right icon-btn-color" style="padding: 10px;margin-left: 10px;">
+                    {% trans "All layers"  %}
+                </a>
+
             </div>
 
 
@@ -159,9 +163,7 @@
 {#                        {% trans "Advanced" %} <i class="fa fa-search"></i>#}
 {#                    </a>#}
 
-                <a href="{% url "layer_browse"  %}" class="btn btn-gd-primary pull-right icon-btn-color">
-                    {% trans "All layers"  %} <i class="fa fa-cloud-upload" aria-hidden="true"></i>
-                </a>
+
 
                     {% if not user.is_authenticated %}
                         <a onclick="layerpopup('SigninModal');" class="btn btn-gd-primary pull-right icon-btn-color">
