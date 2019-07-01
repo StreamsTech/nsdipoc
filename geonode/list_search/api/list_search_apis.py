@@ -9,9 +9,8 @@ from geonode.base.models import ResourceBase
 from list_search_serializers import ResourceBaseListSearchSerializer
 
 
-
 class LargeResultsSetPagination(PageNumberPagination):
-    page_size = 20
+    page_size = 21
     page_size_query_param = 'page_size'
     max_page_size = 1000
 
@@ -36,5 +35,8 @@ class ResourceBaseListSearchAPIView(generics.ListAPIView):
     def get_queryset(self):
         permitted_ids = get_objects_for_user(
             self.request.user, 'base.view_resourcebase').values('id')
-        queryset = ResourceBase.objects.distinct().order_by('-date').filter(status='ACTIVE')
-        return queryset.filter(id__in=permitted_ids)
+        order_by = self.request.query_params.get('order_by', None)
+        queryset = ResourceBase.objects.distinct().filter(status='ACTIVE').filter(id__in=permitted_ids)
+        if order_by is not None:
+            queryset = queryset.order_by(order_by)
+        return queryset

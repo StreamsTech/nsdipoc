@@ -13,12 +13,26 @@
             self.searchResults = [];
             self.resource_type = null;
             self.redirectUrl = null;
+            self.nextUrl = null;
+            self.previousUrl = null;
+            self.currentUrl = null;
             self.organization = {
                 selectedOrganization: null
             };
             self.category = {
                 selectedCategory: null
             };
+
+            self.orderby = {
+                selectedOrderBy: '-date'
+            };
+            self.orders = [
+                {option:'Most Recent', value:'-date'},
+                {option:'Less Recent', value:'date'},
+                {option:'A - Z', value:'title'},
+                {option:'Z - A', value:'-title'},
+
+            ];
 
 
             //----------------------------------------------------------------------------------------------------------
@@ -37,6 +51,7 @@
                     url += "&category__gn_description=" + category;
                 if (searchString)
                     url += "&title__icontains=" + searchString;
+                url += "&order_by=" + self.orderby.selectedOrderBy;
                 return url;
 
             };
@@ -77,16 +92,15 @@
                 });
             };
 
-            self.updateResourceList = function(){
-              self.setItems(self.getUrl(self.resource_type, self.organization.selectedOrganization, self.category.selectedCategory, null));
+            self.updateResourceList = function () {
+                self.setItems(self.getUrl(self.resource_type, self.organization.selectedOrganization, self.category.selectedCategory, null));
             };
-
 
 
             //----------------------------------------------------------------------------------------------------------
             self.showSearchResults = function () {
                 var message = document.getElementsByClassName('search-resource')[0];
-                if(self.searchString)
+                if (self.searchString)
                     message.style.display = 'block';
                 else
                     self.hideSearchResults();
@@ -98,23 +112,24 @@
             };
 
             self.searchAutocomplete = function () {
-                if(self.searchString){
+                if (self.searchString) {
                     self.setSearchItems(self.getUrl(self.resource_type, null, null, self.searchString));
-                self.showSearchResults();
+                    self.showSearchResults();
                 }
                 else
                     self.hideSearchResults();
 
             };
 
-            self.searchResources = function(){
-                self.setItems(self.getUrl(self.resource_type, self.organization.selectedOrganization, self.category.selectedCategory, self.searchString));
+            self.searchResources = function () {
+                self.setItems(self.getUrl(self.resource_type, null, null, self.searchString));
             };
 
 
             //----------------------------------------------------------------------------------------------------------
             self.initdata = function (resource_type) {
                 self.resource_type = resource_type;
+                self.orderby.selectedOrderBy = '-date';
                 self.loadOrganizationsList();
                 self.loadCategoryList();
                 self.setItems(self.getUrl(self.resource_type, null, null, null));
