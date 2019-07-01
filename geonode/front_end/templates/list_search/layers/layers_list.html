@@ -10,448 +10,459 @@
 {% block body %}
 
 
-<style>
-    .search-resource {
-        display: none;
-        position: absolute;
-        bottom: 0;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        padding: 0;
-        top: 39px;
-        width: 100%;
-        z-index: 999;
-    }
-</style>
+    <style>
+        .search-resource {
+            display: none;
+            position: absolute;
+            bottom: 0;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 0;
+            top: 39px;
+            width: 100%;
+            z-index: 999;
+        }
+    </style>
 
-<div ng-app="listSearchApp" ng-controller="LayerListSearchController" ng-init="initdata()">
-    <div class="d-title">
-
-        <div class="pull-right">
+    <div ng-app="listSearchApp" ng-controller="LayerListSearchController" ng-init="initdata()">
 
 
-            <div style="display: inline;width: 100px;position: relative">
+            <div class="d-title">{% trans "Explore Layers" %}</div>
 
-                <div style="display: inline-block">
-                    <div class="input-group" style="width: 100px;">
-                        <input type="search" class="form-control" style="display: inline-block;width: auto;height: 39px"
-                               id='myinput' placeholder="Search for..." ng-click="showSearchResults()" ng-blur="hideSearchResults()" ng-change="seaerchAutocomplete()" ng-model="titleSearch">
-                        <span class="input-group-btn">
-                        <button class="btn btn-default" ng-click="updateLayersWithTitle()" type="button">Go!</button>
+ <div style="margin-bottom: 10px">
+
+            <div class="pull-left">
+
+                <div style="display: inline;width: 245px;position: relative;float: left">
+
+                    <div style="display: inline-block">
+                        <div class="input-group" style="width: 100px;">
+                            <input type="search" class="form-control" style="display: inline-block;width: auto;height: 39px"
+                                   id='myinput' placeholder="Search for..." ng-click="showSearchResults()" ng-blur="hideSearchResults()" ng-change="seaerchAutocomplete()" ng-model="titleSearch">
+                            <span class="input-group-btn">
+                        <button class="btn btn-gd-primary" style="padding: 10px" ng-click="updateLayersWithTitle()" type="button">Go</button>
                         </span>
-                    </div><!-- /input-group -->
-                </div><!-- /.col-lg-6 -->
+                        </div><!-- /input-group -->
+                    </div><!-- /.col-lg-6 -->
 
 
-                <div class="search-resource">
-                    <ul class="list-group" ng-repeat="searchItem in searchResults">
-                        <li class="list-group-item">
-                            <a href="[{ searchItem.detail_url }]">[{searchItem.title}]</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-
-            <select class="form-control" style="display: inline;width: 100px;height: 39px;"
-                    ng-model="organization.selectedOrganization" ng-change="updateLayersWithOrganization()"
-                    ng-options="org.slug as org.title for org in organizations">
-                <option value="">All Organization</option>
-            </select>
-            <a href="{% url "layer_browse"  %}" class="btn btn-gd-primary pull-right icon-btn-color">
-                                                            {% trans "All layers"  %}
-                                                        </a>
-
-            <select class="form-control" ng-model="category.selectedCategory" ng-change="updateLayersWithCategory()"
-                    ng-options="cat.identifier as cat.gn_description for cat in categories">
-                <option value="">All Category</option>
-            </select>
-
-
-
-
-            <div class="btn-group" role="group" aria-label="tools">
-                <div id="profileSortId" class="btn-group" role="group">
-                    <a href="javascript:;" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                       aria-haspopup="true" aria-expanded="false">
-                        <span id="currtenSortTitle">{% trans "Most recent" %}</span>
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-right" id="sort">
-                        <li>
-                            <a data-value="-date" data-filter="order_by" class="selected"
-                               ng-click="single_choice_listener($event)">
-                                {% trans "Most recent" %}
-                            </a>
-                        </li>
-                        <li>
-                            <a data-value="date" data-filter="order_by" ng-click="single_choice_listener($event)">
-                                {% trans "Less recent" %}
-                            </a>
-                        </li>
-                        <li>
-                            <a data-value="title" data-filter="order_by" ng-click="single_choice_listener($event)">
-                                {% trans "A - Z" %}
-                            </a>
-                        </li>
-                        <li>
-                            <a data-value="-title" data-filter="order_by" ng-click="single_choice_listener($event)">
-                                {% trans "Z - A" %}
-                            </a>
-                        </li>
-                        <!--<li>-->
-                        <!--<a data-value="-popular_count" data-filter="order_by" ng-click="single_choice_listener($event)">-->
-                        <!--{% trans "Most popular" %}-->
-                        <!--</a>-->
-                        <!--</li>-->
-                    </ul>
-                </div>
-            </div>
-
-
-            <div class="btn-group" role="group" aria-label="tools">
-                <div id="profileSortId" class="btn-group" role="group">
-                    <a href="javascript:;" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                       aria-haspopup="true" aria-expanded="false">
-                        <span id="limitOfpage">100</span>
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-right" id="sort">
-                        <li>
-                            <a ng-click="limit_choice_listener(20)">
-                                20
-                            </a>
-                        </li>
-                        <li>
-                            <a ng-click="limit_choice_listener(40)">
-                                40
-                            </a>
-                        </li>
-                        <li>
-                            <a ng-click="limit_choice_listener(100)">
-                                100
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-
-            <div class="btn-group" role="group">
-
-
-                <a href="javascript:;" ng-class="{'btn-success' : pageViewing == 'list'}" class="btn btn-default"
-                   ng-click="displayView('list')">
-                    <i class="fa fa-bars"></i>
-                </a>
-
-
-                <a href="javascript:;" ng-class="{'btn-success' : pageViewing == 'grid'}" class="btn btn-default"
-                   ng-click="displayView('grid')">
-                    <i class="fa fa-th-large"></i>
-                    <!--<img src="images/user-separator-icon.png" />-->
-                </a>
-
-
-            </div>
-
-
-            <div class="btn-group">
-
-                <a href="javascript:;" id="advanced-search-control"
-                   class="btn btn-gd-primary pull-right icon-btn-color">
-                    {% trans "Advanced" %} <i class="fa fa-search"></i>
-                </a>
-                {% if not user.is_authenticated %}
-                <a onclick="layerpopup('SigninModal');" class="btn btn-gd-primary pull-right icon-btn-color">
-                    {% trans "Upload Layers" %} <i class="fa fa-cloud-upload" aria-hidden="true"></i>
-                </a>
-                {% endif %}
-                {% if user.is_authenticated %}
-
-                <a href="{% url "layer_upload"  %}" class="btn btn-gd-primary pull-right icon-btn-color">
-                                                            {% trans "Upload Layers"  %} <i class="fa fa-cloud-upload" aria-hidden="true"></i>
-                                                        </a>
-
-                {% endif %}
-            </div>
-
-
-        </div>
-
-        {% trans "Explore Layers" %}
-    </div>
-
-
-    <div class="panel panel-default gallery-container">
-
-        <div class="panel-body">
-
-            <div class="row">
-
-                <div ng-repeat="item in resourceList" class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-                    <div class="grid-container lmd">
-                        <div class="avater">
-                            <div class="avater-img">
-                                <a class="avater-img-mid" href="[{ item.detail_url }]">
-                                    <img ng-if="item.thumbnail_url != null" ng-src="[{ item.thumbnail_url }]"
-                                         alt="No thumbs found" class="group-logo"/>
-                                    <img ng-if="item.thumbnail_url == null"
-                                         ng-src="/static/geonode/img/missing_thumb.png" alt="No thumbs found"
-                                         class="group-logo"/>
-                                </a>
-                            </div>
-                            <!-- ngIf: false -->
-
-                        </div>
-                        <div class="information">
-                            <div class="top-content text-center">
-                                <div class="title">
-                                    <a href="[{ item.detail_url }]" title="[{ item.title }]">
-                                        [{ item.title }]
-                                    </a>
-                                </div>
-                                <div class="category">
-                                    [{ item.category }]
-                                    [{ item.category == null || item.category == '' ? 'Not provided.' : '' }]
-                                </div>
-                                <div class="details ng-binding">
-                                    [{ item.abstract | limitTo: 220 }][{ item.abstract.length > 220 ? '...' : ''}]
-                                </div>
-                            </div>
-
-                            <div class="summery"
-                                 style="float: left;width:319px;border: 1px solid #e7e7e7;height: 79px;background-color: #f6f6f6;padding: 9px;border-right: 0;margin-bottom: 15px;">
-                                <div class="item-items">
-                                    <div class="item-items">
-                                        <ul class="list-inline lmd">
-                                            <li><a href="/people/profile/[{ item.owner }]"
-                                                   title="[{item.resource_type}] owner">
-                                                <i class="fa fa-user"></i> [{ item.owner }] </a>
-                                            </li>
-                                            <li><a href="[{ item.detail_url }]#info"
-                                                   title="[{item.resource_type}] creation date">
-                                                <i class="fa fa-calendar-o"></i> [{ item.date|date:'d MMM y' }] </a>
-                                            </li>
-                                            <li><a href="[{ item.detail_url }]"
-                                                   title="[{item.resource_type}] view count">
-                                                <i class="fa fa-eye"></i> [{ item.popular_count }] </a>
-                                            </li>
-                                            <li><a href="[{ item.detail_url }]#share"
-                                                   title="[{item.resource_type}] share count">
-                                                <i class="fa fa-download"></i> [{ item.download_count }] </a>
-                                            </li>
-                                            <li><a href="[{ item.detail_url }]#share"
-                                                   title="[{item.resource_type}] share count">
-                                                <i class="fa fa-share"></i> [{ item.share_count }] </a>
-                                            </li>
-                                            <li><a href="[{ item.detail_url }]#rate"
-                                                   title="[{item.resource_type}] rating">
-                                                <i class="fa fa-star"></i> [{ item.rating }] </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="float:left;padding:5px;border: 1px solid #c8d2d8;">
-                                <div style="font-size: 11px;color:rgb(255, 255, 255); font-weight: bold;background-color:#00489c; text-align: center;margin:-6px -6px 5px;">
-                                    Shared by
-                                </div>
-                                <a href="/organization/organization/[{item.organization_slug}]">
-                                    <img ng-src="[{item.organization_logo}]"
-                                         height="53px"
-                                         width="50px"
-                                         class="center-block"
-                                         alt="[{ group.title }]"
-                                         title="[{ group.title }]">
-                                </a>
-
-                            </div>
-                        </div>
-
-
-                        <div class="clearfix"></div>
-                        <div>
-                            <div class="bottom-content">
-                                <div class="row">
-                                    <div class="profile-items text-center">
-                                        <ul class="list-inline">
-                                            {% if request.user.is_manager_of_any_group %}
-                                            <!--{{ request.user.group_list_all }}-->
-                                            <li ng-if="item.featured && item.resource_type=='layer' && item.can_make_featured==true"
-                                                class="col-md-6">
-                                                {% verbatim %}
-                                                <button class="btn btn-gd-primary favorite-btn btn-block"
-                                                        data-layerID="[{item.id}]" dataname="[{item.can_make_featured}]"
-                                                        data-statusID="false"
-                                                        ng-click="featuredFunction(item.id,false);">
-                                                    <i class="fa fa-star-o"></i>
-                                                    Unfeatured
-                                                </button>
-                                                {% endverbatim %}
-                                            </li>
-
-                                            <li ng-if="!item.featured && item.resource_type=='layer' && item.can_make_featured==true"
-                                                class="col-md-6" id="featured_chng">
-                                                {% verbatim %}
-                                                <button class="btn btn-gd-primary btn-block" dataname="[{item.group}]"
-                                                        ng-click="featuredFunction(item.id,true);"
-                                                        data-layerID="[{item.id}]" data-statusID="true">
-                                                    <i class="fa fa-star-o"></i>
-                                                    Make Featured
-                                                </button>
-                                                {% endverbatim %}
-                                            </li>
-                                            <li ng-if="item.favorite && item.resource_type=='layer' && item.can_make_featured==false"
-                                                class="col-md-12">
-                                                {% verbatim %}
-                                                <button class="btn btn-gd-primary favorite-btn btn-block"
-                                                        ng-click="favouriteFunction(item.id,false);"
-                                                        data-favouriteID="[{item.id}]" data-favouriteStatus="false">
-                                                    <i class="fa fa-heart-o"></i>
-                                                    Unfavorite
-                                                </button>
-                                                {% endverbatim %}
-                                            </li>
-                                            <li ng-if="!item.favorite && item.resource_type=='layer' && item.can_make_featured==false"
-                                                class="col-md-12">
-                                                {% verbatim %}
-                                                <button class="btn btn-gd-primary btn-block"
-                                                        ng-click="favouriteFunction(item.id,true);"
-                                                        data-favouriteID="[{item.id}]" data-favouriteStatus="true">
-                                                    <i class="fa fa-heart-o"></i>
-                                                    Add to favorite
-                                                </button>
-                                                {% endverbatim %}
-                                            </li>
-
-                                            <li ng-if="item.favorite && item.resource_type=='layer' && item.can_make_featured==true"
-                                                class="col-md-6">
-                                                {% verbatim %}
-                                                <button class="btn btn-gd-primary favorite-btn btn-block"
-                                                        ng-click="favouriteFunction(item.id,false);"
-                                                        data-favouriteID="[{item.id}]" data-favouriteStatus="false">
-                                                    <i class="fa fa-heart-o"></i>
-                                                    Unfavorite
-                                                </button>
-                                                {% endverbatim %}
-                                            </li>
-                                            <li ng-if="!item.favorite && item.resource_type=='layer' && item.can_make_featured==true"
-                                                class="col-md-6">
-                                                {% verbatim %}
-                                                <button class="btn btn-gd-primary btn-block"
-                                                        ng-click="favouriteFunction(item.id,true);"
-                                                        data-favouriteID="[{item.id}]" data-favouriteStatus="true">
-                                                    <i class="fa fa-heart-o"></i>
-                                                    Add to favorite
-                                                </button>
-                                                {% endverbatim %}
-                                            </li>
-
-                                            <li ng-if="item.favorite && item.resource_type=='map'" class="col-md-12">
-                                                {% verbatim %}
-                                                <button class="btn btn-gd-primary favorite-btn btn-block"
-                                                        ng-click="favouriteFunction(item.id,false);"
-                                                        data-favouriteID="[{item.id}]" data-favouriteStatus="false">
-                                                    <i class="fa fa-heart-o"></i>
-                                                    Unfavorite
-                                                </button>
-                                                {% endverbatim %}
-                                            </li>
-                                            <li ng-if="!item.favorite && item.resource_type=='map'" class="col-md-12">
-                                                {% verbatim %}
-                                                <button class="btn btn-gd-primary btn-block"
-                                                        ng-click="favouriteFunction(item.id,true);"
-                                                        data-favouriteID="[{item.id}]" data-favouriteStatus="true">
-                                                    <i class="fa fa-heart-o"></i>
-                                                    Add to favorite
-                                                </button>
-                                                {% endverbatim %}
-                                            </li>
-
-                                            <li ng-if="item.favorite && item.resource_type=='document'"
-                                                class="col-md-12">
-                                                {% verbatim %}
-                                                <button class="btn btn-gd-primary favorite-btn btn-block"
-                                                        ng-click="favouriteFunction(item.id,false);"
-                                                        data-favouriteID="[{item.id}]" data-favouriteStatus="false">
-                                                    <i class="fa fa-heart-o"></i>
-                                                    Unfavorite
-                                                </button>
-                                                {% endverbatim %}
-                                            </li>
-                                            <li ng-if="!item.favorite && item.resource_type=='document'"
-                                                class="col-md-12">
-                                                {% verbatim %}
-                                                <button class="btn btn-gd-primary btn-block"
-                                                        ng-click="favouriteFunction(item.id,true);"
-                                                        data-favouriteID="[{item.id}]" data-favouriteStatus="true">
-                                                    <i class="fa fa-heart-o"></i>
-                                                    Add to favorite
-                                                </button>
-                                                {% endverbatim %}
-                                            </li>
-                                            {% else %}
-                                            {% if user.is_authenticated %}
-                                            <li ng-if="item.favorite" class="col-md-12">
-                                                {% verbatim %}
-                                                <button class="btn btn-gd-primary favorite-btn btn-block"
-                                                        ng-click="favouriteFunction(item.id,false);" href=""
-                                                        data-favouriteID="[{item.id}]" data-favouriteStatus="false">
-                                                    <i class="fa fa-heart-o"></i>
-                                                    Unfavorite
-                                                </button>
-                                                {% endverbatim %}
-                                            </li>
-                                            <li ng-if="!item.favorite" class="col-md-12">
-                                                {% verbatim %}
-                                                <button class="btn btn-gd-primary btn-block"
-                                                        ng-click="favouriteFunction(item.id,true);"
-                                                        data-favouriteID="[{item.id}]" data-favouriteStatus="true">
-                                                    <i class="fa fa-heart-o"></i>
-                                                    Add to favorite
-                                                </button>
-                                                {% endverbatim %}
-                                            </li>
-                                            {% endif %}
-                                            {% endif %}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
+                    <div class="search-resource">
+                        <ul class="list-group" ng-repeat="searchItem in searchResults">
+                            <li class="list-group-item">
+                                <a href="[{ searchItem.detail_url }]">[{searchItem.title}]</a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
 
+
+                <select class="form-control" style="display: inline;width: 180px;height: 39px;float: left;margin-right: 5px;"
+                        ng-model="organization.selectedOrganization" ng-change="updateLayersWithOrganization()"
+                        ng-options="org.slug as org.title for org in organizations">
+                    <option value="">All Organization</option>
+                </select>
+
+                <select class="form-control" style="display: inline;width: 180px;height: 39px;float: left;" ng-model="category.selectedCategory" ng-change="updateLayersWithCategory()"
+                        ng-options="cat.identifier as cat.gn_description for cat in categories">
+                    <option value="">All Category</option>
+                </select>
+
             </div>
 
+
+            <div class="pull-right">
+
+
+
+
+
+                <div class="btn-group" role="group" aria-label="tools">
+                    <div id="profileSortId" class="btn-group" role="group">
+                        <a href="javascript:;" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                           aria-haspopup="true" aria-expanded="false">
+                            <span id="currtenSortTitle">{% trans "Most recent" %}</span>
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-right" id="sort">
+                            <li>
+                                <a data-value="-date" data-filter="order_by" class="selected"
+                                   ng-click="single_choice_listener($event)">
+                                    {% trans "Most recent" %}
+                                </a>
+                            </li>
+                            <li>
+                                <a data-value="date" data-filter="order_by" ng-click="single_choice_listener($event)">
+                                    {% trans "Less recent" %}
+                                </a>
+                            </li>
+                            <li>
+                                <a data-value="title" data-filter="order_by" ng-click="single_choice_listener($event)">
+                                    {% trans "A - Z" %}
+                                </a>
+                            </li>
+                            <li>
+                                <a data-value="-title" data-filter="order_by" ng-click="single_choice_listener($event)">
+                                    {% trans "Z - A" %}
+                                </a>
+                            </li>
+                            <!--<li>-->
+                            <!--<a data-value="-popular_count" data-filter="order_by" ng-click="single_choice_listener($event)">-->
+                            <!--{% trans "Most popular" %}-->
+                            <!--</a>-->
+                            <!--</li>-->
+                        </ul>
+                    </div>
+                </div>
+
+
+                <div class="btn-group" role="group" aria-label="tools">
+                    <div id="profileSortId" class="btn-group" role="group">
+                        <a href="javascript:;" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                           aria-haspopup="true" aria-expanded="false">
+                            <span id="limitOfpage">100</span>
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-right" id="sort">
+                            <li>
+                                <a ng-click="limit_choice_listener(20)">
+                                    20
+                                </a>
+                            </li>
+                            <li>
+                                <a ng-click="limit_choice_listener(40)">
+                                    40
+                                </a>
+                            </li>
+                            <li>
+                                <a ng-click="limit_choice_listener(100)">
+                                    100
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+
+                <div class="btn-group" role="group">
+
+
+                    <a href="javascript:;" ng-class="{'btn-success' : pageViewing == 'list'}" class="btn btn-default"
+                       ng-click="displayView('list')">
+                        <i class="fa fa-bars"></i>
+                    </a>
+
+
+                    <a href="javascript:;" ng-class="{'btn-success' : pageViewing == 'grid'}" class="btn btn-default"
+                       ng-click="displayView('grid')">
+                        <i class="fa fa-th-large"></i>
+                        <!--<img src="images/user-separator-icon.png" />-->
+                    </a>
+
+
+                </div>
+
+
+                <div class="btn-group">
+
+{#                    <a href="javascript:;" id="advanced-search-control"#}
+{#                       class="btn btn-gd-primary pull-right icon-btn-color">#}
+{#                        {% trans "Advanced" %} <i class="fa fa-search"></i>#}
+{#                    </a>#}
+
+                <a href="{% url "layer_browse"  %}" class="btn btn-gd-primary pull-right icon-btn-color">
+                    {% trans "All layers"  %} <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                </a>
+
+                    {% if not user.is_authenticated %}
+                        <a onclick="layerpopup('SigninModal');" class="btn btn-gd-primary pull-right icon-btn-color">
+                            {% trans "Upload Layers" %} <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                        </a>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+
+                        <a href="{% url "layer_upload"  %}" class="btn btn-gd-primary pull-right icon-btn-color" style="margin-right: 5px;margin-left: 10px;">
+                            {% trans "Upload Layers"  %} <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                        </a>
+
+                    {% endif %}
+                </div>
+
+
+            </div>
+
+<div style="clear: both"></div>
         </div>
 
-        [{printme}]
+
+        <div class="panel panel-default gallery-container">
+
+            <div class="panel-body">
+
+                <div class="row">
+
+                    <div ng-repeat="item in resourceList" class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                        <div class="grid-container lmd">
+                            <div class="avater">
+                                <div class="avater-img">
+                                    <a class="avater-img-mid" href="[{ item.detail_url }]">
+                                        <img ng-if="item.thumbnail_url != null" ng-src="[{ item.thumbnail_url }]"
+                                             alt="No thumbs found" class="group-logo"/>
+                                        <img ng-if="item.thumbnail_url == null"
+                                             ng-src="/static/geonode/img/missing_thumb.png" alt="No thumbs found"
+                                             class="group-logo"/>
+                                    </a>
+                                </div>
+                                <!-- ngIf: false -->
+
+                            </div>
+                            <div class="information">
+                                <div class="top-content text-center">
+                                    <div class="title">
+                                        <a href="[{ item.detail_url }]" title="[{ item.title }]">
+                                            [{ item.title }]
+                                        </a>
+                                    </div>
+                                    <div class="category">
+                                        [{ item.category }]
+                                        [{ item.category == null || item.category == '' ? 'Not provided.' : '' }]
+                                    </div>
+                                    <div class="details ng-binding">
+                                        [{ item.abstract | limitTo: 220 }][{ item.abstract.length > 220 ? '...' : ''}]
+                                    </div>
+                                </div>
+
+                                <div class="summery"
+                                     style="float: left;width:319px;border: 1px solid #e7e7e7;height: 79px;background-color: #f6f6f6;padding: 9px;border-right: 0;margin-bottom: 15px;">
+                                    <div class="item-items">
+                                        <div class="item-items">
+                                            <ul class="list-inline lmd">
+                                                <li><a href="/people/profile/[{ item.owner }]"
+                                                       title="[{item.resource_type}] owner">
+                                                    <i class="fa fa-user"></i> [{ item.owner }] </a>
+                                                </li>
+                                                <li><a href="[{ item.detail_url }]#info"
+                                                       title="[{item.resource_type}] creation date">
+                                                    <i class="fa fa-calendar-o"></i> [{ item.date|date:'d MMM y' }] </a>
+                                                </li>
+                                                <li><a href="[{ item.detail_url }]"
+                                                       title="[{item.resource_type}] view count">
+                                                    <i class="fa fa-eye"></i> [{ item.popular_count }] </a>
+                                                </li>
+                                                <li><a href="[{ item.detail_url }]#share"
+                                                       title="[{item.resource_type}] share count">
+                                                    <i class="fa fa-download"></i> [{ item.download_count }] </a>
+                                                </li>
+                                                <li><a href="[{ item.detail_url }]#share"
+                                                       title="[{item.resource_type}] share count">
+                                                    <i class="fa fa-share"></i> [{ item.share_count }] </a>
+                                                </li>
+                                                <li><a href="[{ item.detail_url }]#rate"
+                                                       title="[{item.resource_type}] rating">
+                                                    <i class="fa fa-star"></i> [{ item.rating }] </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="float:left;padding:5px;border: 1px solid #c8d2d8;">
+                                    <div style="font-size: 11px;color:rgb(255, 255, 255); font-weight: bold;background-color:#00489c; text-align: center;margin:-6px -6px 5px;">
+                                        Shared by
+                                    </div>
+                                    <a href="/organization/organization/[{item.organization_slug}]">
+                                        <img ng-src="[{item.organization_logo}]"
+                                             height="53px"
+                                             width="50px"
+                                             class="center-block"
+                                             alt="[{ group.title }]"
+                                             title="[{ group.title }]">
+                                    </a>
+
+                                </div>
+                            </div>
 
 
+                            <div class="clearfix"></div>
+                            <div>
+                                <div class="bottom-content">
+                                    <div class="row">
+                                        <div class="profile-items text-center">
+                                            <ul class="list-inline">
+                                                {% if request.user.is_manager_of_any_group %}
+                                                    <!--{{ request.user.group_list_all }}-->
+                                                    <li ng-if="item.featured && item.resource_type=='layer' && item.can_make_featured==true"
+                                                        class="col-md-6">
+                                                        {% verbatim %}
+                                                            <button class="btn btn-gd-primary favorite-btn btn-block"
+                                                                    data-layerID="[{item.id}]" dataname="[{item.can_make_featured}]"
+                                                                    data-statusID="false"
+                                                                    ng-click="featuredFunction(item.id,false);">
+                                                                <i class="fa fa-star-o"></i>
+                                                                Unfeatured
+                                                            </button>
+                                                        {% endverbatim %}
+                                                    </li>
+
+                                                    <li ng-if="!item.featured && item.resource_type=='layer' && item.can_make_featured==true"
+                                                        class="col-md-6" id="featured_chng">
+                                                        {% verbatim %}
+                                                            <button class="btn btn-gd-primary btn-block" dataname="[{item.group}]"
+                                                                    ng-click="featuredFunction(item.id,true);"
+                                                                    data-layerID="[{item.id}]" data-statusID="true">
+                                                                <i class="fa fa-star-o"></i>
+                                                                Make Featured
+                                                            </button>
+                                                        {% endverbatim %}
+                                                    </li>
+                                                    <li ng-if="item.favorite && item.resource_type=='layer' && item.can_make_featured==false"
+                                                        class="col-md-12">
+                                                        {% verbatim %}
+                                                            <button class="btn btn-gd-primary favorite-btn btn-block"
+                                                                    ng-click="favouriteFunction(item.id,false);"
+                                                                    data-favouriteID="[{item.id}]" data-favouriteStatus="false">
+                                                                <i class="fa fa-heart-o"></i>
+                                                                Unfavorite
+                                                            </button>
+                                                        {% endverbatim %}
+                                                    </li>
+                                                    <li ng-if="!item.favorite && item.resource_type=='layer' && item.can_make_featured==false"
+                                                        class="col-md-12">
+                                                        {% verbatim %}
+                                                            <button class="btn btn-gd-primary btn-block"
+                                                                    ng-click="favouriteFunction(item.id,true);"
+                                                                    data-favouriteID="[{item.id}]" data-favouriteStatus="true">
+                                                                <i class="fa fa-heart-o"></i>
+                                                                Add to favorite
+                                                            </button>
+                                                        {% endverbatim %}
+                                                    </li>
+
+                                                    <li ng-if="item.favorite && item.resource_type=='layer' && item.can_make_featured==true"
+                                                        class="col-md-6">
+                                                        {% verbatim %}
+                                                            <button class="btn btn-gd-primary favorite-btn btn-block"
+                                                                    ng-click="favouriteFunction(item.id,false);"
+                                                                    data-favouriteID="[{item.id}]" data-favouriteStatus="false">
+                                                                <i class="fa fa-heart-o"></i>
+                                                                Unfavorite
+                                                            </button>
+                                                        {% endverbatim %}
+                                                    </li>
+                                                    <li ng-if="!item.favorite && item.resource_type=='layer' && item.can_make_featured==true"
+                                                        class="col-md-6">
+                                                        {% verbatim %}
+                                                            <button class="btn btn-gd-primary btn-block"
+                                                                    ng-click="favouriteFunction(item.id,true);"
+                                                                    data-favouriteID="[{item.id}]" data-favouriteStatus="true">
+                                                                <i class="fa fa-heart-o"></i>
+                                                                Add to favorite
+                                                            </button>
+                                                        {% endverbatim %}
+                                                    </li>
+
+                                                    <li ng-if="item.favorite && item.resource_type=='map'" class="col-md-12">
+                                                        {% verbatim %}
+                                                            <button class="btn btn-gd-primary favorite-btn btn-block"
+                                                                    ng-click="favouriteFunction(item.id,false);"
+                                                                    data-favouriteID="[{item.id}]" data-favouriteStatus="false">
+                                                                <i class="fa fa-heart-o"></i>
+                                                                Unfavorite
+                                                            </button>
+                                                        {% endverbatim %}
+                                                    </li>
+                                                    <li ng-if="!item.favorite && item.resource_type=='map'" class="col-md-12">
+                                                        {% verbatim %}
+                                                            <button class="btn btn-gd-primary btn-block"
+                                                                    ng-click="favouriteFunction(item.id,true);"
+                                                                    data-favouriteID="[{item.id}]" data-favouriteStatus="true">
+                                                                <i class="fa fa-heart-o"></i>
+                                                                Add to favorite
+                                                            </button>
+                                                        {% endverbatim %}
+                                                    </li>
+
+                                                    <li ng-if="item.favorite && item.resource_type=='document'"
+                                                        class="col-md-12">
+                                                        {% verbatim %}
+                                                            <button class="btn btn-gd-primary favorite-btn btn-block"
+                                                                    ng-click="favouriteFunction(item.id,false);"
+                                                                    data-favouriteID="[{item.id}]" data-favouriteStatus="false">
+                                                                <i class="fa fa-heart-o"></i>
+                                                                Unfavorite
+                                                            </button>
+                                                        {% endverbatim %}
+                                                    </li>
+                                                    <li ng-if="!item.favorite && item.resource_type=='document'"
+                                                        class="col-md-12">
+                                                        {% verbatim %}
+                                                            <button class="btn btn-gd-primary btn-block"
+                                                                    ng-click="favouriteFunction(item.id,true);"
+                                                                    data-favouriteID="[{item.id}]" data-favouriteStatus="true">
+                                                                <i class="fa fa-heart-o"></i>
+                                                                Add to favorite
+                                                            </button>
+                                                        {% endverbatim %}
+                                                    </li>
+                                                {% else %}
+                                                    {% if user.is_authenticated %}
+                                                        <li ng-if="item.favorite" class="col-md-12">
+                                                            {% verbatim %}
+                                                                <button class="btn btn-gd-primary favorite-btn btn-block"
+                                                                        ng-click="favouriteFunction(item.id,false);" href=""
+                                                                        data-favouriteID="[{item.id}]" data-favouriteStatus="false">
+                                                                    <i class="fa fa-heart-o"></i>
+                                                                    Unfavorite
+                                                                </button>
+                                                            {% endverbatim %}
+                                                        </li>
+                                                        <li ng-if="!item.favorite" class="col-md-12">
+                                                            {% verbatim %}
+                                                                <button class="btn btn-gd-primary btn-block"
+                                                                        ng-click="favouriteFunction(item.id,true);"
+                                                                        data-favouriteID="[{item.id}]" data-favouriteStatus="true">
+                                                                    <i class="fa fa-heart-o"></i>
+                                                                    Add to favorite
+                                                                </button>
+                                                            {% endverbatim %}
+                                                        </li>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            [{printme}]
+
+
+        </div>
     </div>
-</div>
 
 
 {% endblock %}
 
 {% block extra_script %}
-<script src="{{ STATIC_URL }}list_search/js/apps.js"></script>
-<script src="{{ STATIC_URL }}list_search/js/services.js"></script>
-<script src="{{ STATIC_URL }}list_search/js/layers.listsearch.controllers.js"></script>
+    <script src="{{ STATIC_URL }}list_search/js/apps.js"></script>
+    <script src="{{ STATIC_URL }}list_search/js/services.js"></script>
+    <script src="{{ STATIC_URL }}list_search/js/layers.listsearch.controllers.js"></script>
 
-<!--<script>-->
-<!--var input = document.getElementById('myinput');-->
-<!--var message = document.getElementsByClassName('newone')[0];-->
-<!--input.addEventListener('focus', function () {-->
-<!--message.style.display = 'block';-->
-<!--});-->
-<!--input.addEventListener('focusout', function () {-->
-<!--message.style.display = 'none';-->
-<!--});-->
-<!--</script>-->
+    <!--<script>-->
+    <!--var input = document.getElementById('myinput');-->
+    <!--var message = document.getElementsByClassName('newone')[0];-->
+    <!--input.addEventListener('focus', function () {-->
+    <!--message.style.display = 'block';-->
+    <!--});-->
+    <!--input.addEventListener('focusout', function () {-->
+    <!--message.style.display = 'none';-->
+    <!--});-->
+    <!--</script>-->
 
 {% endblock extra_script %}
 
