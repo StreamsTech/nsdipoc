@@ -12,6 +12,7 @@
             self.titleSearch = "";
             self.searchResults = [];
             self.resource_type = null;
+            self.redirectUrl = null;
             self.organization = {
                 selectedOrganization: null
             };
@@ -128,8 +129,8 @@
                 self.setItems(self.previousUrl);
             };
 
-            self.redirectTo = function (url, queryString) {
-                $window.location.href = url + queryString;
+            self.redirectTo = function (url) {
+                $window.location.href = url;
             };
 
 

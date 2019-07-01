@@ -39,7 +39,8 @@
                     <div class="search-resource">
                         <ul class="list-group" ng-repeat="searchItem in searchResults">
                             <li class="list-group-item">
-                                <a href="[{ searchItem.detail_url }]">[{searchItem.title}]</a>
+                                <a href="#" ng-mousedown="redirectTo(searchItem.detail_url)">[{searchItem.title}]</a>
+                        </a>
                             </li>
                         </ul>
                     </div>
