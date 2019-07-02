@@ -235,8 +235,10 @@
 
             function getSobBaseMaps(){
                 var baseMaps = [];
-                var urlRoot = 'http://172.16.0.206/';
-                baseMaps.push({title: 'Mouza.Map', url: urlRoot+'mouza/',thumb : 'Stamen.Toner.jpg'});
+                var urlRoot = 'http://nsdi.gov.bd/';
+                baseMaps.push({title: '1M', url: urlRoot+'uploaded/basemaps/sob/1M/',thumb : 'sob1M.jpg'});
+                baseMaps.push({title: '50K', url: urlRoot+'uploaded/basemaps/sob/50K/',thumb : 'sob50K.jpg'});
+                baseMaps.push({title: '25K', url: urlRoot+'uploaded/basemaps/sob/25K/',thumb : 'sob25K.jpg'});
                 addxyzPart(baseMaps, 'SOBMAPS', '{z}/{x}/{y}.png');
                 return baseMaps;
             }
