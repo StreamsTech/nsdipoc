@@ -74,6 +74,8 @@ from geonode.social.templatetags.social_tags import get_data
 from .api import TagResource, RegionResource, OwnersResource
 from .api import ThesaurusKeywordResource
 from .api import TopicCategoryResource
+
+from geonode.base.models import TopicCategory
 from .api import FILTER_TYPES
 from geonode.nsdi.utils import get_organization
 
@@ -96,6 +98,7 @@ class CommonMetaApi:
                  'tkeywords': ALL_WITH_RELATIONS,
                  'regions': ALL_WITH_RELATIONS,
                  'category': ALL_WITH_RELATIONS,
+                 'group': ALL_WITH_RELATIONS,
                  'owner': ALL_WITH_RELATIONS,
                  'date': ALL,
                  'resource_type':ALL,
@@ -137,7 +140,8 @@ class CommonModelApi(ModelResource):
         'bbox_x0',
         'bbox_x1',
         'bbox_y0',
-        'bbox_y1'
+        'bbox_y1',
+        'group__logo'
     ]
 
     def build_filters(self, filters=None):
@@ -657,13 +661,17 @@ class LayerResource(CommonModelApi):
 
     #jahangir091
     def get_object_list(self, request):
-        group_id = request.GET.get('group', None)
-        if group_id:
-            group = get_object_or_404(GroupProfile, id=group_id)
-            return super(LayerResource, self).get_object_list(request).filter(group=group)
-        else:
-            return super(LayerResource, self).get_object_list(request).filter(status='ACTIVE')
-    #end
+        group_slug = request.GET.get('group', None)
+        category_identifier = request.GET.get('cat', None)
+        queryset = super(LayerResource, self).get_object_list(request).filter(status='ACTIVE')
+        if group_slug:
+            group = get_object_or_404(GroupProfile, slug=group_slug)
+            queryset = queryset.filter(group=group)
+        if category_identifier:
+            cat = get_object_or_404(TopicCategory, identifier=category_identifier)
+            queryset = queryset.filter(category=cat)
+        return queryset
+     #end
 
 class MapResource(CommonModelApi):
 

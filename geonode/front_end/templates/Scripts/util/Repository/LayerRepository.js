@@ -167,9 +167,18 @@
                     });
                 });
             },
-            getLayers: function(url) {
+            getLayers: function(group, category) {
                 var deferred = $q.defer();
-                $http.get('api/layers/', {
+                var query_string = '?';
+                if (group !== null)
+                {
+                    query_string += "group=" + group + "&";
+                }
+                if (category !== null){
+                    query_string += "cat=" + category;
+                }
+                var layers_url = 'api/layers/' + query_string;
+                $http.get(layers_url, {
                     headers: {
                         'X-CSRFToken': $cookies.get('csrftoken')
                     }

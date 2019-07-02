@@ -362,10 +362,10 @@
             }
         }        
 
-        var analyticsGISUrl='api/analytics/gis/';
-        var postAnalyticsData=$interval( function(){ 
-            analyticsService.postGISAnalyticsToServer(analyticsGISUrl);
-         }, 60000);
+        // var analyticsGISUrl='api/analytics/gis/';
+        // var postAnalyticsData=$interval( function(){
+        //     analyticsService.postGISAnalyticsToServer(analyticsGISUrl);
+        //  }, 60000);
          postMapOrLayerLoadData();
 
         (getGeoServerSettings)();

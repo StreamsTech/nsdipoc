@@ -1,13 +1,15 @@
 ﻿appModule.controller('catalogBrowserController', catalogBrowserController);
 catalogBrowserController.$inject = ['$scope',
+    '$http',
     '$rootScope',
     'surfToastr',
     'mapService',
     'layerService',
+    'categoryListService',
     '$modalInstance'
 ];
 
-function catalogBrowserController($scope, $rootScope, surfToastr, mapService, layerService, $modalInstance) {
+function catalogBrowserController($scope, $http, $rootScope, surfToastr, mapService, layerService, categoryListService, $modalInstance) {
 
     $scope.serverList = [{
             name: 'Geoserver',
@@ -22,6 +24,13 @@ function catalogBrowserController($scope, $rootScope, surfToastr, mapService, la
         // }
     ];
 
+    $scope.organization = {
+        selectedOrganization:null
+    };
+    $scope.category = {
+        selectedCategory:null
+    };
+
     function loadLayersByWms(server) {
         var url = server.url + '?service=wms&tiled=true&request=GetCapabilities&access_token=9df608bcabe911e7a833080027252357';
         layerService.fetchWmsLayers(url)
@@ -33,15 +42,15 @@ function catalogBrowserController($scope, $rootScope, surfToastr, mapService, la
             });
     }
 
-    function loadLayersByApi(server) {
-        layerService.fetchLayers()
+    function loadLayersByApi(server, group, category) {
+        layerService.fetchLayers(group, category)
             .then(function(res) {
                 $scope.layers = res;
             });
     }
     $scope.loadLayers = function(server) {
         $scope.selectedServerName = server.name;
-        server.method(server);
+        server.method(server, $scope.organization.selectedOrganization, $scope.category.selectedCategory);
 
     };
 
@@ -58,5 +67,42 @@ function catalogBrowserController($scope, $rootScope, surfToastr, mapService, la
     $scope.closeDialog = function() {
         $modalInstance.close();
     };
+
+    $scope.initdata = function(){
+        $scope.loadCategoryList();
+        $scope.loadOrganizationsList();
+        $scope.organization.selectedOrganization = null;
+        $scope.category.selectedCategory = null;
+        $scope.loadLayers($scope.serverList[0])
+    };
+
+    $scope.loadCategoryList = function(){
+        var url = '/api/categories/';
+
+        categoryListService.getDataList(url).then(function (datalist) {
+            $scope.categories = datalist.data.objects;
+
+
+        });
+    };
+
+    $scope.loadOrganizationsList = function(){
+        var url = '/api/groups/';
+
+        categoryListService.getDataList(url).then(function (datalist) {
+            $scope.organizations = datalist.data.objects;
+
+
+        });
+    };
+
+    $scope.updateLayersWithOrganization = function () {
+        $scope.loadLayers($scope.serverList[0])
+
+    };
+    $scope.updateLayersWithCategory = function () {
+        $scope.loadLayers($scope.serverList[0])
+
+    }
 
 }
