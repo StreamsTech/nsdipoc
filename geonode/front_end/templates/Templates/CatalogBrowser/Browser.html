@@ -66,10 +66,10 @@
                     <div class="list-group" style="overflow-y: auto;height:382px;margin-right:2px;">
                
                     <div class="list-group-item" style="overflow: hidden;border-radius:0" ng-repeat="layer in layers | filter: searchKeyword" >
-                        <div class="col-md-10"> 
-                            [{layer.Name}]
+                        <div class="col-md-10" style="padding-left: 0;">
+                          <img src="[{layer.organization_logo}]" width="40" height="40"/>  [{layer.Name}]
                         </div>  
-                        <div class="col-md-2">
+                        <div class="col-md-2" style="padding-right: 0;text-align: right">
                             <button class="btn btn-primary" ng-click="addLayer(layer)">Add</button>
                         </div>  
                     </div>
