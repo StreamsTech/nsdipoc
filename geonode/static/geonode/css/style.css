@@ -3960,3 +3960,11 @@ vertical-align: middle !important;
    margin-left: 5px !important;
     margin-right: 5px;
 }
+
+
+@media (max-width: 1324px) {
+
+    .container{
+        width: 100%;
+    }
+}
