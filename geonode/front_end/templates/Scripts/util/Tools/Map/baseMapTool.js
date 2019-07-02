@@ -232,6 +232,16 @@
                 addxyzPart(baseMaps, 'Stamen', '{z}/{x}/{y}.png');
                 return baseMaps;
             }
+
+            function getSobBaseMaps(){
+                var baseMaps = [];
+                var urlRoot = 'http://nsdi.gov.bd/';
+                baseMaps.push({title: '1M', url: urlRoot+'uploaded/basemaps/sob/1M/',thumb : 'sob1M.jpg'});
+                baseMaps.push({title: '50K', url: urlRoot+'uploaded/basemaps/sob/50K/',thumb : 'sob50K.jpg'});
+                baseMaps.push({title: '25K', url: urlRoot+'uploaded/basemaps/sob/25K/',thumb : 'sob25K.jpg'});
+                addxyzPart(baseMaps, 'SOBMAPS', '{z}/{x}/{y}.png');
+                return baseMaps;
+            }
     
             function getEsriBaseMaps(){
                 var baseMaps = [];
@@ -379,7 +389,8 @@
                 otherBaseLayers = otherBaseLayers.concat(getOSMBaseMaps(),
                     getThunderForestBaseMaps(), 
                     getStamenBaseMaps(),
-                    getEsriBaseMaps());
+                    getEsriBaseMaps(),
+                    getSobBaseMaps());
     
                 var olLayers = _.map(otherBaseLayers, function(item){
     
