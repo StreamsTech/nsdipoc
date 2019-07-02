@@ -3951,3 +3951,12 @@ vertical-align: middle !important;
 {
    display: block;
 }
+.button-bar
+{
+    margin-bottom: 10px;
+}
+.button-bar select
+{
+   margin-left: 5px !important;
+    margin-right: 5px;
+}
