@@ -22,10 +22,10 @@ from django.conf.urls import patterns, url
 from django.conf import settings
 from django.views.generic import TemplateView
 from .views import (
-    LayerStyleView, 
-    LayerAttributeView, 
-    LayerAttributeRangeView, 
-    LayerStyleListAPIView, 
+    LayerStyleView,
+    LayerAttributeView,
+    LayerAttributeRangeView,
+    LayerStyleListAPIView,
     StyleExtensionRetrieveUpdateAPIView,
     GeoLocationApiView
 )
@@ -36,7 +36,9 @@ js_info_dict = {
 
 urlpatterns = patterns(
     'geonode.layers.views',
-    url(r'^$', TemplateView.as_view(template_name='list_search/layers/layers_list.html'), {'is_layer': True}, name='layer_browse'),
+    url(r'^$', TemplateView.as_view(template_name='list_search/templates/resources_list.html'),
+        {'resource_type': 'layer'},
+        name='layer_browse'),
     # url(r'^$', TemplateView.as_view(template_name='layers/layer_list.html'), {'is_layer': True}, name='layer_browse'),
     url(r'^upload$', 'layer_upload', name='layer_upload'),
     url(r'^(?P<layername>[^/]*)$', 'layer_detail', name="layer_detail"),
@@ -45,7 +47,8 @@ urlpatterns = patterns(
     url(r'^(?P<granule_id>[^/]*)/(?P<layername>[^/]*)/granule_remove$', 'layer_granule_remove',
         name="layer_granule_remove"),
     url(r'^(?P<layername>[^/]*)/replace$', 'layer_replace', name="layer_replace"),
-    url(r'^restore/organization/layers$', 'restoreBackedupOrganizationLayers', name="restore-backedup-organization-layers"),
+    url(r'^restore/organization/layers$', 'restoreBackedupOrganizationLayers',
+        name="restore-backedup-organization-layers"),
     url(r'^(?P<layername>[^/]*)/newlayer$', 'add_new_layer', name="add_new_layer"),
     url(r'^(?P<layername>[^/]*)/thumbnail$', 'layer_thumbnail', name='layer_thumbnail'),
     url(r'^(?P<layername>[^/]*)/get$', 'get_layer', name='get_layer'),
@@ -54,8 +57,8 @@ urlpatterns = patterns(
     url(r'^organization/layers/backup$', 'backupOrganizationLayers', name='organization-layers-backup'),
     url(r'^organization/layers/backup/view$', 'organizationLayerBackupView', name='organization-layers-backup-view'),
 
-#@jahangir091
-#layer publish activity urls
+    # @jahangir091
+    # layer publish activity urls
     url(r'^(?P<layer_pk>[0-9]+)/publish$', 'layer_publish', name='layer-publish'),
     url(r'^(?P<layer_pk>[0-9]+)/approve$', 'layer_approve', name='layer-approve'),
     url(r'^(?P<layer_pk>[0-9]+)/draft$', 'layer_draft', name='layer-draft'),
@@ -65,8 +68,7 @@ urlpatterns = patterns(
     url(r'^(?P<layername>[^/]*)/preview$', 'layer_permission_preview', name="layer_permission_preview"),
     url(r'^orglayers/stat$', 'organization_wise_layer_stat', name="layer_stat"),
 
-
-#end
+    # end
     # url(r'^api/batch_permissions/?$', 'batch_permissions',
     #    name='batch_permssions'),
     # url(r'^api/batch_delete/?$', 'batch_delete', name='batch_delete'),
@@ -81,13 +83,17 @@ if 'geonode.geoserver' in settings.INSTALLED_APPS:
                            url(r'^download$', 'layer_batch_download', name='layer_batch_download_dep'),
                            ) + urlpatterns
 
-#custom
+# custom
 urlpatterns = patterns('',
-    url(r'^geo-location$', TemplateView.as_view(template_name='layers/geo-location.html'), name='geo_location'),
-    url(r'^api/geo-location/$', GeoLocationApiView.as_view(), name='api_geo_location'),
-    url(r'^(?P<layername>[^/]*)/style/$', LayerStyleView.as_view(), name='layer_style'),
-    url(r'^style/(?P<pk>[0-9]+)/$', StyleExtensionRetrieveUpdateAPIView.as_view(), name='style_extention'),
-    url(r'^(?P<layername>[^/]*)/styles/$', LayerStyleListAPIView.as_view(), name='layer_styles'),
-    url(r'^(?P<layername>[^/]*)/unique-value-for-attribute/(?P<attributename>[^/]*)/$', LayerAttributeView.as_view(), name='layer_attribute'),
-    url(r'^(?P<layername>[^/]*)/range-value-for-attribute/$', LayerAttributeRangeView.as_view(), name='layer_range_attribute'),
-) + urlpatterns
+                       url(r'^geo-location$', TemplateView.as_view(template_name='layers/geo-location.html'),
+                           name='geo_location'),
+                       url(r'^api/geo-location/$', GeoLocationApiView.as_view(), name='api_geo_location'),
+                       url(r'^(?P<layername>[^/]*)/style/$', LayerStyleView.as_view(), name='layer_style'),
+                       url(r'^style/(?P<pk>[0-9]+)/$', StyleExtensionRetrieveUpdateAPIView.as_view(),
+                           name='style_extention'),
+                       url(r'^(?P<layername>[^/]*)/styles/$', LayerStyleListAPIView.as_view(), name='layer_styles'),
+                       url(r'^(?P<layername>[^/]*)/unique-value-for-attribute/(?P<attributename>[^/]*)/$',
+                           LayerAttributeView.as_view(), name='layer_attribute'),
+                       url(r'^(?P<layername>[^/]*)/range-value-for-attribute/$', LayerAttributeRangeView.as_view(),
+                           name='layer_range_attribute'),
+                       ) + urlpatterns

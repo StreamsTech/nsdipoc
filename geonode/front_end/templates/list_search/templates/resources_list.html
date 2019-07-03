@@ -14,7 +14,7 @@
 
     </style>
 
-    <div ng-app="listSearchApp" ng-controller="ResourceListSearchController" ng-init="initdata('layer')">
+    <div ng-app="listSearchApp" ng-controller="ResourceListSearchController" ng-init="initdata()">
 
 
         <div class="d-title">{% trans "Explore Layers" %}</div>
@@ -62,8 +62,7 @@
                     <option value="">All Category</option>
                 </select>
 
-                <a href="{% url "layer_browse" %}" class="btn btn-primary pull-right">{% trans "All Layers" %}</a>
-
+                <a href="{% url "layer_browse" %}" class="btn btn-primary pull-right">{% trans "All" %}</a>
 
             </div>
 
@@ -103,17 +102,14 @@
 
 
                 <div class="btn-group">
-                    {% if not user.is_authenticated %}
-                        <a onclick="layerpopup('SigninModal');" class="btn btn-gd-primary pull-right icon-btn-color">
-                            {% trans "Upload Layers" %} <i class="fa fa-cloud-upload" aria-hidden="true"></i>
-                        </a>
-                    {% endif %}
                     {% if user.is_authenticated %}
-
-
-                        <a href="{% url "layer_upload" %}" class="btn btn-primary pull-right">{% trans "Upload Layer" %}</a>
-
-
+                    {% if resource_type == 'layer' %}
+                        <a href="{% url "layer_upload" %}" class="btn btn-primary pull-right">{% trans "Upload Layer" %}  <i class="fa fa-cloud-upload" aria-hidden="true"></i></a>
+                    {% elif resource_type == 'document' %}
+                        <a href="{% url "document_upload" %}" class="btn btn-primary pull-right">{% trans "Upload Document" %} <i class="fa fa-file-o" aria-hidden="true"></i></a>
+                    {% elif resource_type == 'map' %}
+                    <a href="{% url "new_map" %}" class="btn btn-primary pull-right">{% trans "Create a New Map" %}  <i class="fa fa-map-marker" aria-hidden="true"></i></a>
+                    {% endif %}
                     {% endif %}
                 </div>
 
@@ -243,18 +239,11 @@
 {% block extra_script %}
     <script src="{{ STATIC_URL }}list_search/js/apps.js"></script>
     <script src="{{ STATIC_URL }}list_search/js/services.js"></script>
-    <script src="{{ STATIC_URL }}list_search/js/layers.listsearch.controllers.js"></script>
+    <script src="{{ STATIC_URL }}list_search/js/resource.listsearch.controllers.js"></script>
 
-    <!--<script>-->
-    <!--var input = document.getElementById('myinput');-->
-    <!--var message = document.getElementsByClassName('newone')[0];-->
-    <!--input.addEventListener('focus', function () {-->
-    <!--message.style.display = 'block';-->
-    <!--});-->
-    <!--input.addEventListener('focusout', function () {-->
-    <!--message.style.display = 'none';-->
-    <!--});-->
-    <!--</script>-->
+<script>
+    window.explore_resource_type = "{{resource_type}}";
+</script>
 
 {% endblock extra_script %}
 

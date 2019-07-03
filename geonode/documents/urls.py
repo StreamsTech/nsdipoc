@@ -29,7 +29,8 @@ js_info_dict = {
 }
 
 urlpatterns = patterns('geonode.documents.views',
-                       url(r'^$', TemplateView.as_view(template_name='documents/document_list.html'),
+                       url(r'^$', TemplateView.as_view(template_name='list_search/templates/resources_list.html'),
+                           {'resource_type': 'document'},
                            name='document_browse'),
                        url(r'^(?P<docid>\d+)/?$', 'document_detail', name='document_detail'),
                        url(r'^(?P<docid>\d+)/download/?$', 'document_download', name='document_download'),
@@ -42,15 +43,15 @@ urlpatterns = patterns('geonode.documents.views',
                            name='document_metadata_detail'),
                        url(r'^(?P<docid>\d+)/metadata$', 'document_metadata', name='document_metadata'),
 
-                       url(r'^(?P<docid>\d+)/preview$', 'document_permission_preview', name="document_permission_preview"),
+                       url(r'^(?P<docid>\d+)/preview$', 'document_permission_preview',
+                           name="document_permission_preview"),
 
-
-	#@jahangir091
+                       # @jahangir091
                        # urls for publishing documents through workspace
                        url(r'^(?P<document_pk>[0-9]+)/delete$', 'document_delete', name='document-delete'),
                        url(r'^(?P<document_pk>[0-9]+)/publish$', 'document_publish', name='document-publish'),
                        url(r'^(?P<document_pk>[0-9]+)/approve$', 'document_approve', name='document-approve'),
                        url(r'^(?P<document_pk>[0-9]+)/deny$', 'document_deny', name='document-deny'),
-	#end
+                       # end
 
                        )

@@ -23,7 +23,8 @@ from django.conf import settings
 from django.views.generic import TemplateView
 
 from geonode.maps.qgis_server_views import MapCreateView, MapDetailView
-from geonode.maps.views import WmsServerList, WmsServerCreate, WmsServerUpdate, WmsServerDelete, MapLayerRetrieveUpdateAPIView
+from geonode.maps.views import WmsServerList, WmsServerCreate, WmsServerUpdate, WmsServerDelete, \
+    MapLayerRetrieveUpdateAPIView
 
 js_info_dict = {
     'packages': ('geonode.maps',),
@@ -44,7 +45,7 @@ elif 'geonode_qgis_server' in settings.INSTALLED_APPS:
 urlpatterns = patterns(
     'geonode.maps.views',
     url(r'^$',
-        TemplateView.as_view(template_name='maps/map_list.html'),
+        TemplateView.as_view(template_name='list_search/templates/resources_list.html'), {'resource_type': 'map'},
         name='maps_browse'),
     url(r'^bccviewmap$', TemplateView.as_view(template_name='maps/bccviewmap.html'), name='bccviewmap'),
     url(r'^new$', new_map_view, name="new_map"),
@@ -84,7 +85,7 @@ urlpatterns = patterns(
 
     url(r'^(?P<mapid>[^/]+)/preview$', 'map_permission_preview', name="map_permission_preview"),
 
-    #@jahangjir091
+    # @jahangjir091
     # urls for publishing maps through workspace
     url(r'^(?P<map_pk>[0-9]+)/delete$', 'map_delete', name='map-delete'),
     url(r'^(?P<map_pk>[0-9]+)/publish$', 'map_publish', name='map-publish'),
@@ -98,11 +99,12 @@ urlpatterns = patterns(
     url(r'^wms/server/(?P<server_pk>[0-9]+)$', WmsServerUpdate.as_view(), name='wms-server-update'),
     url(r'^wms/server/(?P<server_pk>[0-9]+)/delete$', WmsServerDelete.as_view(), name='wms-server-delete'),
 
-#end
+    # end
 
 )
 
-#custom
+# custom
 urlpatterns = patterns('',
-    url(r'^(?P<map_id>[0-9]+)/layer/(?P<layername>[^/]*)/$', MapLayerRetrieveUpdateAPIView.as_view(), name='map_layer'),
-) + urlpatterns
+                       url(r'^(?P<map_id>[0-9]+)/layer/(?P<layername>[^/]*)/$', MapLayerRetrieveUpdateAPIView.as_view(),
+                           name='map_layer'),
+                       ) + urlpatterns

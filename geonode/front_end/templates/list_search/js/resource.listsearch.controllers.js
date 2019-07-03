@@ -127,8 +127,8 @@
 
 
             //----------------------------------------------------------------------------------------------------------
-            self.initdata = function (resource_type) {
-                self.resource_type = resource_type;
+            self.initdata = function () {
+                self.resource_type = $window.explore_resource_type;
                 self.orderby.selectedOrderBy = '-date';
                 self.loadOrganizationsList();
                 self.loadCategoryList();
