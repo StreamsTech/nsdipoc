@@ -273,71 +273,9 @@
             function getOlBaseMaps() {
     
                 var baseLayers = [
-                 {
 
-                        title: 'Vector',
-
-                        olLayer: new ol.layer.Tile({
-
-                            title: 'Vector',
-
-                            visible: false,
-
-                            source: new ol.source.TileWMS({
-                                url: urlResolver.resolveGeoserverTile(),
-                                params: {'LAYERS': 'cite:sob_base_map_vector_group', 'TILED': true},
-                                serverType: 'geoserver',
-                                // Countries have transparency, so do not fade tiles:
-                                transition: 0
-                              })
-
-                        }),
-                        groupName: 'SOB',
-                        thumb : 'map-thumb.jpg'
-
-                    },
                     {
 
-                        title: 'Raster',
-
-                        olLayer: new ol.layer.Tile({
-
-                            title: 'Raster',
-
-                            visible: false,
-
-                            source: new ol.source.TileWMS({
-                                url: urlResolver.resolveGeoserverTile(),
-                                params: {'LAYERS': 'cite:78L11AR', 'TILED': true},
-                                serverType: 'geoserver',
-                                // Countries have transparency, so do not fade tiles:
-                                transition: 0
-                              })
-
-                        }),
-                        groupName: 'SOB',
-                        thumb : 'map-thumb.jpg'
-
-                    },
-    
-                    {
-    
-                        title: 'Map Quest Satellite',
-    
-                        olLayer: new ol.layer.Tile({
-    
-                            title: 'Map Quest Satellite',
-    
-                            visible: false,
-    
-                            source: new ol.source.MapQuest({ layer: 'sat' })
-    
-                        }),
-                        groupName: 'Others',
-                        thumb : 'map-thumb.jpg'
-    
-                    }, {
-    
                         title: 'No Map',
     
                         olLayer: new ol.layer.Image({
