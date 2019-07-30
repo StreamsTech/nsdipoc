@@ -49,6 +49,7 @@ class GeoserverWMSGetFeatureInfoListAPIView(ListAPIView, GeoServerMixin):
             if not response:
                 response = v
             else:
-                response['features'] += v['features']
+                if 'features' in v:
+                    response['features'] += v['features']
 
         return Response(response, status=status.HTTP_200_OK)
