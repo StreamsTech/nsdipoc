@@ -7,12 +7,17 @@ from geonode.class_factory import ClassFactory
 from geonode.layers.models import Layer
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated
+from django.utils.translation import ugettext as _
 
 from geonode.rest_authentications import CsrfExemptSessionAuthentication
 from rest_framework.response import Response
 from rest_framework import status
 from geonode.groups.models import GroupProfile
 from geonode.layers.api.utils import updateBoundingBox, getShapeFileFromAttribute, uploadLayer, changeDbFieldTypes, reloadFeatureTypes
+from geonode.nsdi.utils import get_organization
+from geonode.layers.views import _resolve_layer
+
+_PERMISSION_MSG_VIEW = _("You are not permitted to update this layer")
 
 
 class LayerFeatureUploadView(CreateAPIView):
@@ -31,6 +36,11 @@ class LayerFeatureUploadView(CreateAPIView):
         factory = ClassFactory(self._EXTRA_FIELD)
         try:
             layer = Layer.objects.get(id=pk)
+            layer = _resolve_layer(
+                request,
+                layer.typename,
+                'base.view_resourcebase',
+                _PERMISSION_MSG_VIEW)
             model_instance = factory.get_model(name=str(layer.title_en), 
                                                 table_name=str(layer.name),
                                                 db=str(layer.store))
@@ -71,14 +81,14 @@ class CreateFeaturedLayer(CreateAPIView):
 
         layer_title = request.data.get('layer_title')
 
-        group = GroupProfile.objects.get(id=request.data.get('organization_id'))
+        group = get_organization(request.user)
 
         keywords = []
         if layer_title is not None and len(layer_title) > 0:
             keywords = layer_title.split()
 
         base_file, tempdir = getShapeFileFromAttribute(**request.data)
-        saved_layer = uploadLayer(base_file=base_file, user=request.user, group=group, keywords=keywords, **request.data)
+        saved_layer = uploadLayer(base_file=base_file, user=request.user, group=group, keywords=keywords, user_data_epsg=4326, **request.data)
 
         #primarily all the columns of the saved_layer is character variyng
         #now we should change column types according to given types
@@ -90,6 +100,13 @@ class CreateFeaturedLayer(CreateAPIView):
         ## this method does this task
         reloadFeatureTypes(saved_layer)
 
+        saved_layer.current_version = 1
+        saved_layer.latest_version = 1
+        saved_layer.geometry_type = request.data.get('layer_type').lower()
+        saved_layer.save()
+        permissions = request.data.get('permissions')
+        if permissions is not None and len(permissions.keys()) > 0:
+            saved_layer.set_permissions(permissions)
         out['layer_id'] = saved_layer.id
 
         if not saved_layer:
