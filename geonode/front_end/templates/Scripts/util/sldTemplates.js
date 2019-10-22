@@ -374,8 +374,8 @@ appModule.factory('sldTemplateService', [function() {
             '</ogc:PropertyIsGreaterThanOrEqualTo>',
         getPropertyIsBetween :'<ogc:PropertyIsBetween>' +
             '<ogc:PropertyName>{0}</ogc:PropertyName>' +
-            '<ogc:LowerBoundary>{1}</ogc:LowerBoundary>' +
-             '<ogc:UpperBoundary>{2}</ogc:UpperBoundary>' +
+            '<ogc:LowerBoundary><ogc:Literal>{1}</ogc:Literal></ogc:LowerBoundary>' +
+             '<ogc:UpperBoundary><ogc:Literal>{2}</ogc:Literal></ogc:UpperBoundary>' +
             '</ogc:PropertyIsBetween>',
         getPropertyIsLike : '<ogc:PropertyIsLike wildCard="*" singleChar="." escape="!">' +
             '<ogc:PropertyName>{0}</ogc:PropertyName>' +
