@@ -102,7 +102,7 @@ PyJWT==1.5.3
 pyproj==1.9.5.1
 pyshp==1.2.3
 python-dateutil==2.5.3
-python-gnupg==0.4.1
+python-gnupg==0.4.4
 python-mimeparse==1.5.2
 python-openid==2.2.5
 python-social-auth==0.2.19
