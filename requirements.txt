@@ -121,7 +121,7 @@ transifex-client==0.10
 ua-parser==0.7.3
 unicodecsv==0.14.1
 Unidecode==0.4.19
-urllib3==1.22
+urllib3==1.26.5
 user-agents==1.1.0
 vine==1.1.4
 xlrd==1.1.0
