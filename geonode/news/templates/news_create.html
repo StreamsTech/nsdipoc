@@ -3,14 +3,14 @@
 
 {% load i18n %}
 {% load base_tags %}
-{% block title %} {% trans "Add News" %} - {{ block.super }} {% endblock %}
+{% block title %} {% trans "Add Event" %} - {{ block.super }} {% endblock %}
 
 {% block body_outer %}
 
 <div class="gd-content container">
     <div class="d-title">
     
-          {% trans "Add News" %}
+          {% trans "Add Event" %}
       
     </div>
 
@@ -59,9 +59,9 @@
                         {% endfor %}
                             <div class="block-separator"></div>
                             {% if news.id %}
-                                <button type="submit" id="" class="btn btn-gd-primary">Update News</button>
+                                <button type="submit" id="" class="btn btn-gd-primary">Update Event</button>
                               {% else %}
-                                <button type="submit" id="" class="btn btn-gd-primary">Add News</button>
+                                <button type="submit" id="" class="btn btn-gd-primary">Add Event</button>
                             {% endif %}
                         </div>
                         </form>
