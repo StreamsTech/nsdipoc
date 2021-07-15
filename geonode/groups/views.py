@@ -57,7 +57,7 @@ def group_create(request):
             group = form.save(commit=False)
             group.save()
             form.save_m2m()
-            user = Profile.objects.get(id=request.POST['admin'])
+            user = Profile.objects.get(id=request.POST['admins'])
             group.join(user, role="manager")
             return HttpResponseRedirect(
                 reverse(
