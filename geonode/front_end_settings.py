@@ -13,7 +13,7 @@ NSDI_FRONT_END_SETTINGS = {
         'search_engine_title': 'NSDI',
         'navbar_css': settings.STATIC_URL + 'static/navbar-nsdi.css?',
         'restore_organization_layers': True,
-        'standardization': True,
+        'framework': True,
 
     },
     'layer_detail_page': {

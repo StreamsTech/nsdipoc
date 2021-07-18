@@ -214,10 +214,9 @@
 			        {% endif %}
 
                     <li><a href="{% url "news-list" %}">{% trans "Events" %}</a></li>
-                    {% if request.user.is_superuser or request.user.is_manager_of_any_group and FRONT_END_SETTINGS.templates_base.standardization %}
-			        <li class="dropdown">
+                    <li class="dropdown">
 			            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-			               aria-haspopup="true" aria-expanded="false">{% trans "Standardisation" %}<span class="caret"></span></a>
+			               aria-haspopup="true" aria-expanded="false">{% trans "Framework" %}<span class="caret"></span></a>
 			            <!--<a href="#">explore<span class="sr-only">(current)</span></a> -->
 			            <ul class="dropdown-menu">
 			                <li id="nav_maps">
@@ -228,7 +227,6 @@
 			                </li>
 			            </ul>
 			        </li>
-			        {% endif %}
 
 
                                     {% endblock %}
