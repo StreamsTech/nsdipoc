@@ -8,6 +8,6 @@ urlpatterns = patterns(
     'geonode.news.views',
 
     url(r'^projection/?$', TemplateView.as_view(template_name='projection.html'), name='projection'),
-    url(r'^nsdi-policy/?$', TemplateView.as_view(template_name='policy.html'), name='nsdi-policy'),
+    url(r'^nsdi-policy/?$', TemplateView.as_view(template_name='nsdi_policy.html'), name='nsdi-policy'),
 
 )
