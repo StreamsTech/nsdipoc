@@ -233,14 +233,25 @@
                 return baseMaps;
             }
 
+            // function getSobBaseMaps(){
+            //     var baseMaps = [];
+            //     var urlRoot = 'http://nsdi.gov.bd/';
+            //     baseMaps.push({title: 'Topography', url: urlRoot+'uploaded/basemaps/sob/topography/',thumb : 'topo.jpg'});
+            //     baseMaps.push({title: 'Orthophoto', url: urlRoot+'uploaded/basemaps/sob/orthophoto/',thumb : 'ortho.png'});
+            //     baseMaps.push({title: 'DEM', url: urlRoot+'uploaded/basemaps/sob/dem/',thumb : 'dem.png'});
+            //     addxyzPart(baseMaps, 'SoB', '{z}/{x}/{y}.png');
+            //     return baseMaps;
+            // }
+
             function getSobBaseMaps(){
                 var baseMaps = [];
-                var urlRoot = 'http://nsdi.gov.bd/';
-                baseMaps.push({title: 'Topography', url: urlRoot+'uploaded/basemaps/sob/topography/',thumb : 'topo.jpg'});
-                baseMaps.push({title: 'Orthophoto', url: urlRoot+'uploaded/basemaps/sob/orthophoto/',thumb : 'ortho.png'});
-                baseMaps.push({title: 'DEM', url: urlRoot+'uploaded/basemaps/sob/dem/',thumb : 'dem.png'});
-                addxyzPart(baseMaps, 'SoB', '{z}/{x}/{y}.png');
-                return baseMaps;
+                var urlRoot = 'http://nsdi.gov.bd/uploaded/basemaps/sob';
+                var sobServerURLRoot = 'http://data.sob.gov.bd/maptiles';
+                 baseMaps.push({title: 'Topography', url: sobServerURLRoot+'/topo/',thumb : 'topo.jpg'});
+                 baseMaps.push({title: 'Orthophoto', url: sobServerURLRoot+'/ortho/',thumb : 'ortho.png'});
+                 baseMaps.push({title: 'DEM', url: urlRoot+'uploaded/basemaps/sob/dem/',thumb : 'dem.png'});
+                 addxyzPart(baseMaps, 'SoB', '{z}/{x}/{y}.png');
+                 return baseMaps;
             }
     
             function getEsriBaseMaps(){
