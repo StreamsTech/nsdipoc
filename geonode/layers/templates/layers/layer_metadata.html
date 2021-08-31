@@ -30,14 +30,10 @@
         <div class="row">
             <div class="col-md-8">
                 <div class="lead">
-                    <span style="color:red;"> * Marked fields are mandatory</span>
-                </div>
-                <div class="lead">
-                    <span style="color:red;"> (*) Marked fields are mandatory for layer to push for approval</span>
-                </div>
-                <div class="lead">
                     {% blocktrans with layer.typename as layer_title %}
                         Editing details for {{ layer_title }}
+                    <br>
+                    <span style="color:red; font-size: 13px;"> (*) Marked fields are mandatory for layer to push for approval</span>
                     {% endblocktrans %}
                 </div>
                 <form id="layer_metadata_update" class="form-horizontal"
@@ -108,7 +104,7 @@
 
                     <div class="row">
                         <div class="col-md-12">
-                            <label class="control-label required-field" for="id_resourece-category" ><span> * </span>{% trans "Category" %}&nbsp;</label>
+                            <label class="control-label required-field" for="id_resourece-category" >{% trans "Category" %}&nbsp;</label>
                             <fieldset id="category_form">
                                 {% autoescape off %}
                                     {% for choice in category_form.category_choice_field.field.choices %}
@@ -198,5 +194,5 @@
 </div>
 {% endblock %}
 {% block extra_script %}
- {% include 'metadata_form_js.html' %} 
+ {% include 'metadata_form_js.html' %}
 {% endblock %}
