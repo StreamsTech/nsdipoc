@@ -213,6 +213,7 @@ _DEFAULT_STATICFILES_DIRS = [
     # os.path.join(PROJECT_ROOT, "front_end/templates/Scripts/"),
     os.path.join(PROJECT_ROOT, "front_end/templates/"),
     os.path.join(PROJECT_ROOT, "nsdi_frontend/templates/"),
+    os.path.join(PROJECT_ROOT, "standardization/static/"),
 
 ]
 
@@ -394,7 +395,8 @@ INSTALLED_APPS = (
 
     'oauth2_provider',
     'captcha',
-    'url_filter'
+    'url_filter',
+    'crispy_forms',
 
 ) + GEONODE_APPS
 

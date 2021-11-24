@@ -1,0 +1,22 @@
+<div class="catalog-browser" style="height: 100%; width: 100%;">
+    <div class="modal-header">
+        <i class="fa fa-times-circle modal-close-icon" style="float: right; cursor: pointer"
+            ng-click="closeDialog()"></i>
+        <h4 class="modal-title">Error list</h4>
+    </div>
+    <div class="row topic-cat-list-data" style="margin-right:0; margin-left:0; " ng-repeat="item in error_list">
+                <div class="col-md-2">
+                    [{item.cell}]
+                </div>
+
+                <div class="col-md-10">
+                    expected data type  [{item.expected}]  but  [{item.given}]  is given.
+                </div>
+
+        </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" ng-click="closeDialog()">Close</button>
+    </div>
+
+</div>

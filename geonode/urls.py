@@ -184,6 +184,8 @@ urlpatterns = patterns('',
                        url(r'^api/nsdi/', include('geonode.nsdi.api.urls')),
                        url(r'^api/list_search/', include('geonode.list_search.api.urls')),
 
+                       url(r'^api/', include('geonode.standardization.api.urls')),
+
                        url(r'', include(api.urls)),
 
                        # Analytics
