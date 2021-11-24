@@ -3,7 +3,6 @@ import logging
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import LimitOffsetPagination
 
-from geonode.data_upload.utils import get_table_headers
 from geonode.standardization.models import DataProductSpecification
 from geonode.standardization.api.serializers import DPSSerializer
 
