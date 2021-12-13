@@ -226,7 +226,7 @@
 			                  <a href="{% url "nsdi-policy" %}">{% trans "NSDI Policy" %}</a>
 			                </li>
                             <li id="nav_layers">
-			                  <a href="{% url "nsdi-dps" %}">{% trans "Data Product Specifications" %}</a>
+			                  <a href="{% url "nsdi-dps-list" %}">{% trans "Data Product Specifications" %}</a>
 			                </li>
 			            </ul>
 			        </li>
@@ -987,6 +987,13 @@
 
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jstree/3.3.5/themes/default/style.min.css"/>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jstree/3.3.5/jstree.min.js"></script>
+
+    <script src="{{ STATIC_URL }}Scripts/util/appMessages.js"></script>
+    <script src="{{ STATIC_URL }}Scripts/lib/toastr.min.js"></script>
+    <script src="{{ STATIC_URL }}Scripts/util/surfToastr.js"></script>
+    <script src="{{ STATIC_URL }}.components/angular-file-upload/dist/angular-file-upload.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular-cookies.min.js"></script>
+    <script src="{{ STATIC_URL }}js/standardization_app.js"></script>
 
     {% block extra_script %}{% endblock extra_script %}
 
