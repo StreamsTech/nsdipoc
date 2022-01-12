@@ -9,7 +9,7 @@
         <div class="pull-right">
             <div aria-label="tools" class="btn-group top-site-search" role="group">
                 <div class="input-group">
-                    <input autocomplete="off" class="form-control" ng-model="searchedAccount"
+                    <input autocomplete="off" class="form-control" ng-model="searchValue"
                            placeholder="Search DPS" style="height: 38px;border-radius:0;"
                            type="text">
                     <span class="input-group-btn">
@@ -43,7 +43,10 @@
         <table class="table table-striped mb-0">
             <thead>
             <tr>
-                <th scope="col" ng-repeat="header in table_headers">[{header}]</th>
+                <th><a href="#" ng-click="orderData('organization')">Organization <i class="glyphicon glyphicon-sort"></i></a></th>
+                <th><a href="#" ng-click="orderData('document_type')">Type of Document <i class="glyphicon glyphicon-sort"></i></a></th>
+                <th><a href="#" ng-click="orderData('title')">Title <i class="glyphicon glyphicon-sort"></i></a></th>
+                <th><a href="#" ng-click="orderData('creation_date')">Creation Date <i class="glyphicon glyphicon-sort"></i></a></th>
             </tr>
             </thead>
             <tbody>

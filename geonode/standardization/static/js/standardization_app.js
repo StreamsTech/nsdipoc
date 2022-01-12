@@ -101,17 +101,18 @@
         function ($scope, FileUploader, $window, surfToastr, modelDataUploadService, $modal) {
 
             $scope.init = function () {
-                $scope.searchedAccount = null;
+                $scope.searchValue = null;
                 $scope.next_url = null;
                 $scope.previous_url = null;
                 $scope.pageSize = 10;
                 $scope.currentPage = 1;
+                $scope.defaultSortField = "";
 
                 $scope.data_api_url = '../../api/dps-list';
-                get_report_data($scope.data_api_url);
+                get_data($scope.data_api_url);
             };
 
-            function get_report_data(url) {
+            function get_data(url) {
                 modelDataUploadService.getData(url).then(function (data_list) {
                     $scope.report_data = data_list.results;
                     $scope.table_headers = data_list.report_table_headers;
@@ -126,79 +127,38 @@
 
             $scope.filter_data = function () {
                 $scope.currentPage = 1;
-                var query_string = '';
-                if($scope.selectedYearMonth){
-                    var year = $scope.selectedYearMonth.getFullYear();
-                    var month = $scope.selectedYearMonth.getMonth() + 1;
-                    if (month < 10)
-                        month = '0' + month;
-                    query_string += 'year_month=' + year + '-' + month + '&';
+                if($scope.searchValue){
+                    var query_string = 'search=' + $scope.searchValue.toString();
+                    var filter_url = $scope.data_api_url + '?' + query_string;
+                    get_data(filter_url);
                 }
-                if($scope.selectedDma){
-                    query_string += 'dma_id=' + $scope.selectedDma.dma_id + '&'
-                }
-                if($scope.selectedZone){
-                    query_string += 'zone_id=' + $scope.selectedZone.zone_id + '&'
-                }
-                if ($scope.searchedAccount){
-                    query_string += 'account_id=' + $scope.searchedAccount + '&'
-                }
-                var filter_url = $scope.data_api_url + '?' + query_string;
-                get_report_data(filter_url);
-
+                get_data($scope.data_api_url);
             };
 
-            $scope.changeZone = function(){
-                $scope.selectedDma = null;
-                $scope.dmaListUnderZone = [];
-                if ($scope.selectedZone){
-                    var zone = $scope.selectedZone.zone_id;
-                    $scope.dmaListUnderZone = $scope.report_filter_options.all_dma.filter(function(dma) { return dma.zone_id == zone });
+            $scope.orderData = function (orderValue){
+                if(orderValue == $scope.defaultSortField){
+                    $scope.defaultSortField = '-' + $scope.defaultSortField;
                 }
-                $scope.filter_data();
-
+                else {
+                    $scope.defaultSortField = orderValue;
+                }
+                var filter_url = $scope.data_api_url + '?ordering=' + $scope.defaultSortField;
+                get_data(filter_url);
             };
 
             $scope.next = function () {
                 if($scope.next_url){
                     $scope.currentPage += 1;
-                    get_report_data($scope.next_url);
+                    get_data($scope.next_url);
                     }
             };
 
             $scope.previous = function () {
                 if($scope.previous_url){
                     $scope.currentPage -= 1;
-                    get_report_data($scope.previous_url);
+                    get_data($scope.previous_url);
                     }
             };
-
-            $scope.deleteBulkmeterData = function (item) {
-
-
-                console.log("ekhane aise")
-
-
-                var itemId = item.id;
-                var form_data = {
-                        id: itemId
-                };
-                var bulk_dma_delete_api_url = '../../../../api/wasa/delete-bulk-meter-data';
-                modelDataUploadService.postData(bulk_dma_delete_api_url, form_data).then(function (res) {
-                    if(! res.error){
-                        $scope.report_data.splice(itemId,1);
-                        console.log($scope.report_data);
-                        $scope.init('METER_READING');
-                        $scope.hideModal()
-                    }
-
-                }).catch(function(err){
-                    console.log(err)
-                    $scope.hideModal()
-                });
-
-
-            }
 
             $scope.showModal = function () {
 

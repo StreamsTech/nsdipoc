@@ -341,6 +341,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.humanize',
     'django.contrib.gis',
+    'django_filters',
 
     # Social auth app
     'social.apps.django_app.default',
