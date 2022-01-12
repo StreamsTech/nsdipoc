@@ -132,7 +132,10 @@
                     var filter_url = $scope.data_api_url + '?' + query_string;
                     get_data(filter_url);
                 }
-                get_data($scope.data_api_url);
+                else{
+                    get_data($scope.data_api_url);
+                }
+
             };
 
             $scope.orderData = function (orderValue){
