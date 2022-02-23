@@ -3976,3 +3976,10 @@ footer {
         width: 100%;
     }
 }
+
+.announcement_marque {
+    padding-top:11px;
+    text-align: center;
+    font-size: 25px;
+    color: black;
+ }
