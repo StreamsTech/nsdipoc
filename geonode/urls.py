@@ -90,6 +90,9 @@ urlpatterns = patterns('',
                         # standardization views
                        (r'^standardization/', include('geonode.standardization.urls')),
 
+                        # workshop/training views
+                       (r'^workshop/', include('geonode.workshop_training.urls')),
+
                        # dashboard views
                        (r'^dashboard/', include('geonode.dashboard.urls')),
 
@@ -184,6 +187,7 @@ urlpatterns = patterns('',
                        url(r'^api/nsdi/', include('geonode.nsdi.api.urls')),
                        url(r'^api/list_search/', include('geonode.list_search.api.urls')),
                        url(r'^api/', include('geonode.standardization.api.urls')),
+                       url(r'^api/', include('geonode.workshop_training.api.urls')),
                        url(r'', include(api.urls)),
 
                        # Analytics

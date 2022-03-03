@@ -1,0 +1,95 @@
+{% extends "site_base.html" %}
+{% load i18n %}
+
+{% block body_outer %}
+<div class="gd-content" ng-app="standardizationModule" ng-controller="WorkshopTrainingController" ng-init="init()">
+
+
+    <div class="d-title">
+        <div class="pull-right">
+            <div aria-label="tools" class="btn-group top-site-search" role="group">
+                <div class="input-group">
+                    <input autocomplete="off" class="form-control" ng-model="searchValue"
+                           placeholder="Search DPS" style="height: 38px;border-radius:0;"
+                           type="text">
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" style="padding: 8px 12px;font-size: 14px;"
+                                type="submit" ng-click="filter_data()">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+         Trainings and Workshops on NSDI
+    </div>
+
+    <div class="panel-footer list-pagination">
+      
+            
+                <ul class="pagination">
+                <li ng-class="{'disabled':!previous_url}" ng-click="previous()"><a href="" target="_self"><strong><i class="fa fa-angle-left"></i></strong></a></li>
+                <li><a href="" target="_self">page [{currentPage}] of [{totalPage}] </span></a>
+                </li>
+                <li ng-class="{'disabled':!next_url}" ng-click="next()"><a href="" target="_self"><strong><i class="fa fa-angle-right"></i></strong></a></li>
+            </ul>
+        <a href="{% url "nsdi-dps-create" %}"><button class="btn btn-gd-primary float-right" style="float: right;">Add new</button></a>
+          
+     
+    </div>
+
+    <div ng-show="report_data.length > 0">
+        <div class="table-responsive w-100">
+        <table class="table table-striped mb-0">
+            <thead>
+            <tr>
+                <th><a href="#" ng-click="orderData('organization')">Organization <i class="glyphicon glyphicon-sort"></i></a></th>
+                <th><a href="#" ng-click="orderData('document_type')">Type of Document <i class="glyphicon glyphicon-sort"></i></a></th>
+                <th><a href="#" ng-click="orderData('title')">Title <i class="glyphicon glyphicon-sort"></i></a></th>
+                <th><a href="#" ng-click="orderData('creation_date')">Creation Date <i class="glyphicon glyphicon-sort"></i></a></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="item in report_data">
+                <td>[{item.organization}]</td>
+                <td>[{item.document_type}]</td>
+                <td>[{item.title}]</td>
+                <td>[{item.creation_date}]</td>
+                <td>
+                    [{next_url}]
+                    <a href="[{item.doc_file}]" target="_blank">
+                        <span class="glyphicon glyphicon-download-alt"></span>
+                    </a>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+        </div>
+    </div>
+    <div ng-show="report_data.length == 0">
+
+        <div class="card bg-light mb-3" style="max-width: 18rem;">
+  <div class="card-header">Header</div>
+  <div class="card-body">
+    <h5 class="card-title">Light card title</h5>
+    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+  </div>
+</div>
+        <div class="card bg-light mb-3" style="max-width: 18rem;">
+  <div class="card-header">Header</div>
+  <div class="card-body">
+    <h5 class="card-title">Light card title</h5>
+    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+  </div>
+</div>
+
+        <div class="alert alert-success" role="alert">
+            <h4 class="alert-heading">sorry!</h4>
+            <p>No data matches with your query.</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
