@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
@@ -21,3 +22,14 @@ class WorkshopTrainingListView(TemplateView):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(WorkshopTrainingListView, self).dispatch(*args, **kwargs)
+
+
+class WorkshopTrainingDetailsView(TemplateView):
+    """
+    This view gives the details of a news
+    """
+    template_name = 'workshop_training_detail.html'
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(WorkshopTrainingDetailsView, self).dispatch(*args, **kwargs)
