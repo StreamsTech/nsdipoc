@@ -286,6 +286,7 @@ GEONODE_APPS = (
     #@jahangir091
     'geonode.news',
     'geonode.standardization',
+    'geonode.workshop_training',
     'geonode.dashboard',
     'geonode.cms',
     'geonode.workspace',

@@ -1,0 +1,85 @@
+{% extends "site_base.html" %}
+{% load i18n %}
+
+{% block body_outer %}
+<div class="gd-content" ng-app="standardizationModule" ng-controller="WorkshopDocumentController" ng-init="init()">
+    <div class="pull-right">
+        <a href="{% url "workshop-training-document-create" workshop_pk %}"><button class="btn btn-gd-primary float-right" style="float: right;">Add new</button></a>
+    </div>
+
+    <div class="d-title">
+         General Information
+    </div>
+
+    <div class="panel-footer list-pagination">
+    </div>
+
+    <div ng-show="generalInformation[0].documents.length > 0">
+        <div class="table-responsive w-100">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Tile </th>
+                    <th>Organization</th>
+                    <th>Creation Date</th>
+                </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="item in generalInformation[0].documents">
+                <td>[{item.title}]</td>
+                <td>[{item.organization}]</td>
+                <td>[{item.date_created}]</td>
+                <th><a href="#" ng-click="orderData('organization')">Edit</a></th>
+                <td>
+                    [{next_url}]
+                    <a href="[{item.doc_file}]" target="_blank">
+                        <span class="glyphicon glyphicon-download-alt"></span>
+                    </a>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+
+    <div ng-repeat="dayItem in dayInformation">
+        <div class="d-title">
+         [{dayItem.type}]
+        </div>
+
+        <div class="panel-footer list-pagination">
+        </div>
+
+        <div ng-show="dayItem.documents.length > 0">
+            <div class="table-responsive w-100">
+                <table class="table table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Tile </th>
+                            <th>Organization</th>
+                            <th>Creation Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item2 in dayItem.documents">
+                            <td>[{item2.title}]</td>
+                            <td>[{item2.organization}]</td>
+                            <td>[{item2.date_created}]</td>
+                            <th><a href="#" ng-click="orderData('organization')">Edit</a></th>
+                            <td>
+                                <a href="[{item2.doc_file}]" target="_blank">
+                                    <span class="glyphicon glyphicon-download-alt"></span>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
