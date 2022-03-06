@@ -3,15 +3,15 @@
 
 {% block body_outer %}
 <div class="gd-content" ng-app="standardizationModule" ng-controller="WorkshopDocumentController" ng-init="init()">
-
+    <div class="pull-right">
+        <a href="{% url "workshop-training-document-create" workshop_pk %}"><button class="btn btn-gd-primary float-right" style="float: right;">Add new</button></a>
+    </div>
 
     <div class="d-title">
          General Information
     </div>
 
     <div class="panel-footer list-pagination">
-        <a href="{% url "nsdi-dps-create" %}"><button class="btn btn-gd-primary float-right" style="float: right;">Add new</button></a>
-
     </div>
 
     <div ng-show="generalInformation[0].documents.length > 0">

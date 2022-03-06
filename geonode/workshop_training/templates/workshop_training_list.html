@@ -7,33 +7,13 @@
 
     <div class="d-title">
         <div class="pull-right">
-            <div aria-label="tools" class="btn-group top-site-search" role="group">
-                <div class="input-group">
-                    <input autocomplete="off" class="form-control" ng-model="searchValue"
-                           placeholder="Search DPS" style="height: 38px;border-radius:0;"
-                           type="text">
-                    <span class="input-group-btn">
-                        <button class="btn btn-primary" style="padding: 8px 12px;font-size: 14px;"
-                                type="submit" ng-click="filter_data()">
-                            <i class="fa fa-search"></i>
-                        </button>
-                    </span>
-                </div>
-            </div>
+            <a href="{% url "workshop-training-create" %}"><button class="btn btn-gd-primary float-right" style="float: right;">Add new</button></a>
+
         </div>
          Trainings and Workshops on NSDI
     </div>
 
     <div class="panel-footer list-pagination">
-                <ul class="pagination">
-                <li ng-class="{'disabled':!previous_url}" ng-click="previous()"><a href="" target="_self"><strong><i class="fa fa-angle-left"></i></strong></a></li>
-                <li><a href="" target="_self">page [{currentPage}] of [{totalPage}] </span></a>
-                </li>
-                <li ng-class="{'disabled':!next_url}" ng-click="next()"><a href="" target="_self"><strong><i class="fa fa-angle-right"></i></strong></a></li>
-            </ul>
-        <a href="{% url "nsdi-dps-create" %}"><button class="btn btn-gd-primary float-right" style="float: right;">Add new</button></a>
-
-
     </div>
 
     <div ng-show="report_data.length > 0">
@@ -41,9 +21,9 @@
             <div class="col-md-3" ng-repeat="item in report_data">
                 <a href="#" ng-click="workshopDetails(item.id)">
                 <div class="panel panel-default">
-                    <div class="panel-heading">[{item.title}]</div>
+                    <div class="panel-heading" style="height: 100px; text-align: center;">[{item.title}]</div>
                     <div class="panel-body">[{item.workshop_date_format}]</div>
-                    <div class="panel-footer">[{item.overview}]</div>
+                    <div class="panel-footer" style="height: 100px; text-align: center;">[{item.overview}]</div>
                 </div>
                 </a>
             </div>
