@@ -24,6 +24,8 @@ class WorkshopTrainingSerializer(ModelSerializer):
 class WorkshopDocumentSerializer(ModelSerializer):
     organization = serializers.SerializerMethodField()
     date_created = serializers.SerializerMethodField()
+    editable = serializers.SerializerMethodField()
+
     class Meta:
         model = WorkshopDocument
         fields = '__all__'
@@ -33,6 +35,15 @@ class WorkshopDocumentSerializer(ModelSerializer):
 
     def get_date_created(self, document):
         return document.date_created.strftime("%m %b, %Y")
+
+    def get_editable(self, document):
+        request = self.context.get("request")
+        user = None
+        if request and hasattr(request, "user"):
+            user = request.user
+        if user and user == document.user:
+            return True
+        return False
 
 
 class WorkshopDaySerializer(ModelSerializer):

@@ -318,6 +318,11 @@
             $scope.downloadFile = function (url){
                 $window.location.href = url;
             };
+
+            $scope.documentEdit = function (workshopId, documentId) {
+                $window.location.href = '/workshop/' + workshopId + '/document/' + documentId + '/edit';
+
+            };
         }
 
     ]);

@@ -46,7 +46,7 @@ class WorkshopDocument(models.Model):
     organization = models.ForeignKey(GroupProfile, related_name="documents")
     title = models.CharField(max_length=200)
     doc_file = models.FileField(upload_to='workshop_training')
-    workshop_day = models.ForeignKey(WorkshopDay, related_name="documents")
+    workshop_day = models.ForeignKey(WorkshopDay, verbose_name="Category", related_name="documents")
     description = models.TextField(max_length=300, blank=True, null=True, verbose_name="Description")
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)

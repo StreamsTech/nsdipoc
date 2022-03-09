@@ -29,7 +29,7 @@
                 <td>[{item.title}]</td>
                 <td>[{item.organization}]</td>
                 <td>[{item.date_created}]</td>
-                <th><a href="#" ng-click="orderData('organization')">Edit</a></th>
+                <th ng-show="item2.editable">><a href="#" ng-click="documentEdit(generalInformation[0].training_course.id, item.id)">Edit</a></th>
                 <td>
                     [{next_url}]
                     <a href="[{item.doc_file}]" target="_blank">
@@ -67,7 +67,7 @@
                             <td>[{item2.title}]</td>
                             <td>[{item2.organization}]</td>
                             <td>[{item2.date_created}]</td>
-                            <th><a href="#" ng-click="orderData('organization')">Edit</a></th>
+                            <th ng-show="item2.editable"><a href="#" ng-click="documentEdit(dayItem.training_course.id, item2.id)">Edit</a></th>
                             <td>
                                 <a href="[{item2.doc_file}]" target="_blank">
                                     <span class="glyphicon glyphicon-download-alt"></span>

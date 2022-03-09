@@ -25,7 +25,6 @@ class WorkshopTrainingListApiView(ModelViewSet):
         return serializer_class
 
 
-
 class WorkshopDocumentsListApiView(ModelViewSet):
 
     def get_queryset(self):

@@ -55,12 +55,6 @@ class WorkshopTrainingCreateView(CreateView):
         else:
             return response
 
-    # def form_valid(self, form):
-    #     self.object = form.save(commit=False)
-    #     self.object.publish_date = form.data['publish_date']
-    #     self.object.save()
-    #     return HttpResponseRedirect(self.get_success_url())
-
     def get_success_url(self):
         for day in range(self.object.days + 1):
             type = DAY_TYPE_SLUGS[day]
@@ -70,24 +64,47 @@ class WorkshopTrainingCreateView(CreateView):
 
 class WorkshopTrainingDocumentCreateView(CreateView):
     """
-    This view is for creating new WorkshopTraining
+    This view is for creating new WorkshopTraining Document
     """
     template_name = 'workshop_training_document_create.html'
     model = WorkshopDocument
 
     def get_success_url(self):
-        return reverse('workshop-training-details', kwargs={'workshop_pk': self.object.id})
+        return reverse('workshop-training-details', kwargs={'workshop_pk': self.kwargs['workshop_pk']})
 
-    def get_context_data(self, **kwargs):
-        context = super(WorkshopTrainingDocumentCreateView, self).get_context_data(**kwargs)
-        context['user_name'] = self.request.user.username
-        context['organization'] = get_organization(self.request.user).title
-        return context
+    def get_form_class(self):
+        return WorkshopDocumentCreateForm
 
-    def get_form(self, form_class=None):
-        initial = {
-            'user': self.request.user
-        }
-        form_class = WorkshopDocumentCreateForm(data=initial)
-        return form_class
+    def get_form_kwargs(self):
+        kwargs = super(WorkshopTrainingDocumentCreateView, self).get_form_kwargs()
+        kwargs['workshop_pk'] = self.kwargs['workshop_pk']
+        kwargs['user_id'] = self.request.user.id
+        return kwargs
 
+
+class WorkshopTrainingDocumentDetailsView(DetailView):
+    """
+    This view gives the details of a Workshop training document
+    """
+    template_name = 'document_details.html'
+
+    def get_object(self):
+        return WorkshopDocument.objects.get(pk=self.kwargs['document_pk'])
+
+
+class WorkshopTrainingDocumentEditView(UpdateView):
+    template_name = 'workshop_training_document_update.html'
+    model = WorkshopDocument
+    form_class = WorkshopDocumentCreateForm
+
+    def get_object(self):
+        return WorkshopDocument.objects.get(pk=self.kwargs['document_pk'])
+
+    def get_success_url(self):
+        return reverse('workshop-training-details', kwargs={'workshop_pk': self.kwargs['workshop_pk']})
+
+    def get_form_kwargs(self):
+        kwargs = super(WorkshopTrainingDocumentEditView, self).get_form_kwargs()
+        kwargs['workshop_pk'] = self.kwargs['workshop_pk']
+        kwargs['user_id'] = self.request.user.id
+        return kwargs

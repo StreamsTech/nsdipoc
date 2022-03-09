@@ -6,10 +6,11 @@
 
 
     <div class="d-title">
+        {% if request.user.is_superuser %}
         <div class="pull-right">
             <a href="{% url "workshop-training-create" %}"><button class="btn btn-gd-primary float-right" style="float: right;">Add new</button></a>
-
         </div>
+        {% endif %}
          Trainings and Workshops on NSDI
     </div>
 
