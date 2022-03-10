@@ -1,0 +1,18 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% block title %} {% trans "NSDI Policy" %} - {{ block.super }} {% endblock %}
+
+{% block body_outer %}
+<style>
+    .pdfobject-container { height: 650px; width: 800px; }
+</style>
+<div class="gd-content">
+    <div class="container">
+        <div class="col-md-2"></div>
+        <div id="policy-pdf" class="col-md-8"></div>
+    </div>
+</div>
+<script src="{{ STATIC_URL }}js/pdfObject.js"></script>
+<script>PDFObject.embed("{{ STATIC_URL }}nsdi_policy.pdf", "#policy-pdf");</script>
+{% endblock %}
