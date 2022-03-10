@@ -15,10 +15,10 @@ class WorkshopTrainingSerializer(ModelSerializer):
 
     def get_workshop_date_format(self, workshop):
         if workshop.days == 1:
-            return "Date: "+ workshop.date_from.strftime("%m %b, %Y")
+            return "Date: "+ workshop.date_from.strftime("%d %b, %Y")
         if workshop.days == 2:
-            return "Date: " + workshop.date_from.strftime("%m %b") + " and " + workshop.date_to.strftime("%m %b, %Y")
-        return "Date: From " + workshop.date_from.strftime("%m %b") + " to " + workshop.date_to.strftime("%m %b, %Y")
+            return "Date: " + workshop.date_from.strftime("%d %b") + " and " + workshop.date_to.strftime("%d %b, %Y")
+        return "Date: From " + workshop.date_from.strftime("%d %b") + " to " + workshop.date_to.strftime("%d %b, %Y")
 
 
 class WorkshopDocumentSerializer(ModelSerializer):
@@ -48,6 +48,7 @@ class WorkshopDocumentSerializer(ModelSerializer):
 
 class WorkshopDaySerializer(ModelSerializer):
     documents = WorkshopDocumentSerializer(many=True, read_only=True)
+
     class Meta:
         model = WorkshopDay
         fields = '__all__'
