@@ -21,6 +21,7 @@
                 <tr>
                     <th>Tile </th>
                     <th>Organization</th>
+                    <th>Uploaded by</th>
                     <th>Creation Date</th>
                 </tr>
             </thead>
@@ -28,6 +29,7 @@
             <tr ng-repeat="item in generalInformation[0].documents">
                 <td>[{item.title}]</td>
                 <td>[{item.organization}]</td>
+                <td>[{item.user}]</td>
                 <td>[{item.date_created}]</td>
                 <th ng-show="item2.editable">><a href="#" ng-click="documentEdit(generalInformation[0].training_course.id, item.id)">Edit</a></th>
                 <td>
@@ -59,6 +61,7 @@
                         <tr>
                             <th>Tile </th>
                             <th>Organization</th>
+                            <th>Uploaded by</th>
                             <th>Creation Date</th>
                         </tr>
                     </thead>
@@ -66,6 +69,7 @@
                         <tr ng-repeat="item2 in dayItem.documents">
                             <td>[{item2.title}]</td>
                             <td>[{item2.organization}]</td>
+                            <td>[{item2.user}]</td>
                             <td>[{item2.date_created}]</td>
                             <th ng-show="item2.editable"><a href="#" ng-click="documentEdit(dayItem.training_course.id, item2.id)">Edit</a></th>
                             <td>
