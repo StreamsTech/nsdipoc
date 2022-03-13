@@ -34,7 +34,7 @@ class WorkshopDocumentSerializer(ModelSerializer):
         return document.organization.title
 
     def get_date_created(self, document):
-        return document.date_created.strftime("%m %b, %Y")
+        return document.date_created.strftime("%d %b, %Y")
 
     def get_editable(self, document):
         request = self.context.get("request")
