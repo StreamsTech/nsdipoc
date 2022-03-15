@@ -1,4 +1,5 @@
-from django.shortcuts import render
+import requests
+from django.shortcuts import render, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
@@ -6,7 +7,11 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.template import RequestContext, loader
+from django.http import HttpResponseForbidden
+from django.http import Http404
 
+from geonode.authentication_decorators import document_delete_permission_required
 from geonode.nsdi.utils import get_organization
 from models import WorkshopTraining, WorkshopDay, DAY_TYPE_SLUGS, WorkshopDocument
 from forms import WorkshopCreateForm, WorkshopDocumentCreateForm
@@ -108,3 +113,25 @@ class WorkshopTrainingDocumentEditView(UpdateView):
         kwargs['workshop_pk'] = self.kwargs['workshop_pk']
         kwargs['user_id'] = self.request.user.id
         return kwargs
+
+
+class WorkshopTrainingDocumentDeleteView(DeleteView):
+    template_name = 'document_delete.html'
+    model = WorkshopDocument
+
+    def get_success_url(self):
+        return reverse('workshop-training-details', kwargs={'workshop_pk': self.kwargs['workshop_pk']})
+
+    @method_decorator(login_required)
+    @method_decorator(document_delete_permission_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(WorkshopTrainingDocumentDeleteView, self).dispatch(request, *args, **kwargs)
+
+    def get_object(self):
+        id = self.kwargs['document_pk']
+        return get_object_or_404(WorkshopDocument, id=id)
+
+    def get_context_data(self, **kwargs):
+        context = super(WorkshopTrainingDocumentDeleteView, self).get_context_data(**kwargs)
+        context['workshop_pk'] = self.kwargs['workshop_pk']
+        return context

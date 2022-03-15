@@ -323,6 +323,11 @@
                 $window.location.href = '/workshop/' + workshopId + '/document/' + documentId + '/edit';
 
             };
+
+            $scope.documentDelete = function (workshopId, documentId) {
+                $window.location.href = '/workshop/' + workshopId + '/document/' + documentId + '/delete';
+
+            };
         }
 
     ]);

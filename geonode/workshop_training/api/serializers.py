@@ -25,6 +25,7 @@ class WorkshopDocumentSerializer(ModelSerializer):
     organization = serializers.SerializerMethodField()
     date_created = serializers.SerializerMethodField()
     editable = serializers.SerializerMethodField()
+    delete = serializers.SerializerMethodField()
     user = serializers.SerializerMethodField()
 
     class Meta:
@@ -46,6 +47,15 @@ class WorkshopDocumentSerializer(ModelSerializer):
         if request and hasattr(request, "user"):
             user = request.user
         if user and user == document.user:
+            return True
+        return False
+
+    def get_delete(self, document):
+        request = self.context.get("request")
+        user = None
+        if request and hasattr(request, "user"):
+            user = request.user
+        if user and user.username in ['dlamsal', 'fujita', 'jahangir']:
             return True
         return False
 

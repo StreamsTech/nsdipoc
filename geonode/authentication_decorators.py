@@ -30,3 +30,20 @@ def manager_required(fn):
                 status=403)
         return fn(*args, **kwrgs)
     return wrapper
+
+
+def document_delete_permission_required(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwrgs):
+        from django.core.handlers.wsgi import WSGIRequest
+        request = [a for a in args if isinstance(a, WSGIRequest)][0]
+        user = request.__dict__.get('user', None) if request else None
+        if not user.username in ['dlamsal', 'fujita', 'jahangir']:
+            return HttpResponse(
+                loader.render_to_string(
+                    '401.html', RequestContext(
+                        request, {
+                            'error_message': _("You are not allowed to perform this job.")})),
+                status=403)
+        return fn(*args, **kwrgs)
+    return wrapper

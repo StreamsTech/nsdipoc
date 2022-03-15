@@ -31,7 +31,8 @@
                 <td>[{item.organization}]</td>
                 <td>[{item.user}]</td>
                 <td>[{item.date_created}]</td>
-                <th ng-show="item2.editable">><a href="#" ng-click="documentEdit(generalInformation[0].training_course.id, item.id)">Edit</a></th>
+                <th ng-show="item.editable"><a href="#" ng-click="documentEdit(generalInformation[0].training_course.id, item.id)">Edit</a></th>
+                <th ng-show="item.delete"><a href="#" ng-click="documentDelete(generalInformation[0].training_course.id, item.id)">Delete</a></th>
                 <td>
                     [{next_url}]
                     <a href="[{item.doc_file}]" target="_blank">
@@ -72,6 +73,7 @@
                             <td>[{item2.user}]</td>
                             <td>[{item2.date_created}]</td>
                             <th ng-show="item2.editable"><a href="#" ng-click="documentEdit(dayItem.training_course.id, item2.id)">Edit</a></th>
+                            <th ng-show="item2.delete"><a href="#" ng-click="documentDelete(dayItem.training_course.id, item2.id)">Delete</a></th>
                             <td>
                                 <a href="[{item2.doc_file}]" target="_blank">
                                     <span class="glyphicon glyphicon-download-alt"></span>

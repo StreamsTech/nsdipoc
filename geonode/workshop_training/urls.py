@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 
 from geonode.workshop_training.views import WorkshopTrainingListView, WorkshopTrainingDetailsView, WorkshopTrainingCreateView
 from geonode.workshop_training.views import WorkshopTrainingDocumentCreateView, WorkshopTrainingDocumentDetailsView, WorkshopTrainingDocumentEditView
+from geonode.workshop_training.views import WorkshopTrainingDocumentDeleteView
 
 
 urlpatterns = patterns(
@@ -15,6 +16,7 @@ urlpatterns = patterns(
     url(r'^(?P<workshop_pk>[0-9]+)/details$', WorkshopTrainingDetailsView.as_view(), name='workshop-training-details'),
     url(r'^(?P<workshop_pk>[0-9]+)/document/(?P<document_pk>[0-9]+)/details$', WorkshopTrainingDocumentDetailsView.as_view(), name='workshop-training-document-details'),
     url(r'^(?P<workshop_pk>[0-9]+)/document/(?P<document_pk>[0-9]+)/edit$', WorkshopTrainingDocumentEditView.as_view(), name='workshop-training-document-edit'),
+    url(r'^(?P<workshop_pk>[0-9]+)/document/(?P<document_pk>[0-9]+)/delete$', WorkshopTrainingDocumentDeleteView.as_view(), name='workshop-training-document-delete'),
     # url(r'^data-product-specification-create/?$',DPSCreateView.as_view(), name='nsdi-dps-create'),
 
 )
