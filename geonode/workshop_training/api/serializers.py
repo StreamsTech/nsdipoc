@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 
@@ -55,7 +56,7 @@ class WorkshopDocumentSerializer(ModelSerializer):
         user = None
         if request and hasattr(request, "user"):
             user = request.user
-        if user and user.username in ['dlamsal', 'fujita', 'jahangir']:
+        if user and user.username in settings.DOCUMENT_DELETE_PERMISSION_USER_LIST:
             return True
         return False
 

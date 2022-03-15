@@ -1,4 +1,6 @@
 from functools import wraps
+
+from django.conf import settings
 from django.http import HttpResponse
 from django.template import RequestContext, loader
 from django.utils.translation import ugettext as _
@@ -38,7 +40,7 @@ def document_delete_permission_required(fn):
         from django.core.handlers.wsgi import WSGIRequest
         request = [a for a in args if isinstance(a, WSGIRequest)][0]
         user = request.__dict__.get('user', None) if request else None
-        if not user.username in ['dlamsal', 'fujita', 'jahangir']:
+        if not user.username in settings.DOCUMENT_DELETE_PERMISSION_USER_LIST:
             return HttpResponse(
                 loader.render_to_string(
                     '401.html', RequestContext(
